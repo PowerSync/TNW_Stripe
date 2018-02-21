@@ -1,5 +1,5 @@
 {
-  "name": "pmclain/module-stripe",
+  "name": "tnw/module-stripe",
   "description": "Stripe Payments for Magento 2",
   "type": "magento2-module",
   "license": "OSL-3.0",
@@ -13,7 +13,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "Pmclain\\Stripe\\": ""
+      "TNW\\Stripe\\": ""
     }
   }
 }

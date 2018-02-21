@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -33,10 +33,10 @@
                             <item name="renders" xsi:type="array">
                               <!-- merge payment method renders here -->
                               <item name="children" xsi:type="array">
-                                <item name="pmclain_stripe" xsi:type="array">
-                                  <item name="component" xsi:type="string">Pmclain_Stripe/js/view/payment/pmclain_stripe</item>
+                                <item name="tnw_stripe" xsi:type="array">
+                                  <item name="component" xsi:type="string">TNW_Stripe/js/view/payment/tnw_stripe</item>
                                   <item name="methods" xsi:type="array">
-                                    <item name="pmclain_stripe" xsi:type="array">
+                                    <item name="tnw_stripe" xsi:type="array">
                                       <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                     </item>
                                   </item>

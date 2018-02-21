@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,12 +8,12 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Model\Ui;
+namespace TNW\Stripe\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -22,8 +22,8 @@ use Magento\Store\Model\ScopeInterface;
 
 class ConfigProvider implements ConfigProviderInterface
 {
-  const CODE = 'pmclain_stripe';
-  const CC_VAULT_CODE = 'pmclain_stripe_vault';
+  const CODE = 'tnw_stripe';
+  const CC_VAULT_CODE = 'tnw_stripe_vault';
 
   protected $_config;
   protected $_encryptor;
@@ -65,6 +65,6 @@ class ConfigProvider implements ConfigProviderInterface
   }
 
   protected function _getConfig($value) {
-    return $this->_config->getValue('payment/pmclain_stripe/' . $value, ScopeInterface::SCOPE_STORE);
+    return $this->_config->getValue('payment/tnw_stripe/' . $value, ScopeInterface::SCOPE_STORE);
   }
 }

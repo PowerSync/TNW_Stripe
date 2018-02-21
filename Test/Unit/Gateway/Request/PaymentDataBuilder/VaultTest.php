@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,17 +8,17 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Test\Unit\Gateway\PaymentDataBuilder;
+namespace TNW\Stripe\Test\Unit\Gateway\PaymentDataBuilder;
 
-use Pmclain\Stripe\Gateway\Request\PaymentDataBuilder;
-use Pmclain\Stripe\Gateway\Request\PaymentDataBuilder\Vault;
+use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
+use TNW\Stripe\Gateway\Request\PaymentDataBuilder\Vault;
 use \PHPUnit_Framework_MockObject_MockObject as MockObject;
-use Pmclain\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
@@ -28,7 +28,7 @@ use Magento\Customer\Model\Session;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\AttributeInterface;
-use Pmclain\Stripe\Gateway\Config\Config;
+use TNW\Stripe\Gateway\Config\Config;
 
 
 class VaultTest extends \PHPUnit\Framework\TestCase

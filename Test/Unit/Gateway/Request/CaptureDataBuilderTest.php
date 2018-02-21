@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,25 +8,25 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Test\Unit\Gateway\Request;
+namespace TNW\Stripe\Test\Unit\Gateway\Request;
 
-use Pmclain\Stripe\Gateway\Request\CaptureDataBuilder;
+use TNW\Stripe\Gateway\Request\CaptureDataBuilder;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Sales\Model\Order\Payment;
-use Pmclain\Stripe\Gateway\Helper\SubjectReader;
-use Pmclain\Stripe\Helper\Payment\Formatter;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Helper\Payment\Formatter;
 
 class CaptureDataBuilderTest extends \PHPUnit\Framework\TestCase
 {
   use Formatter;
 
   /**
-   * @var \Pmclain\Stripe\Gateway\Request\CaptureDataBuilder
+   * @var \TNW\Stripe\Gateway\Request\CaptureDataBuilder
    */
   private $builder;
 

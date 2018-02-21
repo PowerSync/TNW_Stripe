@@ -10,8 +10,8 @@ define(
     'use strict';
     rendererList.push(
       {
-        type: 'pmclain_stripe',
-        component: 'Pmclain_Stripe/js/view/payment/method-renderer/pmclain_stripe'
+        type: 'tnw_stripe',
+        component: 'TNW_Stripe/js/view/payment/method-renderer/tnw_stripe'
       }
     );
     /** Add view logic here if needed */

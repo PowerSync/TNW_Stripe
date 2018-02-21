@@ -1,7 +1,7 @@
 <?php
 use Magento\Vault\Model\Ui\TokenUiComponentProviderInterface;
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@ use Magento\Vault\Model\Ui\TokenUiComponentProviderInterface;
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -21,7 +21,7 @@ $icon = $block->getData('icons')[$details['type']];
 $id = $block->escapeHtml($block->getData('id'));
 ?>
 <div data-mage-init='{
-        "Pmclain_Stripe/js/vault": {
+        "TNW_Stripe/js/vault": {
             "container": "payment_<?php /* @noEscape */ echo $id; ?>",
             "publicHash": "<?php echo $block->escapeHtml($block->getData(TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH)); ?>",
             "code": "<?php echo $block->escapeHtml($block->getData('code')); ?>",

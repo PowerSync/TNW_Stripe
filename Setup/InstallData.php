@@ -1,6 +1,6 @@
 <?php
 
-namespace Pmclain\Stripe\Setup;
+namespace TNW\Stripe\Setup;
 
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\InstallDataInterface;

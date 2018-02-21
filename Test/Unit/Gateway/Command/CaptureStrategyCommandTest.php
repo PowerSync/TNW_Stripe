@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,15 +8,15 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Test\Unit\Gateway\Command;
+namespace TNW\Stripe\Test\Unit\Gateway\Command;
 
-use Pmclain\Stripe\Gateway\Command\CaptureStrategyCommand;
-use Pmclain\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Gateway\Command\CaptureStrategyCommand;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -28,7 +28,7 @@ use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory;
-use Pmclain\Stripe\Model\Adapter\StripeAdapter;
+use TNW\Stripe\Model\Adapter\StripeAdapter;
 
 class CaptureStrategyCommandTest extends \PHPUnit\Framework\TestCase
 {
@@ -108,7 +108,7 @@ class CaptureStrategyCommandTest extends \PHPUnit\Framework\TestCase
   }
 
   /**
-   * @covers \Pmclain\Stripe\Gateway\Command\CaptureStrategyCommand::execute
+   * @covers \TNW\Stripe\Gateway\Command\CaptureStrategyCommand::execute
    */
   public function testSaleExecute()
   {

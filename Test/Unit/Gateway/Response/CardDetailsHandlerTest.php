@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,18 +8,18 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Test\Unit\Gateway\Response;
+namespace TNW\Stripe\Test\Unit\Gateway\Response;
 
-use Pmclain\Stripe\Gateway\Response\CardDetailsHandler;
+use TNW\Stripe\Gateway\Response\CardDetailsHandler;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Sales\Model\Order\Payment;
-use Pmclain\Stripe\Gateway\Config\Config;
-use Pmclain\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Gateway\Config\Config;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 
 class CardDetailsHandlerTest extends \PHPUnit\Framework\TestCase
 {

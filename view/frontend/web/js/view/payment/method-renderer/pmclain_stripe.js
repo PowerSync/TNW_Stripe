@@ -26,7 +26,7 @@ define(
 
     return Component.extend({
       defaults: {
-        template: 'Pmclain_Stripe/payment/form',
+        template: 'TNW_Stripe/payment/form',
         stripe: null,
         stripeCardElement: null,
         stripeCard: null,
@@ -108,7 +108,7 @@ define(
       },
 
       getCode: function() {
-        return 'pmclain_stripe';
+        return 'tnw_stripe';
       },
 
       isActive: function() {

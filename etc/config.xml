@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -18,7 +18,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
   <default>
     <payment>
-      <pmclain_stripe>
+      <tnw_stripe>
         <model>StripeFacade</model>
         <payment_action>authorize</payment_action>
         <active>0</active>
@@ -41,14 +41,14 @@
         <useccv>1</useccv>
         <cctypes_stripe_mapper><![CDATA[{"american-express":"AE","discover":"DI","jcb":"JCB","mastercard":"MC","master-card":"MC","visa":"VI","maestro":"MI","diners-club":"DN","unionpay":"CUP"}]]></cctypes_stripe_mapper>
         <order_status>processing</order_status>
-      </pmclain_stripe>
-      <pmclain_stripe_vault>
+      </tnw_stripe>
+      <tnw_stripe_vault>
         <model>StripeCreditCardVaultFacade</model>
         <title>Stored Cards (Stripe)</title>
         <instant_purchase>
           <supported>1</supported>
         </instant_purchase>
-      </pmclain_stripe_vault>
+      </tnw_stripe_vault>
     </payment>
   </default>
 </config>

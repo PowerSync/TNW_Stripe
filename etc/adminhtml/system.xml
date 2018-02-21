@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -18,7 +18,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
   <system>
     <section id="payment">
-      <group id="pmclain_stripe" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+      <group id="tnw_stripe" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Stripe</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Enabled</label>
@@ -26,7 +26,7 @@
         </field>
         <field id="payment_action" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Payment Action</label>
-          <source_model>Pmclain\Stripe\Model\Adminhtml\Source\PaymentAction</source_model>
+          <source_model>TNW\Stripe\Model\Adminhtml\Source\PaymentAction</source_model>
         </field>
         <field id="order_status" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>New Order Status</label>
@@ -61,7 +61,7 @@
         </field>
         <field id="cctypes" translate="label" type="multiselect" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Credit Card Types</label>
-          <source_model>Pmclain\Stripe\Model\Adminhtml\Source\Cctype</source_model>
+          <source_model>TNW\Stripe\Model\Adminhtml\Source\Cctype</source_model>
         </field>
         <field id="useccv" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Credit Card Verification</label>
@@ -71,10 +71,10 @@
           <label>Payment from Applicable Countries</label>
           <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
         </field>
-        <field id="pmclain_stripe_vault_active" translate="label" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="tnw_stripe_vault_active" translate="label" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Allow Stored Credit Cards</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <config_path>payment/pmclain_stripe_vault/active</config_path>
+          <config_path>payment/tnw_stripe_vault/active</config_path>
         </field>
         <field id="specificcountry" translate="label" type="multiselect" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Payment from Specific Countries</label>

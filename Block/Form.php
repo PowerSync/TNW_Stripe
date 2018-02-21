@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,19 +8,19 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Block;
+namespace TNW\Stripe\Block;
 
-use Pmclain\Stripe\Gateway\Config\Config as GatewayConfig;
+use TNW\Stripe\Gateway\Config\Config as GatewayConfig;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Block\Form\Cc;
 use Magento\Payment\Model\Config;
 use Magento\Payment\Helper\Data as Helper;
-use Pmclain\Stripe\Model\Ui\ConfigProvider;
+use TNW\Stripe\Model\Ui\ConfigProvider;
 
 class Form extends Cc
 {

@@ -24,13 +24,13 @@ cd magento2
 
 # add composer package under test, composer require will trigger update/install
 composer config minimum-stability dev
-composer config repositories.travis_to_test git https://github.com/pmclain/module-stripe.git
-composer require pmclain/module-stripe:dev-master#$TRAVIS_COMMIT
+composer config repositories.travis_to_test git https://github.com/tnw/module-stripe.git
+composer require tnw/module-stripe:dev-master#$TRAVIS_COMMIT
 
 # prepare for test suite
 case $TEST_SUITE in
     integration)
-        cp vendor/pmclain/module-stripe/Test/Integration/phpunit.xml.dist dev/tests/integration/phpunit.xml
+        cp vendor/tnw/module-stripe/Test/Integration/phpunit.xml.dist dev/tests/integration/phpunit.xml
 
         cd dev/tests/integration
 
@@ -58,6 +58,6 @@ case $TEST_SUITE in
         cd ../../..
         ;;
     unit)
-        cp vendor/pmclain/module-stripe/Test/Unit/phpunit.xml.dist dev/tests/unit/phpunit.xml
+        cp vendor/tnw/module-stripe/Test/Unit/phpunit.xml.dist dev/tests/unit/phpunit.xml
     ;;
 esac

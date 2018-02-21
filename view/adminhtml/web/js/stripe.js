@@ -14,7 +14,7 @@ define([
     defaults: {
       $selector: null,
       selector: 'edit_form',
-      container: 'payment_form_pmclain_stripe',
+      container: 'payment_form_tnw_stripe',
       active: false,
       scriptLoaded: false,
       stripe: null,
@@ -72,7 +72,7 @@ define([
      */
     onActiveChange: function (isActive) {
       if (!isActive) {
-        this.$selector.off('submitOrder.pmclain_stripe');
+        this.$selector.off('submitOrder.tnw_stripe');
 
         return;
       }
@@ -127,7 +127,7 @@ define([
      * Enable form event listeners
      */
     enableEventListeners: function () {
-      this.$selector.on('submitOrder.pmclain_stripe', this.submitOrder.bind(this));
+      this.$selector.on('submitOrder.tnw_stripe', this.submitOrder.bind(this));
     },
 
     /**
