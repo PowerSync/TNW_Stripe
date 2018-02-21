@@ -23,44 +23,49 @@ class SubjectReader
    * @param array $subject
    * @return array
    */
-  public function readResponseObject(array $subject) {
-    $response = Helper\SubjectReader::readResponse($subject);
+    public function readResponseObject(array $subject)
+    {
+        $response = Helper\SubjectReader::readResponse($subject);
 
-    if(!is_object($response['object'])) {
-      throw new \InvalidArgumentException('Response object does not exist');
+        if (!is_object($response['object'])) {
+            throw new \InvalidArgumentException('Response object does not exist');
+        }
+
+        if ($response['object'] instanceof \Stripe\Error\Card) {
+            return [
+            'error' => true,
+            'message' => __($response['object']->getMessage())
+            ];
+        }
+
+        return $response['object']->__toArray();
     }
 
-    if($response['object'] instanceof \Stripe\Error\Card) {
-      return [
-        'error' => true,
-        'message' => __($response['object']->getMessage())
-      ];
+    public function readPayment(array $subject)
+    {
+        return Helper\SubjectReader::readPayment($subject);
     }
 
-    return $response['object']->__toArray();
-  }
+    public function readTransaction(array $subject)
+    {
+        if (!is_object($subject['object'])) {
+            throw new \InvalidArgumentException('Response object does not exist');
+        }
 
-  public function readPayment(array $subject) {
-    return Helper\SubjectReader::readPayment($subject);
-  }
-
-  public function readTransaction(array $subject) {
-    if(!is_object($subject['object'])) {
-      throw new \InvalidArgumentException('Response object does not exist');
+        return $subject['object']->__toArray();
     }
 
-    return $subject['object']->__toArray();
-  }
-
-  public function readAmount(array $subject) {
-    return Helper\SubjectReader::readAmount($subject);
-  }
-
-  public function readCustomerId(array $subject) {
-    if(!isset($subject['customer_id'])) {
-      throw new \InvalidArgumentException('The customerId field does not exist');
+    public function readAmount(array $subject)
+    {
+        return Helper\SubjectReader::readAmount($subject);
     }
 
-    return (int) $subject['customer_id'];
-  }
+    public function readCustomerId(array $subject)
+    {
+        if (!isset($subject['customer_id'])) {
+            throw new \InvalidArgumentException('The customerId field does not exist');
+        }
+
+        return (int) $subject['customer_id'];
+    }
 }

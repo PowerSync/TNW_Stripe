@@ -19,10 +19,11 @@ use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 
 class TransactionRefund extends AbstractTransaction
 {
-  protected function process(array $data) {
-    return $this->adapter->refund(
-      $data['transaction_id'],
-      $data[PaymentDataBuilder::AMOUNT]
-    );
-  }
+    protected function process(array $data)
+    {
+        return $this->adapter->refund(
+            $data['transaction_id'],
+            $data[PaymentDataBuilder::AMOUNT]
+        );
+    }
 }

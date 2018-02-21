@@ -17,28 +17,28 @@ namespace TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 
 use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 
-
 class Vault extends PaymentDataBuilder
 {
-  public function build(array $subject) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $payment = $paymentDataObject->getPayment();
-    $order = $paymentDataObject->getOrder();
+    public function build(array $subject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $payment = $paymentDataObject->getPayment();
+        $order = $paymentDataObject->getOrder();
 
-    $extensionAttributes = $payment->getExtensionAttributes();
-    $paymentToken = $extensionAttributes->getVaultPaymentToken();
+        $extensionAttributes = $payment->getExtensionAttributes();
+        $paymentToken = $extensionAttributes->getVaultPaymentToken();
 
-    $stripeCustomerId = $this->getStripeCustomerId();
+        $stripeCustomerId = $this->getStripeCustomerId();
     
-    $result = [
-      self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
-      self::ORDER_ID => $order->getOrderIncrementId(),
-      self::CURRENCY => $this->config->getCurrency(),
-      self::SOURCE => $paymentToken->getGatewayToken(),
-      self::CAPTURE => 'false',
-      self::CUSTOMER => $stripeCustomerId
-    ];
+        $result = [
+        self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
+        self::ORDER_ID => $order->getOrderIncrementId(),
+        self::CURRENCY => $this->config->getCurrency(),
+        self::SOURCE => $paymentToken->getGatewayToken(),
+        self::CAPTURE => 'false',
+        self::CUSTOMER => $stripeCustomerId
+        ];
 
-    return $result;
-  }
+        return $result;
+    }
 }

@@ -26,93 +26,99 @@ class TransactionSaleTest extends \PHPUnit\Framework\TestCase
   /**
    * @var TransactionSale
    */
-  private $model;
+    private $model;
 
   /**
    * @var Logger|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $loggerMock;
+    private $loggerMock;
 
   /**
    * @var StripeAdapter|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $adapter;
+    private $adapter;
 
-  protected function setUp() {
-    $criticalLoggerMock = $this->getMockForAbstractClass(LoggerInterface::class);
-    $this->loggerMock = $this->getMockBuilder(Logger::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->adapter = $this->getMockBuilder(StripeAdapter::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    protected function setUp()
+    {
+        $criticalLoggerMock = $this->getMockForAbstractClass(LoggerInterface::class);
+        $this->loggerMock = $this->getMockBuilder(Logger::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+        $this->adapter = $this->getMockBuilder(StripeAdapter::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->model = new TransactionSale($criticalLoggerMock, $this->loggerMock, $this->adapter);
-  }
+        $this->model = new TransactionSale($criticalLoggerMock, $this->loggerMock, $this->adapter);
+    }
 
   /**
    * @expectedException \Magento\Payment\Gateway\Http\ClientException
    * @expectedExceptionMessage Test message
    */
-  public function testPlaceRequestException() {
-    $this->loggerMock->expects($this->once())
-      ->method('debug')
-      ->with(
-        [
-          'request' => $this->getTransferData(),
-          'client' => TransactionSale::class,
-          'response' => []
-        ]
-      );
+    public function testPlaceRequestException()
+    {
+        $this->loggerMock->expects($this->once())
+        ->method('debug')
+        ->with(
+            [
+            'request' => $this->getTransferData(),
+            'client' => TransactionSale::class,
+            'response' => []
+            ]
+        );
 
-    $this->adapter->expects($this->once())
-      ->method('sale')
-      ->willThrowException(new \Exception('Test message'));
+        $this->adapter->expects($this->once())
+        ->method('sale')
+        ->willThrowException(new \Exception('Test message'));
 
-    $transferObjectMock = $this->getTransferObjectMock();
+        $transferObjectMock = $this->getTransferObjectMock();
 
-    $this->model->placeRequest($transferObjectMock);
-  }
+        $this->model->placeRequest($transferObjectMock);
+    }
 
-  public function testPlaceRequestSuccess() {
-    $response = $this->getResponseObject();
-    $this->adapter->expects($this->once())
-      ->method('sale')
-      ->willReturn($response);
+    public function testPlaceRequestSuccess()
+    {
+        $response = $this->getResponseObject();
+        $this->adapter->expects($this->once())
+        ->method('sale')
+        ->willReturn($response);
 
-    $this->loggerMock->expects($this->once())
-      ->method('debug')
-      ->with(
-        [
-          'request' => $this->getTransferData(),
-          'client' => TransactionSale::class,
-          'response' => ['success' => 1]
-        ]
-      );
+        $this->loggerMock->expects($this->once())
+        ->method('debug')
+        ->with(
+            [
+            'request' => $this->getTransferData(),
+            'client' => TransactionSale::class,
+            'response' => ['success' => 1]
+            ]
+        );
 
-    $actualResult = $this->model->placeRequest($this->getTransferObjectMock());
+        $actualResult = $this->model->placeRequest($this->getTransferObjectMock());
 
-    $this->assertTrue(is_object($actualResult['object']));
-    $this->assertEquals(['object' => $response], $actualResult);
-  }
+        $this->assertTrue(is_object($actualResult['object']));
+        $this->assertEquals(['object' => $response], $actualResult);
+    }
 
-  private function getTransferData() {
-    return ['test-data-key' => 'test-data-value'];
-  }
+    private function getTransferData()
+    {
+        return ['test-data-key' => 'test-data-value'];
+    }
 
-  private function getTransferObjectMock() {
-    $transferObjectMock = $this->createMock(TransferInterface::class);
-    $transferObjectMock->expects($this->once())
-      ->method('getBody')
-      ->willReturn($this->getTransferData());
+    private function getTransferObjectMock()
+    {
+        $transferObjectMock = $this->createMock(TransferInterface::class);
+        $transferObjectMock->expects($this->once())
+        ->method('getBody')
+        ->willReturn($this->getTransferData());
 
-    return $transferObjectMock;
-  }
+        return $transferObjectMock;
+    }
 
-  private function getResponseObject() {
-    $object = new \stdClass();
-    $object->success = true;
+    private function getResponseObject()
+    {
+        $object = new \stdClass();
+        $object->success = true;
 
-    return $object;
-  }
+        return $object;
+    }
 }

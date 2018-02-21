@@ -17,27 +17,28 @@ namespace TNW\Stripe\Gateway\Validator;
 
 class ResponseValidator extends GeneralResponseValidator
 {
-  protected function getResponseValidators() {
-    return array_merge(
-      parent::getResponseValidators(),
-      [
-        function ($response) {
-          if(isset($response['error'])) {
-            return [false, [$response['message']]];
-          }
-          return [
-            in_array(
-              $response['status'],
-              [
-                'succeeded',
-                'pending',
-                'failed'
-              ]
-            ),
-            [__('Wrong transaction status')]
-          ];
-        }
-      ]
-    );
-  }
+    protected function getResponseValidators()
+    {
+        return array_merge(
+            parent::getResponseValidators(),
+            [
+            function ($response) {
+                if (isset($response['error'])) {
+                    return [false, [$response['message']]];
+                }
+                return [
+                in_array(
+                    $response['status'],
+                    [
+                    'succeeded',
+                    'pending',
+                    'failed'
+                    ]
+                ),
+                [__('Wrong transaction status')]
+                ];
+            }
+            ]
+        );
+    }
 }

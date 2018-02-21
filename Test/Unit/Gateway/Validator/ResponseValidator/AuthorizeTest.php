@@ -25,28 +25,29 @@ use \PHPUnit_Framework_MockObject_MockObject as MockObject;
 class AuthorizeTest extends \PHPUnit\Framework\TestCase
 {
   /** @var Authorize */
-  private $responseValidator;
+    private $responseValidator;
 
   /** @var ResultInterfaceFactory|MockObject */
-  private $resultInterfaceFactoryMock;
+    private $resultInterfaceFactoryMock;
 
   /** @var SubjectReader|MockObject */
-  private $subjectReaderMock;
+    private $subjectReaderMock;
 
-  protected function setUp() {
-    $this->resultInterfaceFactoryMock = $this->getMockBuilder(ResultInterfaceFactory::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['create'])
-      ->getMock();
-    $this->subjectReaderMock = $this->getMockBuilder(SubjectReader::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    protected function setUp()
+    {
+        $this->resultInterfaceFactoryMock = $this->getMockBuilder(ResultInterfaceFactory::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['create'])
+        ->getMock();
+        $this->subjectReaderMock = $this->getMockBuilder(SubjectReader::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->responseValidator = new Authorize(
-      $this->resultInterfaceFactoryMock,
-      $this->subjectReaderMock
-    );
-  }
+        $this->responseValidator = new Authorize(
+            $this->resultInterfaceFactoryMock,
+            $this->subjectReaderMock
+        );
+    }
 
   /**
    * Run test for validate method
@@ -58,56 +59,56 @@ class AuthorizeTest extends \PHPUnit\Framework\TestCase
    *
    * @dataProvider dataProviderTestValidate
    */
-  public function testValidate(array $response, $isValid, $messages)
-  {
-    /** @var ResultInterface|MockObject $resultMock */
-    $resultMock = $this->createMock(ResultInterface::class);
-    $outcome = $this->getMockBuilder(\stdClass::class)
-      ->setMethods(['__toArray'])
-      ->getMock();
-    $outcome->expects($this->once())
-      ->method('__toArray')
-      ->willReturn($response);
+    public function testValidate(array $response, $isValid, $messages)
+    {
+        /** @var ResultInterface|MockObject $resultMock */
+        $resultMock = $this->createMock(ResultInterface::class);
+        $outcome = $this->getMockBuilder(\stdClass::class)
+        ->setMethods(['__toArray'])
+        ->getMock();
+        $outcome->expects($this->once())
+        ->method('__toArray')
+        ->willReturn($response);
 
-    $validationSubject = [
-      'status' => 'succeeded',
-      'outcome' => $outcome
-    ];
+        $validationSubject = [
+        'status' => 'succeeded',
+        'outcome' => $outcome
+        ];
 
-    $this->subjectReaderMock->expects($this->once())
-      ->method('readResponseObject')
-      ->with($validationSubject)
-      ->willReturn($validationSubject);
+        $this->subjectReaderMock->expects($this->once())
+        ->method('readResponseObject')
+        ->with($validationSubject)
+        ->willReturn($validationSubject);
 
-    $this->resultInterfaceFactoryMock->expects($this->once())
-      ->method('create')
-      ->with([
+        $this->resultInterfaceFactoryMock->expects($this->once())
+        ->method('create')
+        ->with([
         'isValid' => $isValid,
         'failsDescription' => $messages
-      ])
-      ->willReturn($resultMock);
+        ])
+        ->willReturn($resultMock);
 
-    $actualMock = $this->responseValidator->validate($validationSubject);
+        $actualMock = $this->responseValidator->validate($validationSubject);
 
-    $this->assertEquals($resultMock, $actualMock);
-  }
+        $this->assertEquals($resultMock, $actualMock);
+    }
 
   /**
    * @return array
    */
-  public function dataProviderTestValidate()
-  {
-    return [
-      [
+    public function dataProviderTestValidate()
+    {
+        return [
+        [
         ['network_status' => 'approved_by_network'],
         'isValid' => true,
         []
-      ],
+        ],
       [
         ['network_status' => 'declined_by_network'],
         'isValid' => false,
         [__('Transaction has been declined')]
-      ]
-    ];
-  }
+        ]
+        ];
+    }
 }

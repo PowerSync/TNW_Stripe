@@ -24,45 +24,45 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractTransaction implements ClientInterface
 {
-  protected $logger;
+    protected $logger;
 
-  protected $customLogger;
+    protected $customLogger;
 
-  protected $adapter;
+    protected $adapter;
 
-  public function __construct(
-    LoggerInterface $logger,
-    Logger $customLogger,
-    StripeAdapter $adapter
-  ) {
-    $this->logger = $logger;
-    $this->customLogger = $customLogger;
-    $this->adapter = $adapter;
-  }
-
-  public function placeRequest(
-    TransferInterface $transferObject
-  ) {
-    $data = $transferObject->getBody();
-    $log = [
-      'request' => $data,
-      'client' => static::class
-    ];
-    $response['object'] = [];
-
-    try {
-      $response['object'] = $this->process($data);
-    }catch (\Exception $e) {
-      $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
-      $this->logger->critical($message);
-      throw new ClientException($message);
-    }finally {
-      $log['response'] = (array) $response['object'];
-      $this->customLogger->debug($log);
+    public function __construct(
+        LoggerInterface $logger,
+        Logger $customLogger,
+        StripeAdapter $adapter
+    ) {
+        $this->logger = $logger;
+        $this->customLogger = $customLogger;
+        $this->adapter = $adapter;
     }
 
-    return $response;
-  }
+    public function placeRequest(
+        TransferInterface $transferObject
+    ) {
+        $data = $transferObject->getBody();
+        $log = [
+        'request' => $data,
+        'client' => static::class
+        ];
+        $response['object'] = [];
 
-  abstract protected function process(array $data);
+        try {
+            $response['object'] = $this->process($data);
+        } catch (\Exception $e) {
+            $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
+            $this->logger->critical($message);
+            throw new ClientException($message);
+        }finally {
+            $log['response'] = (array) $response['object'];
+            $this->customLogger->debug($log);
+        }
+
+        return $response;
+    }
+
+    abstract protected function process(array $data);
 }

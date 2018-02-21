@@ -19,11 +19,12 @@ use TNW\Stripe\Gateway\Request\SettlementDataBuilder;
 
 class SettlementDataBuilderTest extends \PHPUnit\Framework\TestCase
 {
-  public function testBuild() {
-    $builder = new SettlementDataBuilder();
-    $this->assertEquals(
-      [SettlementDataBuilder::SUBMIT_FOR_SETTLEMENT => true],
-      $builder->build([])
-    );
-  }
+    public function testBuild()
+    {
+        $builder = new SettlementDataBuilder();
+        $this->assertEquals(
+            [SettlementDataBuilder::SUBMIT_FOR_SETTLEMENT => true],
+            $builder->build([])
+        );
+    }
 }

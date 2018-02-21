@@ -1,5 +1,5 @@
 define(
-  [
+    [
     'jquery',
     'Magento_Payment/js/view/payment/cc-form',
     'Magento_Checkout/js/action/place-order',
@@ -10,18 +10,18 @@ define(
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/model/quote',
     'stripejs'
-  ],
-  function (
-      $,
-      Component,
-      placeOrderAction,
-      fullScreenLoader,
-      additionalValidators,
-      validator,
-      redirectOnSuccessAction,
-      VaultEnabler,
-      quote
-  ) {
+    ],
+    function (
+        $,
+        Component,
+        placeOrderAction,
+        fullScreenLoader,
+        additionalValidators,
+        validator,
+        redirectOnSuccessAction,
+        VaultEnabler,
+        quote
+    ) {
     'use strict';
 
     return Component.extend({
@@ -33,14 +33,14 @@ define(
         token: null
       },
 
-      initialize: function() {
+      initialize: function () {
         this._super();
         this.stripe = Stripe(this.getPublishableKey());
         this.vaultEnabler = new VaultEnabler();
         this.vaultEnabler.setPaymentCode(this.getVaultCode());
       },
 
-      initStripeElement: function() {
+      initStripeElement: function () {
         var self = this;
         self.stripeCardElement = self.stripe.elements();
         self.stripeCard = self.stripeCardElement.create('card', {
@@ -54,7 +54,7 @@ define(
         self.stripeCard.mount('#stripe-card-element');
       },
 
-      placeOrder: function(data, event) {
+      placeOrder: function (data, event) {
         var self = this,
           placeOrder;
 
@@ -66,17 +66,17 @@ define(
           this.isPlaceOrderActionAllowed(false);
           fullScreenLoader.startLoader();
 
-          $.when(this.createToken()).done(function() {
+          $.when(this.createToken()).done(function () {
             placeOrder = placeOrderAction(self.getData(), self.messageContainer);
-            $.when(placeOrder).done(function() {
+            $.when(placeOrder).done(function () {
               if (self.redirectAfterPlaceOrder) {
                 redirectOnSuccessAction.execute();
               }
-            }).fail(function() {
+            }).fail(function () {
               fullScreenLoader.stopLoader();
               self.isPlaceOrderActionAllowed(true);
             });
-          }).fail(function(result) {
+          }).fail(function (result) {
             fullScreenLoader.stopLoader();
             self.isPlaceOrderActionAllowed(true);
 
@@ -90,15 +90,15 @@ define(
         return false;
       },
 
-      createToken: function() {
+      createToken: function () {
         var self = this;
 
         var deffer = $.Deferred();
 
-        self.stripe.createToken(self.stripeCard, this.getAddressData()).then(function(response) {
+        self.stripe.createToken(self.stripeCard, this.getAddressData()).then(function (response) {
           if (response.error) {
             deffer.reject(response.error.message);
-          }else {
+          } else {
             self.token = response.token;
             deffer.resolve();
           }
@@ -107,15 +107,15 @@ define(
         return deffer.promise();
       },
 
-      getCode: function() {
+      getCode: function () {
         return 'tnw_stripe';
       },
 
-      isActive: function() {
+      isActive: function () {
         return true;
       },
 
-      getData: function() {
+      getData: function () {
         var data = this._super();
 
         if (this.token) {
@@ -137,7 +137,7 @@ define(
         return window.checkoutConfig.payment[this.getCode()].publishableKey;
       },
 
-      validate: function() {
+      validate: function () {
         var $form = $('#' + this.getCode() + '-form');
         return $form.validation() && $form.validation('isValid');
       },
@@ -174,5 +174,5 @@ define(
         return stripeData;
       }
     });
-  }
+    }
 );

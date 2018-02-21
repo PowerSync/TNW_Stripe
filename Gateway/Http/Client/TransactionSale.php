@@ -17,7 +17,8 @@ namespace TNW\Stripe\Gateway\Http\Client;
 
 class TransactionSale extends AbstractTransaction
 {
-  protected function process(array $data) {
-    return $this->adapter->sale($data);
-  }
+    protected function process(array $data)
+    {
+        return $this->adapter->sale($data);
+    }
 }

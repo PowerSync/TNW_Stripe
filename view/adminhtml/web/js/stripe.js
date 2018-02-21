@@ -87,12 +87,12 @@ define([
 
       this.enableEventListeners();
 
-      if(!this.scriptLoaded()) {
+      if (!this.scriptLoaded()) {
         this.loadScript();
       }
     },
 
-    loadScript: function() {
+    loadScript: function () {
       var self = this;
       var state = self.scriptLoaded;
 
@@ -152,10 +152,10 @@ define([
         return false;
       }
 
-      $.when(this.createToken()).done(function() {
+      $.when(this.createToken()).done(function () {
         $('body').trigger('processStop');
         $('#' + self.container).find('[type="submit"]').trigger('click');
-      }).fail(function(result) {
+      }).fail(function (result) {
         $('body').trigger('processStop');
         self.error(result);
 
@@ -166,7 +166,7 @@ define([
     /**
      * Convert card information to stripe token
      */
-    createToken: function() {
+    createToken: function () {
       var self = this;
       var container = $('#' + this.container);
 
@@ -180,10 +180,10 @@ define([
 
       var defer = $.Deferred();
 
-      self.stripe.createToken(self.stripeCard).then(function(response) {
+      self.stripe.createToken(self.stripeCard).then(function (response) {
         if (response.error) {
           deffer.reject(response.error.message);
-        }else {
+        } else {
           var card = response.token.card;
           container.find('#' + self.code + '_expiration').val(card.exp_month);
           container.find('#' + self.code + '_expiration_yr').val(card.exp_year);

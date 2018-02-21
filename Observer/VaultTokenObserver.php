@@ -26,51 +26,53 @@ use Stripe\Customer;
 class VaultTokenObserver implements ObserverInterface
 {
   /** @var CustomerRepositoryInterface */
-  private $customerRepository;
+    private $customerRepository;
 
   /** @var Config */
-  private $config;
+    private $config;
 
   /** @var EncryptorInterface */
-  private $encryptor;
+    private $encryptor;
 
-  public function __construct(
-    Config $config,
-    EncryptorInterface $encryptor,
-    CustomerRepositoryInterface $customerRepository
-  ) {
-    $this->encryptor = $encryptor;
-    $this->config = $config;
-    $this->customerRepository = $customerRepository;
-    $this->initCredentials();
-  }
-
-  protected function initCredentials() {
-    Stripe::setApiKey($this->encryptor->decrypt($this->config->getSecretKey()));
-  }
-
-  public function execute(Observer $observer) {
-    $token = $observer->getObject();
-    if ($token->getIsActive()) {
-      return;
+    public function __construct(
+        Config $config,
+        EncryptorInterface $encryptor,
+        CustomerRepositoryInterface $customerRepository
+    ) {
+        $this->encryptor = $encryptor;
+        $this->config = $config;
+        $this->customerRepository = $customerRepository;
+        $this->initCredentials();
     }
 
-    try {
-      $customer = $this->customerRepository->getById($token->getCustomerId());
-    }catch (\Exception $e) {
-      return;
+    protected function initCredentials()
+    {
+        Stripe::setApiKey($this->encryptor->decrypt($this->config->getSecretKey()));
     }
 
-    $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
-    if (!$stripeCustomerId) {
-      return;
-    }
+    public function execute(Observer $observer)
+    {
+        $token = $observer->getObject();
+        if ($token->getIsActive()) {
+            return;
+        }
 
-    try {
-      $stripeCustomer = Customer::retrieve($stripeCustomerId->getValue());
-      $stripeCustomer->sources->retrieve($token->getGatewayToken())->delete();
-    }catch (\Exception $e) {
-      return;
+        try {
+            $customer = $this->customerRepository->getById($token->getCustomerId());
+        } catch (\Exception $e) {
+            return;
+        }
+
+        $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
+        if (!$stripeCustomerId) {
+            return;
+        }
+
+        try {
+            $stripeCustomer = Customer::retrieve($stripeCustomerId->getValue());
+            $stripeCustomer->sources->retrieve($token->getGatewayToken())->delete();
+        } catch (\Exception $e) {
+            return;
+        }
     }
-  }
 }

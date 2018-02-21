@@ -22,37 +22,39 @@ use TNW\Stripe\Helper\Payment\Formatter;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order\Payment;
 
-class RefundDataBuilder implements BuilderInterface {
-  use Formatter;
+class RefundDataBuilder implements BuilderInterface
+{
+    use Formatter;
 
-  private $subjectReader;
+    private $subjectReader;
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
-
-  public function build(array $subject) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $payment = $paymentDataObject->getPayment();
-    $amount = null;
-
-    try {
-      $amount = $this->formatPrice($this->subjectReader->readAmount($subject));
-    }catch (\InvalidArgumentException $e) {
-      //nothing
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
     }
 
-    $txnId = str_replace(
-      '-' . TransactionInterface::TYPE_CAPTURE,
-      '',
-      $payment->getParentTransactionId()
-    );
+    public function build(array $subject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $payment = $paymentDataObject->getPayment();
+        $amount = null;
 
-    return [
-      'transaction_id' => $txnId,
-      PaymentDataBuilder::AMOUNT => $amount
-    ];
-  }
+        try {
+            $amount = $this->formatPrice($this->subjectReader->readAmount($subject));
+        } catch (\InvalidArgumentException $e) {
+            //nothing
+        }
+
+        $txnId = str_replace(
+            '-' . TransactionInterface::TYPE_CAPTURE,
+            '',
+            $payment->getParentTransactionId()
+        );
+
+        return [
+        'transaction_id' => $txnId,
+        PaymentDataBuilder::AMOUNT => $amount
+        ];
+    }
 }

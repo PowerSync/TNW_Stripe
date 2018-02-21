@@ -27,74 +27,78 @@ class TransactionSubmitForSettlementTest extends \PHPUnit\Framework\TestCase
   /**
    * @var TransactionSubmitForSettlement
    */
-  private $client;
+    private $client;
 
   /**
    * @var Logger|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $logger;
+    private $logger;
 
   /**
    * @var StripeAdapter|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $adapter;
+    private $adapter;
 
-  protected function setUp() {
-    $criticalLoggerMock = $this->getMockForAbstractClass(LoggerInterface::class);
-    $this->logger = $this->getMockBuilder(Logger::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['debug'])
-      ->getMock();
-    $this->adapter = $this->getMockBuilder(StripeAdapter::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['submitForSettlement'])
-      ->getMock();
+    protected function setUp()
+    {
+        $criticalLoggerMock = $this->getMockForAbstractClass(LoggerInterface::class);
+        $this->logger = $this->getMockBuilder(Logger::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['debug'])
+        ->getMock();
+        $this->adapter = $this->getMockBuilder(StripeAdapter::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['submitForSettlement'])
+        ->getMock();
 
-    $this->client = new TransactionSubmitForSettlement(
-      $criticalLoggerMock,
-      $this->logger,
-      $this->adapter
-    );
-  }
+        $this->client = new TransactionSubmitForSettlement(
+            $criticalLoggerMock,
+            $this->logger,
+            $this->adapter
+        );
+    }
 
   /**
    * @expectedException \Magento\Payment\Gateway\Http\ClientException
    * @expectedExceptionMessage Transaction has been declined
    */
-  public function testPlaceRequestWithException() {
-    $exception = new \Exception('Transaction has been declined');
-    $this->adapter->expects($this->once())
-      ->method('submitForSettlement')
-      ->willThrowException($exception);
+    public function testPlaceRequestWithException()
+    {
+        $exception = new \Exception('Transaction has been declined');
+        $this->adapter->expects($this->once())
+        ->method('submitForSettlement')
+        ->willThrowException($exception);
 
-    $tranferObjectMock = $this->getTransferObjectMock();
-    $this->client->placeRequest($tranferObjectMock);
-  }
+        $tranferObjectMock = $this->getTransferObjectMock();
+        $this->client->placeRequest($tranferObjectMock);
+    }
 
-  public function testPlaceRequest() {
-    $data = new Charge();
-    $this->adapter->expects($this->once())
-      ->method('submitForSettlement')
-      ->willReturn($data);
+    public function testPlaceRequest()
+    {
+        $data = new Charge();
+        $this->adapter->expects($this->once())
+        ->method('submitForSettlement')
+        ->willReturn($data);
 
-    $transferObjectMock = $this->getTransferObjectMock();
-    $response = $this->client->placeRequest($transferObjectMock);
+        $transferObjectMock = $this->getTransferObjectMock();
+        $response = $this->client->placeRequest($transferObjectMock);
 
-    $this->assertTrue(is_object($response['object']));
-    $this->assertEquals(['object' => $data], $response);
-  }
+        $this->assertTrue(is_object($response['object']));
+        $this->assertEquals(['object' => $data], $response);
+    }
   
-  private function getTransferObjectMock() {
-    $mock = $this->createMock(TransferInterface::class);
-    $mock->expects($this->once())
-      ->method('getBody')
-      ->willReturn(
-        [
-          'transaction_id' => 'ch_19RXyy2eZvKYlo2CNU3GxOOe',
-          'amount' => 1.00
-        ]
-      );
+    private function getTransferObjectMock()
+    {
+        $mock = $this->createMock(TransferInterface::class);
+        $mock->expects($this->once())
+        ->method('getBody')
+        ->willReturn(
+            [
+            'transaction_id' => 'ch_19RXyy2eZvKYlo2CNU3GxOOe',
+            'amount' => 1.00
+            ]
+        );
 
-    return $mock;
-  }
+        return $mock;
+    }
 }

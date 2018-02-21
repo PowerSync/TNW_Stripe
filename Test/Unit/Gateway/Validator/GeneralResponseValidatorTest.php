@@ -25,28 +25,29 @@ use \PHPUnit_Framework_MockObject_MockObject as MockObject;
 class GeneralResponseValidatorTest extends \PHPUnit\Framework\TestCase
 {
   /** @var GeneralResponseValidator */
-  private $responseValidator;
+    private $responseValidator;
 
   /** @var ResultInterfaceFactory|MockObject */
-  private $resultInterfaceFactoryMock;
+    private $resultInterfaceFactoryMock;
 
   /** @var SubjectReader|MockObject */
-  private $subjectReaderMock;
+    private $subjectReaderMock;
 
-  protected function setUp() {
-    $this->resultInterfaceFactoryMock = $this->getMockBuilder(ResultInterfaceFactory::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['create'])
-      ->getMock();
-    $this->subjectReaderMock = $this->getMockBuilder(SubjectReader::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    protected function setUp()
+    {
+        $this->resultInterfaceFactoryMock = $this->getMockBuilder(ResultInterfaceFactory::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['create'])
+        ->getMock();
+        $this->subjectReaderMock = $this->getMockBuilder(SubjectReader::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->responseValidator = new GeneralResponseValidator(
-      $this->resultInterfaceFactoryMock,
-      $this->subjectReaderMock
-    );
-  }
+        $this->responseValidator = new GeneralResponseValidator(
+            $this->resultInterfaceFactoryMock,
+            $this->subjectReaderMock
+        );
+    }
 
   /**
    * Run test for validate method
@@ -58,36 +59,36 @@ class GeneralResponseValidatorTest extends \PHPUnit\Framework\TestCase
    *
    * @dataProvider dataProviderTestValidate
    */
-  public function testValidate(array $validationSubject, $isValid, $messages)
-  {
-    /** @var ResultInterface|MockObject $resultMock */
-    $resultMock = $this->createMock(ResultInterface::class);
+    public function testValidate(array $validationSubject, $isValid, $messages)
+    {
+        /** @var ResultInterface|MockObject $resultMock */
+        $resultMock = $this->createMock(ResultInterface::class);
 
-    $this->subjectReaderMock->expects($this->once())
-      ->method('readResponseObject')
-      ->with($validationSubject)
-      ->willReturn($validationSubject['response']['object']);
+        $this->subjectReaderMock->expects($this->once())
+        ->method('readResponseObject')
+        ->with($validationSubject)
+        ->willReturn($validationSubject['response']['object']);
 
-    $this->resultInterfaceFactoryMock->expects($this->once())
-      ->method('create')
-      ->with([
+        $this->resultInterfaceFactoryMock->expects($this->once())
+        ->method('create')
+        ->with([
         'isValid' => $isValid,
         'failsDescription' => $messages
-      ])
-      ->willReturn($resultMock);
+        ])
+        ->willReturn($resultMock);
 
-    $actualMock = $this->responseValidator->validate($validationSubject);
+        $actualMock = $this->responseValidator->validate($validationSubject);
 
-    $this->assertEquals($resultMock, $actualMock);
-  }
+        $this->assertEquals($resultMock, $actualMock);
+    }
 
   /**
    * @return array
    */
-  public function dataProviderTestValidate()
-  {
-    return [
-      [
+    public function dataProviderTestValidate()
+    {
+        return [
+        [
         'validationSubject' => [
           'response' => [
             'object' => [
@@ -97,7 +98,7 @@ class GeneralResponseValidatorTest extends \PHPUnit\Framework\TestCase
         ],
         'isValid' => true,
         []
-      ],
+        ],
       [
         'validationSubject' => [
           'response' => [
@@ -110,7 +111,7 @@ class GeneralResponseValidatorTest extends \PHPUnit\Framework\TestCase
         [
           __('Stripe error response.')
         ]
-      ]
-    ];
-  }
+        ]
+        ];
+    }
 }

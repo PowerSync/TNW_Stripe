@@ -21,49 +21,51 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 
 class GeneralResponseValidator extends AbstractValidator
 {
-  protected $subjectReader;
+    protected $subjectReader;
 
-  public function __construct(
-    ResultInterfaceFactory $resultFactory,
-    SubjectReader $subjectReader
-  ) {
-    parent::__construct($resultFactory);
-    $this->subjectReader = $subjectReader;
-  }
-
-  public function validate(array $subject) {
-    $response = $this->subjectReader->readResponseObject($subject);
-
-    $isValid = true;
-    $errorMessages = [];
-
-    foreach ($this->getResponseValidators() as $validator) {
-      $validationResult = $validator($response);
-
-      if(!$validationResult[0]) {
-        $isValid = $validationResult[0];
-        $errorMessages = array_merge($errorMessages, $validationResult[1]);
-        break;
-      }
+    public function __construct(
+        ResultInterfaceFactory $resultFactory,
+        SubjectReader $subjectReader
+    ) {
+        parent::__construct($resultFactory);
+        $this->subjectReader = $subjectReader;
     }
 
-    return $this->createResult($isValid, $errorMessages);
-  }
+    public function validate(array $subject)
+    {
+        $response = $this->subjectReader->readResponseObject($subject);
 
-  protected function getResponseValidators() {
-    return [
-      function ($response) {
-        if(isset($response['error'])) {
-          return [
-            false,
-            [$response['message']]
-          ];
+        $isValid = true;
+        $errorMessages = [];
+
+        foreach ($this->getResponseValidators() as $validator) {
+            $validationResult = $validator($response);
+
+            if (!$validationResult[0]) {
+                $isValid = $validationResult[0];
+                $errorMessages = array_merge($errorMessages, $validationResult[1]);
+                break;
+            }
         }
+
+        return $this->createResult($isValid, $errorMessages);
+    }
+
+    protected function getResponseValidators()
+    {
         return [
-          $response['status'] === 'succeeded',
-          [__('Stripe error response.')]
+        function ($response) {
+            if (isset($response['error'])) {
+                return [
+                false,
+                [$response['message']]
+                ];
+            }
+            return [
+            $response['status'] === 'succeeded',
+            [__('Stripe error response.')]
+            ];
+        }
         ];
-      }
-    ];
-  }
+    }
 }

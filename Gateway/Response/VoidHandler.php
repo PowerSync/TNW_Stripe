@@ -20,15 +20,18 @@ use TNW\Stripe\Gateway\Response\TransactionIdHandler;
 
 class VoidHandler extends TransactionIdHandler
 {
-  protected function setTransactionId(Payment $orderPayment, $transaction) {
-    return;
-  }
+    protected function setTransactionId(Payment $orderPayment, $transaction)
+    {
+        return;
+    }
 
-  protected function shouldCloseTransaction() {
-    return true;
-  }
+    protected function shouldCloseTransaction()
+    {
+        return true;
+    }
 
-  protected function shouldCloseParentTransaction(Payment $orderPayment) {
-    return true;
-  }
+    protected function shouldCloseParentTransaction(Payment $orderPayment)
+    {
+        return true;
+    }
 }

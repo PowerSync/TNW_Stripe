@@ -17,7 +17,8 @@ namespace TNW\Stripe\Gateway\Http\Client;
 
 class TransactionVoid extends AbstractTransaction
 {
-  protected function process(array $data) {
-    return $this->adapter->void($data['transaction_id']);
-  }
+    protected function process(array $data)
+    {
+        return $this->adapter->void($data['transaction_id']);
+    }
 }

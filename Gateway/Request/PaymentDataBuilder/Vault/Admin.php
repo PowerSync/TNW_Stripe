@@ -25,7 +25,7 @@ use Magento\Backend\Model\Session\Quote;
 class Admin extends Vault
 {
   /** @var Quote $adminSession */
-  private $adminSession;
+    private $adminSession;
 
   /**
    * Admin constructor.
@@ -35,31 +35,32 @@ class Admin extends Vault
    * @param CustomerRepositoryInterface $customerRepository
    * @param Quote $session
    */
-  public function __construct(
-    Config $config,
-    SubjectReader $subjectReader,
-    Session $customerSession,
-    CustomerRepositoryInterface $customerRepository,
-    Quote $session
-  ) {
-    parent::__construct($config, $subjectReader, $customerSession, $customerRepository);
-    $this->adminSession = $session;
-  }
+    public function __construct(
+        Config $config,
+        SubjectReader $subjectReader,
+        Session $customerSession,
+        CustomerRepositoryInterface $customerRepository,
+        Quote $session
+    ) {
+        parent::__construct($config, $subjectReader, $customerSession, $customerRepository);
+        $this->adminSession = $session;
+    }
 
   /**
    * @return \Magento\Framework\Api\AttributeInterface|mixed|null
    */
-  protected function getStripeCustomerId() {
-    $customer = $this->customerRepository->getById($this->adminSession->getCustomerId());
-    $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
+    protected function getStripeCustomerId()
+    {
+        $customer = $this->customerRepository->getById($this->adminSession->getCustomerId());
+        $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
 
-    if(!$stripeCustomerId) {
-      $stripeCustomerId = $this->createNewStripeCustomer($customer->getEmail());
-      $customer->setCustomAttribute('stripe_customer_id', $stripeCustomerId);
+        if (!$stripeCustomerId) {
+            $stripeCustomerId = $this->createNewStripeCustomer($customer->getEmail());
+            $customer->setCustomAttribute('stripe_customer_id', $stripeCustomerId);
 
-      $this->customerRepository->save($customer);
+            $this->customerRepository->save($customer);
+        }
+
+        return $stripeCustomerId;
     }
-
-    return $stripeCustomerId;
-  }
 }

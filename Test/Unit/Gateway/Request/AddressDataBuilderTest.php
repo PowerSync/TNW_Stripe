@@ -26,71 +26,72 @@ class AddressDataBuilderTest extends \PHPUnit\Framework\TestCase
   /**
    * @var PaymentDataObjectInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $paymentDataObjectMock;
+    private $paymentDataObjectMock;
 
   /**
    * @var OrderAdapterInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $orderMock;
+    private $orderMock;
 
   /**
    * @var AddressDataBuilder
    */
-  private $builder;
+    private $builder;
 
   /**
    * @var SubjectReader|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $subjectReaderMock;
+    private $subjectReaderMock;
 
-  protected function setUp() {
-    $this->paymentDataObjectMock = $this->createMock(PaymentDataObjectInterface::class);
-    $this->orderMock = $this->createMock(OrderAdapterInterface::class);
-    $this->subjectReaderMock = $this->getMockBuilder(SubjectReader::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    protected function setUp()
+    {
+        $this->paymentDataObjectMock = $this->createMock(PaymentDataObjectInterface::class);
+        $this->orderMock = $this->createMock(OrderAdapterInterface::class);
+        $this->subjectReaderMock = $this->getMockBuilder(SubjectReader::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->builder = new AddressDataBuilder($this->subjectReaderMock);
-  }
+        $this->builder = new AddressDataBuilder($this->subjectReaderMock);
+    }
 
   /**
    * @expectedException \InvalidArgumentException
    */
-  public function testBuildReadPaymentException()
-  {
-    $buildSubject = [
-      'payment' => null,
-    ];
+    public function testBuildReadPaymentException()
+    {
+        $buildSubject = [
+        'payment' => null,
+        ];
 
-    $this->subjectReaderMock->expects(self::once())
-      ->method('readPayment')
-      ->with($buildSubject)
-      ->willThrowException(new \InvalidArgumentException());
+        $this->subjectReaderMock->expects(self::once())
+        ->method('readPayment')
+        ->with($buildSubject)
+        ->willThrowException(new \InvalidArgumentException());
 
-    $this->builder->build($buildSubject);
-  }
+        $this->builder->build($buildSubject);
+    }
 
-  public function testBuildNoAddresses()
-  {
-    $this->paymentDataObjectMock->expects(static::once())
-      ->method('getOrder')
-      ->willReturn($this->orderMock);
+    public function testBuildNoAddresses()
+    {
+        $this->paymentDataObjectMock->expects(static::once())
+        ->method('getOrder')
+        ->willReturn($this->orderMock);
 
-    $this->orderMock->expects(static::once())
-      ->method('getShippingAddress')
-      ->willReturn(null);
+        $this->orderMock->expects(static::once())
+        ->method('getShippingAddress')
+        ->willReturn(null);
 
-    $buildSubject = [
-      'payment' => $this->paymentDataObjectMock,
-    ];
+        $buildSubject = [
+        'payment' => $this->paymentDataObjectMock,
+        ];
 
-    $this->subjectReaderMock->expects(self::once())
-      ->method('readPayment')
-      ->with($buildSubject)
-      ->willReturn($this->paymentDataObjectMock);
+        $this->subjectReaderMock->expects(self::once())
+        ->method('readPayment')
+        ->with($buildSubject)
+        ->willReturn($this->paymentDataObjectMock);
 
-    static::assertEquals([], $this->builder->build($buildSubject));
-  }
+        static::assertEquals([], $this->builder->build($buildSubject));
+    }
 
   /**
    * @param array $addressData
@@ -98,37 +99,37 @@ class AddressDataBuilderTest extends \PHPUnit\Framework\TestCase
    *
    * @dataProvider dataProviderBuild
    */
-  public function testBuild($addressData, $expectedResult)
-  {
-    $addressMock = $this->getAddressMock($addressData);
+    public function testBuild($addressData, $expectedResult)
+    {
+        $addressMock = $this->getAddressMock($addressData);
 
-    $this->paymentDataObjectMock->expects(static::once())
-      ->method('getOrder')
-      ->willReturn($this->orderMock);
+        $this->paymentDataObjectMock->expects(static::once())
+        ->method('getOrder')
+        ->willReturn($this->orderMock);
 
-    $this->orderMock->expects(static::once())
-      ->method('getShippingAddress')
-      ->willReturn($addressMock);
+        $this->orderMock->expects(static::once())
+        ->method('getShippingAddress')
+        ->willReturn($addressMock);
 
-    $buildSubject = [
-      'payment' => $this->paymentDataObjectMock,
-    ];
+        $buildSubject = [
+        'payment' => $this->paymentDataObjectMock,
+        ];
 
-    $this->subjectReaderMock->expects(self::once())
-      ->method('readPayment')
-      ->with($buildSubject)
-      ->willReturn($this->paymentDataObjectMock);
+        $this->subjectReaderMock->expects(self::once())
+        ->method('readPayment')
+        ->with($buildSubject)
+        ->willReturn($this->paymentDataObjectMock);
 
-    self::assertEquals($expectedResult, $this->builder->build($buildSubject));
-  }
+        self::assertEquals($expectedResult, $this->builder->build($buildSubject));
+    }
 
   /**
    * @return array
    */
-  public function dataProviderBuild()
-  {
-    return [
-      [
+    public function dataProviderBuild()
+    {
+        return [
+        [
         [
           'firstname' => 'john',
           'lastname' => 'doe',
@@ -154,46 +155,46 @@ class AddressDataBuilderTest extends \PHPUnit\Framework\TestCase
             AddressDataBuilder::PHONE => '555-555-5555'
           ]
         ]
-      ]
-    ];
-  }
+        ]
+        ];
+    }
 
   /**
    * @param array $addressData
    * @return AddressAdapterInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  private function getAddressMock($addressData)
-  {
-    $addressMock = $this->createMock(AddressAdapterInterface::class);
+    private function getAddressMock($addressData)
+    {
+        $addressMock = $this->createMock(AddressAdapterInterface::class);
 
-    $addressMock->expects($this->once())
-      ->method('getFirstname')
-      ->willReturn($addressData['firstname']);
-    $addressMock->expects($this->once())
-      ->method('getLastname')
-      ->willReturn($addressData['lastname']);
-    $addressMock->expects($this->once())
-      ->method('getTelephone')
-      ->willReturn($addressData['phone']);
-    $addressMock->expects($this->once())
-      ->method('getStreetLine1')
-      ->willReturn($addressData['street_1']);
-    $addressMock->expects($this->once())
-      ->method('getStreetLine2')
-      ->willReturn($addressData['street_2']);
-    $addressMock->expects($this->once())
-      ->method('getCity')
-      ->willReturn($addressData['city']);
-    $addressMock->expects($this->once())
-      ->method('getRegionCode')
-      ->willReturn($addressData['region_code']);
-    $addressMock->expects($this->once())
-      ->method('getPostcode')
-      ->willReturn($addressData['post_code']);
-    $addressMock->expects($this->once())
-      ->method('getCountryId')
-      ->willReturn($addressData['country_id']);
+        $addressMock->expects($this->once())
+        ->method('getFirstname')
+        ->willReturn($addressData['firstname']);
+        $addressMock->expects($this->once())
+        ->method('getLastname')
+        ->willReturn($addressData['lastname']);
+        $addressMock->expects($this->once())
+        ->method('getTelephone')
+        ->willReturn($addressData['phone']);
+        $addressMock->expects($this->once())
+        ->method('getStreetLine1')
+        ->willReturn($addressData['street_1']);
+        $addressMock->expects($this->once())
+        ->method('getStreetLine2')
+        ->willReturn($addressData['street_2']);
+        $addressMock->expects($this->once())
+        ->method('getCity')
+        ->willReturn($addressData['city']);
+        $addressMock->expects($this->once())
+        ->method('getRegionCode')
+        ->willReturn($addressData['region_code']);
+        $addressMock->expects($this->once())
+        ->method('getPostcode')
+        ->willReturn($addressData['post_code']);
+        $addressMock->expects($this->once())
+        ->method('getCountryId')
+        ->willReturn($addressData['country_id']);
 
-    return $addressMock;
-  }
+        return $addressMock;
+    }
 }

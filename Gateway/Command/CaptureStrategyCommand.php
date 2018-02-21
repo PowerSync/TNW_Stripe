@@ -30,75 +30,78 @@ use Magento\Sales\Api\Data\TransactionInterface;
 
 class CaptureStrategyCommand implements CommandInterface
 {
-  const SALE = 'sale';
+    const SALE = 'sale';
 
-  const CAPTURE = 'settlement';
+    const CAPTURE = 'settlement';
 
-  private $commandPool;
-  private $transactionRepository;
-  private $filterBuilder;
-  private $searchCriteriaBuilder;
-  private $subjectReader;
-  private $stripeAdapter;
+    private $commandPool;
+    private $transactionRepository;
+    private $filterBuilder;
+    private $searchCriteriaBuilder;
+    private $subjectReader;
+    private $stripeAdapter;
 
-  public function __construct(
-    CommandPoolInterface $commandPool,
-    TransactionRepositoryInterface $repository,
-    FilterBuilder $filterBuilder,
-    SearchCriteriaBuilder $searchCriteriaBuilder,
-    SubjectReader $subjectReader,
-    StripeAdapter $stripeAdapter
-  ) {
-    $this->commandPool = $commandPool;
-    $this->transactionRepository = $repository;
-    $this->filterBuilder = $filterBuilder;
-    $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-    $this->subjectReader = $subjectReader;
-    $this->stripeAdapter = $stripeAdapter;
-  }
-
-  public function execute(array $commandSubject) {
-    $paymentDataObject = $this->subjectReader->readPayment($commandSubject);
-    $paymentInfo = $paymentDataObject->getPayment();
-    ContextHelper::assertOrderPayment($paymentInfo);
-
-    $command = $this->getCommand($paymentInfo);
-    $this->commandPool->get($command)->execute($commandSubject);
-  }
-
-  private function getCommand(OrderPaymentInterface $payment) {
-    $existsCapture = $this->isExistsCaptureTransaction($payment);
-    if(!$payment->getAuthorizationTransaction() && !$existsCapture) {
-      return self::SALE;
+    public function __construct(
+        CommandPoolInterface $commandPool,
+        TransactionRepositoryInterface $repository,
+        FilterBuilder $filterBuilder,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        SubjectReader $subjectReader,
+        StripeAdapter $stripeAdapter
+    ) {
+        $this->commandPool = $commandPool;
+        $this->transactionRepository = $repository;
+        $this->filterBuilder = $filterBuilder;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->subjectReader = $subjectReader;
+        $this->stripeAdapter = $stripeAdapter;
     }
 
-    if(!$existsCapture) {
-      return self::CAPTURE;
+    public function execute(array $commandSubject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($commandSubject);
+        $paymentInfo = $paymentDataObject->getPayment();
+        ContextHelper::assertOrderPayment($paymentInfo);
+
+        $command = $this->getCommand($paymentInfo);
+        $this->commandPool->get($command)->execute($commandSubject);
     }
-  }
 
-  private function isExistsCaptureTransaction(OrderPaymentInterface $payment) {
-    $this->searchCriteriaBuilder->addFilters(
-      [
-        $this->filterBuilder
-          ->setField('payment_id')
-          ->setValue($payment->getId())
-          ->create()
-      ]
-    );
+    private function getCommand(OrderPaymentInterface $payment)
+    {
+        $existsCapture = $this->isExistsCaptureTransaction($payment);
+        if (!$payment->getAuthorizationTransaction() && !$existsCapture) {
+            return self::SALE;
+        }
 
-    $this->searchCriteriaBuilder->addFilters(
-      [
-        $this->filterBuilder
-          ->setField('txn_type')
-          ->setValue(TransactionInterface::TYPE_CAPTURE)
-          ->create()
-      ]
-    );
+        if (!$existsCapture) {
+            return self::CAPTURE;
+        }
+    }
 
-    $searchCriteria = $this->searchCriteriaBuilder->create();
+    private function isExistsCaptureTransaction(OrderPaymentInterface $payment)
+    {
+        $this->searchCriteriaBuilder->addFilters(
+            [
+            $this->filterBuilder
+            ->setField('payment_id')
+            ->setValue($payment->getId())
+            ->create()
+            ]
+        );
 
-    $count = $this->transactionRepository->getList($searchCriteria)->getTotalCount();
-    return (boolean) $count;
-  }
+        $this->searchCriteriaBuilder->addFilters(
+            [
+            $this->filterBuilder
+            ->setField('txn_type')
+            ->setValue(TransactionInterface::TYPE_CAPTURE)
+            ->create()
+            ]
+        );
+
+        $searchCriteria = $this->searchCriteriaBuilder->create();
+
+        $count = $this->transactionRepository->getList($searchCriteria)->getTotalCount();
+        return (boolean) $count;
+    }
 }

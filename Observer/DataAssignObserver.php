@@ -24,16 +24,16 @@ class DataAssignObserver extends AbstractDataAssignObserver
    * @param Observer $observer
    * @return void
    */
-  public function execute(Observer $observer)
-  {
-    $method = $this->readMethodArgument($observer);
-    $data = $this->readDataArgument($observer);
-    $paymentInfo = $method->getInfoInstance();
-    if (key_exists('cc_token', $data->getDataByKey('additional_data'))) {
-      $paymentInfo->setAdditionalInformation(
-        'cc_token',
-        $data->getDataByKey('additional_data')['cc_token']
-      );
+    public function execute(Observer $observer)
+    {
+        $method = $this->readMethodArgument($observer);
+        $data = $this->readDataArgument($observer);
+        $paymentInfo = $method->getInfoInstance();
+        if (key_exists('cc_token', $data->getDataByKey('additional_data'))) {
+            $paymentInfo->setAdditionalInformation(
+                'cc_token',
+                $data->getDataByKey('additional_data')['cc_token']
+            );
+        }
     }
-  }
 }

@@ -21,41 +21,45 @@ use Magento\Sales\Model\Order\Payment;
 
 class TransactionIdHandler implements HandlerInterface
 {
-  private $subjectReader;
+    private $subjectReader;
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
-
-  public function handle(array $subject, array $response) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-
-    if($paymentDataObject->getPayment() instanceof Payment) {
-      $transaction = $this->subjectReader->readTransaction($response);
-      $orderPayment = $paymentDataObject->getPayment();
-
-      $this->setTransactionId(
-        $orderPayment,
-        $transaction
-      );
-
-      $orderPayment->setIsTransactionClosed($this->shouldCloseTransaction());
-      $closed = $this->shouldCloseParentTransaction($orderPayment);
-      $orderPayment->setShouldCloseParentTransaction($closed);
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
     }
-  }
 
-  protected function setTransactionId(Payment $orderPayment, $transaction) {
-    $orderPayment->setTransactionId($transaction['id']);
-  }
+    public function handle(array $subject, array $response)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
 
-  protected function shouldCloseTransaction() {
-    return false;
-  }
+        if ($paymentDataObject->getPayment() instanceof Payment) {
+            $transaction = $this->subjectReader->readTransaction($response);
+            $orderPayment = $paymentDataObject->getPayment();
 
-  protected function shouldCloseParentTransaction(Payment $orderPayment) {
-    return false;
-  }
+            $this->setTransactionId(
+                $orderPayment,
+                $transaction
+            );
+
+            $orderPayment->setIsTransactionClosed($this->shouldCloseTransaction());
+            $closed = $this->shouldCloseParentTransaction($orderPayment);
+            $orderPayment->setShouldCloseParentTransaction($closed);
+        }
+    }
+
+    protected function setTransactionId(Payment $orderPayment, $transaction)
+    {
+        $orderPayment->setTransactionId($transaction['id']);
+    }
+
+    protected function shouldCloseTransaction()
+    {
+        return false;
+    }
+
+    protected function shouldCloseParentTransaction(Payment $orderPayment)
+    {
+        return false;
+    }
 }

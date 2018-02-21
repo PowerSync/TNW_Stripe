@@ -23,40 +23,41 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 class PaymentDetailsHandler implements HandlerInterface
 {
-  const RISK_LEVEL = 'risk_level';
-  const SELLER_MESSAGE = 'seller_message';
-  const CAPTURE = 'captured';
-  const TYPE = 'type';
+    const RISK_LEVEL = 'risk_level';
+    const SELLER_MESSAGE = 'seller_message';
+    const CAPTURE = 'captured';
+    const TYPE = 'type';
 
-  protected $additionalInformationMapping = [
+    protected $additionalInformationMapping = [
     self::RISK_LEVEL,
     self::SELLER_MESSAGE,
     self::CAPTURE,
     self::TYPE
-  ];
+    ];
 
-  private $subjectReader;
+    private $subjectReader;
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
-
-  public function handle(array $subject, array $response) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $transaction = $this->subjectReader->readTransaction($response);
-    $payment = $paymentDataObject->getPayment();
-
-    $payment->setCcTransId($transaction['id']);
-    $payment->setLastTransId($transaction['id']);
-
-    $outcome = $transaction['outcome']->__toArray();
-    foreach ($this->additionalInformationMapping as $item) {
-      if(!isset($outcome[$item])) {
-        continue;
-      }
-      $payment->setAdditionalInformation($item, $outcome[$item]);
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
     }
-  }
+
+    public function handle(array $subject, array $response)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $transaction = $this->subjectReader->readTransaction($response);
+        $payment = $paymentDataObject->getPayment();
+
+        $payment->setCcTransId($transaction['id']);
+        $payment->setLastTransId($transaction['id']);
+
+        $outcome = $transaction['outcome']->__toArray();
+        foreach ($this->additionalInformationMapping as $item) {
+            if (!isset($outcome[$item])) {
+                continue;
+            }
+            $payment->setAdditionalInformation($item, $outcome[$item]);
+        }
+    }
 }

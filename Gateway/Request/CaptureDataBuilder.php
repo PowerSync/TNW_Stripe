@@ -23,30 +23,31 @@ use TNW\Stripe\Helper\Payment\Formatter;
 
 class CaptureDataBuilder implements BuilderInterface
 {
-  use Formatter;
+    use Formatter;
 
-  const TRANSACTION_ID = 'transaction_id';
+    const TRANSACTION_ID = 'transaction_id';
 
-  private $subjectReader;
+    private $subjectReader;
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
-
-  public function build(array $subject) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $payment = $paymentDataObject->getPayment();
-    $transactionId = $payment->getCcTransId();
-
-    if(!$transactionId) {
-      throw new LocalizedException(__('No Authorization Transaction to capture'));
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
     }
 
-    return [
-      self::TRANSACTION_ID => $transactionId,
-      PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject))
-    ];
-  }
+    public function build(array $subject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $payment = $paymentDataObject->getPayment();
+        $transactionId = $payment->getCcTransId();
+
+        if (!$transactionId) {
+            throw new LocalizedException(__('No Authorization Transaction to capture'));
+        }
+
+        return [
+        self::TRANSACTION_ID => $transactionId,
+        PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject))
+        ];
+    }
 }

@@ -17,10 +17,12 @@ namespace TNW\Stripe\Helper\Payment;
 
 use Magento\Payment\Helper\Formatter as PaymentFormatter;
 
-trait Formatter {
-  public function formatPrice($price) {
-    $price = sprintf('%.2F', $price);
+trait Formatter
+{
+    public function formatPrice($price)
+    {
+        $price = sprintf('%.2F', $price);
 
-    return str_replace('.', '', $price);
-  }
+        return str_replace('.', '', $price);
+    }
 }

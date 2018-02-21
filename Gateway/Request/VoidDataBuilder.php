@@ -21,20 +21,21 @@ use Magento\Sales\Model\Order\Payment;
 
 class VoidDataBuilder implements BuilderInterface
 {
-  private $subjectReader;
+    private $subjectReader;
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
+    }
 
-  public function build(array $subject) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $payment = $paymentDataObject->getPayment();
+    public function build(array $subject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $payment = $paymentDataObject->getPayment();
 
-    return [
-      'transaction_id' => $payment->getParentTransactionId() ?: $payment->getLastTransId()
-    ];
-  }
+        return [
+        'transaction_id' => $payment->getParentTransactionId() ?: $payment->getLastTransId()
+        ];
+    }
 }

@@ -25,86 +25,89 @@ use TNW\Stripe\Helper\Payment\Formatter;
 
 class RefundDataBuilderTest extends \PHPUnit\Framework\TestCase
 {
-  use Formatter;
+    use Formatter;
 
   /**
    * @var SubjectReader|\PHPUnit_Framework_MockObject_MockObject
    */
-  private $subjectReader;
+    private $subjectReader;
 
   /**
    * @var RefundDataBuilder
    */
-  private $dataBuilder;
+    private $dataBuilder;
 
-  public function setUp() {
-    $this->subjectReader = $this->getMockBuilder(SubjectReader::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    public function setUp()
+    {
+        $this->subjectReader = $this->getMockBuilder(SubjectReader::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->dataBuilder = new RefundDataBuilder($this->subjectReader);
-  }
+        $this->dataBuilder = new RefundDataBuilder($this->subjectReader);
+    }
 
-  public function testBuild() {
-    $paymentDataObject = $this->createMock(PaymentDataObjectInterface::class);
-    $paymentMock = $this->getMockBuilder(Payment::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    public function testBuild()
+    {
+        $paymentDataObject = $this->createMock(PaymentDataObjectInterface::class);
+        $paymentMock = $this->getMockBuilder(Payment::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $buildSubject = [
-      'payment' => $paymentDataObject,
-      'amount' => 10.00,
-    ];
-    $transactionId = 'ch_19RZmz2eZvKYlo2CktQObIT0';
+        $buildSubject = [
+        'payment' => $paymentDataObject,
+        'amount' => 10.00,
+        ];
+        $transactionId = 'ch_19RZmz2eZvKYlo2CktQObIT0';
 
-    $this->subjectReader->expects($this->once())
-      ->method('readPayment')
-      ->with($buildSubject)
-      ->willReturn($paymentDataObject);
-    $paymentDataObject->expects($this->once())
-      ->method('getPayment')
-      ->willReturn($paymentMock);
-    $paymentMock->expects($this->once())
-      ->method('getParentTransactionId')
-      ->willReturn($transactionId);
-    $this->subjectReader->expects($this->once())
-      ->method('readAmount')
-      ->willReturn($buildSubject)
-      ->willReturn($buildSubject['amount']);
+        $this->subjectReader->expects($this->once())
+        ->method('readPayment')
+        ->with($buildSubject)
+        ->willReturn($paymentDataObject);
+        $paymentDataObject->expects($this->once())
+        ->method('getPayment')
+        ->willReturn($paymentMock);
+        $paymentMock->expects($this->once())
+        ->method('getParentTransactionId')
+        ->willReturn($transactionId);
+        $this->subjectReader->expects($this->once())
+        ->method('readAmount')
+        ->willReturn($buildSubject)
+        ->willReturn($buildSubject['amount']);
 
-    $this->assertEquals(
-      ['transaction_id' => $transactionId, PaymentDataBuilder::AMOUNT => $this->formatPrice(10.00)],
-      $this->dataBuilder->build($buildSubject)
-    );
-  }
+        $this->assertEquals(
+            ['transaction_id' => $transactionId, PaymentDataBuilder::AMOUNT => $this->formatPrice(10.00)],
+            $this->dataBuilder->build($buildSubject)
+        );
+    }
 
-  public function testBuildNullAmount() {
-    $paymentDataObject = $this->createMock(PaymentDataObjectInterface::class);
-    $paymentMock = $this->getMockBuilder(Payment::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    public function testBuildNullAmount()
+    {
+        $paymentDataObject = $this->createMock(PaymentDataObjectInterface::class);
+        $paymentMock = $this->getMockBuilder(Payment::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $buildSubject = ['payment' => $paymentDataObject];
-    $transactionId = 'ch_19RZmz2eZvKYlo2CktQObIT0';
+        $buildSubject = ['payment' => $paymentDataObject];
+        $transactionId = 'ch_19RZmz2eZvKYlo2CktQObIT0';
 
-    $this->subjectReader->expects($this->once())
-      ->method('readPayment')
-      ->with($buildSubject)
-      ->willReturn($paymentDataObject);
-    $paymentDataObject->expects($this->once())
-      ->method('getPayment')
-      ->willReturn($paymentMock);
-    $paymentMock->expects($this->once())
-      ->method('getParentTransactionId')
-      ->willReturn($transactionId);
-    $this->subjectReader->expects($this->once())
-      ->method('readAmount')
-      ->with($buildSubject)
-      ->willThrowException(new \InvalidArgumentException());
+        $this->subjectReader->expects($this->once())
+        ->method('readPayment')
+        ->with($buildSubject)
+        ->willReturn($paymentDataObject);
+        $paymentDataObject->expects($this->once())
+        ->method('getPayment')
+        ->willReturn($paymentMock);
+        $paymentMock->expects($this->once())
+        ->method('getParentTransactionId')
+        ->willReturn($transactionId);
+        $this->subjectReader->expects($this->once())
+        ->method('readAmount')
+        ->with($buildSubject)
+        ->willThrowException(new \InvalidArgumentException());
 
-    $this->assertEquals(
-      ['transaction_id' => $transactionId, PaymentDataBuilder::AMOUNT => null],
-      $this->dataBuilder->build($buildSubject)
-    );
-  }
+        $this->assertEquals(
+            ['transaction_id' => $transactionId, PaymentDataBuilder::AMOUNT => null],
+            $this->dataBuilder->build($buildSubject)
+        );
+    }
 }

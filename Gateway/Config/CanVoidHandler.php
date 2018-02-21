@@ -21,18 +21,19 @@ use Magento\Sales\Model\Order\Payment;
 
 class CanVoidHandler implements ValueHandlerInterface
 {
-  private $subjectReader;
+    private $subjectReader;
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
+    }
 
-  public function handle(array $subject, $storeId = NULL) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $payment = $paymentDataObject->getPayment();
+    public function handle(array $subject, $storeId = null)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $payment = $paymentDataObject->getPayment();
 
-    return $payment instanceof Payment && !(bool)$payment->getAmountPaid();
-  }
+        return $payment instanceof Payment && !(bool)$payment->getAmountPaid();
+    }
 }

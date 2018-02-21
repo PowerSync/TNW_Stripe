@@ -23,84 +23,88 @@ use Stripe\Customer;
 
 class CustomerDataBuilder implements BuilderInterface
 {
-  const CUSTOMER = 'customer';
-  const FIRST_NAME = 'firstName';
-  const LAST_NAME = 'lastName';
-  const COMPANY = 'company';
-  const EMAIL = 'email';
-  const PHONE = 'phone';
+    const CUSTOMER = 'customer';
+    const FIRST_NAME = 'firstName';
+    const LAST_NAME = 'lastName';
+    const COMPANY = 'company';
+    const EMAIL = 'email';
+    const PHONE = 'phone';
 
-  private $subjectReader;
-  private $adapter;
-  private $customerSession;
+    private $subjectReader;
+    private $adapter;
+    private $customerSession;
 
   /** @var CustomerRepositoryInterface */
-  private $customerRepository;
+    private $customerRepository;
 
-  public function __construct(
-    SubjectReader $subjectReader,
-    Session $customerSession,
-    CustomerRepositoryInterface $customerRepository
-  ) {
-    $this->subjectReader = $subjectReader;
-    $this->customerSession = $customerSession;
-    $this->customerRepository = $customerRepository;
-  }
-
-  public function build(array $subject) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-
-    if(!$this->isSavePaymentInformation($paymentDataObject)) {
-      return false;
-    }
-    $stripeCustomerId = $this->getStripeCustomerId();
-
-
-
-    $order = $paymentDataObject->getOrder();
-    $billingAddress = $order->getBillingAddress();
-
-    return false;
-  }
-
-  protected function isSavePaymentInformation($paymentDataObject) {
-    $payment = $paymentDataObject->getPayment();
-    $additionalInfo = $payment->getAdditionalInformation();
-
-    if(isset($additionalInfo['is_active_payment_token_enabler'])) {
-      return $additionalInfo['is_active_payment_token_enabler'];
+    public function __construct(
+        SubjectReader $subjectReader,
+        Session $customerSession,
+        CustomerRepositoryInterface $customerRepository
+    ) {
+        $this->subjectReader = $subjectReader;
+        $this->customerSession = $customerSession;
+        $this->customerRepository = $customerRepository;
     }
 
-    return false;
-  }
+    public function build(array $subject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
 
-  protected function getStripeCustomerId() {
-    if(!$this->customerSession->isLoggedIn()) {
-      return false;
+        if (!$this->isSavePaymentInformation($paymentDataObject)) {
+            return false;
+        }
+        $stripeCustomerId = $this->getStripeCustomerId();
+
+
+
+        $order = $paymentDataObject->getOrder();
+        $billingAddress = $order->getBillingAddress();
+
+        return false;
     }
 
-    $customer = $this->customerRepository->getById($this->customerSession->getCustomerId());
-    $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
+    protected function isSavePaymentInformation($paymentDataObject)
+    {
+        $payment = $paymentDataObject->getPayment();
+        $additionalInfo = $payment->getAdditionalInformation();
 
-    if(!$stripeCustomerId) {
-      $stripeCustomerId = $this->createNewStripeCustomer($customer->getEmail());
-      $customer->setCustomAttribute('stripe_customer_id', $stripeCustomerId);
+        if (isset($additionalInfo['is_active_payment_token_enabler'])) {
+            return $additionalInfo['is_active_payment_token_enabler'];
+        }
 
-      $this->customerRepository->save($customer);
+        return false;
     }
 
-    return $stripeCustomerId;
-  }
+    protected function getStripeCustomerId()
+    {
+        if (!$this->customerSession->isLoggedIn()) {
+            return false;
+        }
 
-  protected function createNewStripeCustomer($email) {
-    $result = Customer::create([
-      'description' => 'Customer for ' . $email,
-    ]);
+        $customer = $this->customerRepository->getById($this->customerSession->getCustomerId());
+        $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
 
-    return $result->id;
-  }
+        if (!$stripeCustomerId) {
+            $stripeCustomerId = $this->createNewStripeCustomer($customer->getEmail());
+            $customer->setCustomAttribute('stripe_customer_id', $stripeCustomerId);
 
-  protected function verifyStripeCustomer($stripeCustomerId) {
+            $this->customerRepository->save($customer);
+        }
 
-  }
+        return $stripeCustomerId;
+    }
+
+    protected function createNewStripeCustomer($email)
+    {
+        $result = Customer::create([
+        'description' => 'Customer for ' . $email,
+        ]);
+
+        return $result->id;
+    }
+
+    protected function verifyStripeCustomer($stripeCustomerId)
+    {
+    }
 }

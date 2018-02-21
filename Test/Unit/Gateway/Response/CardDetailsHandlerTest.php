@@ -24,89 +24,94 @@ use TNW\Stripe\Gateway\Helper\SubjectReader;
 class CardDetailsHandlerTest extends \PHPUnit\Framework\TestCase
 {
   /** @var CardDetailsHandler */
-  private $cardHandler;
+    private $cardHandler;
 
   /** @var Payment|\PHPUnit_Framework_MockObject_MockObject */
-  private $payment;
+    private $payment;
 
   /** @var Config|\PHPUnit_Framework_MockObject_MockObject */
-  private $config;
+    private $config;
 
   /** @var SubjectReader|\PHPUnit_Framework_MockObject_MockObject */
-  private $subjectReader;
+    private $subjectReader;
 
-  protected function setUp() {
-    $this->initConfigMock();
-    $this->subjectReader = $this->getMockBuilder(SubjectReader::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    protected function setUp()
+    {
+        $this->initConfigMock();
+        $this->subjectReader = $this->getMockBuilder(SubjectReader::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->cardHandler = new CardDetailsHandler($this->config, $this->subjectReader);
-  }
+        $this->cardHandler = new CardDetailsHandler($this->config, $this->subjectReader);
+    }
 
-  public function testHandle() {
-    $paymentData = $this->getPaymentDataObjectMock();
-    $transaction = $this->getStripeTransaction();
+    public function testHandle()
+    {
+        $paymentData = $this->getPaymentDataObjectMock();
+        $transaction = $this->getStripeTransaction();
 
-    $subject = ['payment' => $paymentData];
-    $response = ['object' => $transaction];
+        $subject = ['payment' => $paymentData];
+        $response = ['object' => $transaction];
 
-    $this->subjectReader->expects($this->once())
-      ->method('readPayment')
-      ->with($subject)
-      ->willReturn($paymentData);
-    $this->subjectReader->expects($this->once())
-      ->method('readTransaction')
-      ->with($response)
-      ->willReturn($transaction);
+        $this->subjectReader->expects($this->once())
+        ->method('readPayment')
+        ->with($subject)
+        ->willReturn($paymentData);
+        $this->subjectReader->expects($this->once())
+        ->method('readTransaction')
+        ->with($response)
+        ->willReturn($transaction);
 
-    $this->cardHandler->handle($subject, $response);
-  }
+        $this->cardHandler->handle($subject, $response);
+    }
 
-  private function initConfigMock() {
-    $this->config = $this->getMockBuilder(Config::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-  }
+    private function initConfigMock()
+    {
+        $this->config = $this->getMockBuilder(Config::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+    }
 
-  private function getPaymentDataObjectMock() {
-    $this->payment = $this->getMockBuilder(Payment::class)
-      ->disableOriginalConstructor()
-      ->setMethods([
+    private function getPaymentDataObjectMock()
+    {
+        $this->payment = $this->getMockBuilder(Payment::class)
+        ->disableOriginalConstructor()
+        ->setMethods([
         'setCcLast4',
         'setCcExpMonth',
         'setCcExpYear',
         'setCcType',
         'setAdditionalInformation'
-      ])
-      ->getMock();
-    $paymentDataObject = $this->getMockBuilder(PaymentDataObject::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['getPayment'])
-      ->getMock();
+        ])
+        ->getMock();
+        $paymentDataObject = $this->getMockBuilder(PaymentDataObject::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['getPayment'])
+        ->getMock();
 
-    $paymentDataObject->expects($this->once())
-      ->method('getPayment')
-      ->willReturn($this->payment);
+        $paymentDataObject->expects($this->once())
+        ->method('getPayment')
+        ->willReturn($this->payment);
 
-    return $paymentDataObject;
-  }
+        return $paymentDataObject;
+    }
 
-  private function getStripeTransaction() {
-    $source = $this->getMockBuilder(\stdClass::class)
-      ->setMethods(['__toArray'])
-      ->getMock();
-    $source->expects($this->once())
-      ->method('__toArray')
-      ->willReturn([
+    private function getStripeTransaction()
+    {
+        $source = $this->getMockBuilder(\stdClass::class)
+        ->setMethods(['__toArray'])
+        ->getMock();
+        $source->expects($this->once())
+        ->method('__toArray')
+        ->willReturn([
         'brand' => 'Visa',
         'last4' => '1234',
         'exp_month' => '01',
         'exp_year' => '18'
-      ]);
+        ]);
 
-    $transaction = ['source' => $source];
+        $transaction = ['source' => $source];
 
-    return $transaction;
-  }
+        return $transaction;
+    }
 }

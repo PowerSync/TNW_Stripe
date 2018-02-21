@@ -24,52 +24,55 @@ use PHPUnit_Framework_MockObject_MockObject as MockObject;
 class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
 {
   /** @var ResponseValidator */
-  private $responseValidator;
+    private $responseValidator;
 
   /** @var ResultInterfaceFactory|MockObject */
-  private $resultInterFaceFactory;
+    private $resultInterFaceFactory;
 
   /** @var SubjectReader|MockObject */
-  private $subjectReader;
+    private $subjectReader;
 
-  protected function setUp() {
-    $this->resultInterfaceFactory = $this->getMockBuilder(ResultInterfaceFactory::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['create'])
-      ->getMock();
-    $this->subjectReader = $this->getMockBuilder(SubjectReader::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    protected function setUp()
+    {
+        $this->resultInterfaceFactory = $this->getMockBuilder(ResultInterfaceFactory::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['create'])
+        ->getMock();
+        $this->subjectReader = $this->getMockBuilder(SubjectReader::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->responseValidator = new ResponseValidator(
-      $this->resultInterfaceFactory,
-      $this->subjectReader
-    );
-  }
-
-  /** @expectedException \InvalidArgumentException */
-  public function testValidateReadResponseException() {
-    $subject = ['response' => null];
-
-    $this->subjectReader->expects($this->once())
-      ->method('readResponseObject')
-      ->with($subject)
-      ->willThrowException(new \InvalidArgumentException());
-
-    $this->responseValidator->validate($subject);
-  }
+        $this->responseValidator = new ResponseValidator(
+            $this->resultInterfaceFactory,
+            $this->subjectReader
+        );
+    }
 
   /** @expectedException \InvalidArgumentException */
-  public function testValidateReadResponseObjectException() {
-    $subject = ['reponse' => ['object' => null]];
+    public function testValidateReadResponseException()
+    {
+        $subject = ['response' => null];
 
-    $this->subjectReader->expects($this->once())
-      ->method('readResponseObject')
-      ->with($subject)
-      ->willThrowException(new \InvalidArgumentException());
+        $this->subjectReader->expects($this->once())
+        ->method('readResponseObject')
+        ->with($subject)
+        ->willThrowException(new \InvalidArgumentException());
 
-    $this->responseValidator->validate($subject);
-  }
+        $this->responseValidator->validate($subject);
+    }
+
+  /** @expectedException \InvalidArgumentException */
+    public function testValidateReadResponseObjectException()
+    {
+        $subject = ['reponse' => ['object' => null]];
+
+        $this->subjectReader->expects($this->once())
+        ->method('readResponseObject')
+        ->with($subject)
+        ->willThrowException(new \InvalidArgumentException());
+
+        $this->responseValidator->validate($subject);
+    }
 
   /**
    * Run test for validate method
@@ -81,58 +84,59 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
    *
    * @dataProvider dataProviderTestValidate
    */
-  public function testValidate(array $validationSubject, $isValid, $messages)
-  {
-    /** @var ResultInterface|MockObject $result */
-    $result = $this->createMock(ResultInterface::class);
+    public function testValidate(array $validationSubject, $isValid, $messages)
+    {
+        /** @var ResultInterface|MockObject $result */
+        $result = $this->createMock(ResultInterface::class);
 
-    $this->subjectReader->expects($this->once())
-      ->method('readResponseObject')
-      ->with($validationSubject)
-      ->willReturn($validationSubject['response']['object']);
+        $this->subjectReader->expects($this->once())
+        ->method('readResponseObject')
+        ->with($validationSubject)
+        ->willReturn($validationSubject['response']['object']);
 
-    $this->resultInterfaceFactory->expects($this->once())
-      ->method('create')
-      ->with([
+        $this->resultInterfaceFactory->expects($this->once())
+        ->method('create')
+        ->with([
         'isValid' => $isValid,
         'failsDescription' => $messages
-      ])
-      ->willReturn($result);
+        ])
+        ->willReturn($result);
 
-    $actual = $this->responseValidator->validate($validationSubject);
+        $actual = $this->responseValidator->validate($validationSubject);
 
-    $this->assertEquals($result, $actual);
-  }
+        $this->assertEquals($result, $actual);
+    }
 
-  public function dataProviderTestValidate() {
-    $succeed = ['object' => ['status' => 'succeeded']];
-    $pending = ['object' => ['status' => 'pending']];
-    $failed = ['object' => ['status' => 'failed']];
-    $invalid = ['object' => ['status' => null]];
+    public function dataProviderTestValidate()
+    {
+        $succeed = ['object' => ['status' => 'succeeded']];
+        $pending = ['object' => ['status' => 'pending']];
+        $failed = ['object' => ['status' => 'failed']];
+        $invalid = ['object' => ['status' => null]];
 
-    return [
-      [
+        return [
+        [
         ['response' => $succeed],
         'isValid' => true,
         []
-      ],
+        ],
       [
         ['response' => $pending],
         'isValid' => false,
         [__('Stripe error response.')]
-      ],
-      [
+        ],
+        [
         ['response' => $failed],
         'isValid' => false,
         [__('Stripe error response.')],
-      ],
-      [
+        ],
+        [
         ['response' => $invalid],
         'isValid' => false,
         [
           __('Stripe error response.')
         ]
-      ]
-    ];
-  }
+        ]
+        ];
+    }
 }
