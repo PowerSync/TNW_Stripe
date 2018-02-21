@@ -1,4 +1,4 @@
-<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+<div data-bind="attr: {class: 'payment-method payment-method-' + getCode()}, css: {'_active': isActive()}">
   <div class="payment-method-title field choice">
     <input type="radio"
            name="payment[method]"
@@ -17,20 +17,38 @@
     </div>
 
     <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
-      <div id="stripe-card-element" afterRender="initStripeElement">
-        <!-- a Stripe Element will be inserted here. -->
-      </div>
-      <!-- ko if: (isVaultEnabled())-->
-      <div class="field choice">
-        <input type="checkbox"
-               name="vault[is_enabled]"
-               class="checkbox"
-               data-bind="attr: {'id': getCode() + '_enable_vault'}, checked: vaultEnabler.isActivePaymentTokenEnabler"/>
-        <label class="label" data-bind="attr: {'for': getCode() + '_enable_vault'}">
-          <span><!-- ko i18n: 'Save for later use.'--><!-- /ko --></span>
-        </label>
-      </div>
-      <!-- /ko -->
+      <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+        <legend class="legend">
+          <span><!-- ko i18n: 'Credit Card Information'--><!-- /ko --></span>
+        </legend>
+        <br>
+        <div id="stripe-card-element">
+          <!-- a Stripe Element will be inserted here. -->
+        </div>
+        <!-- ko if: (isVaultEnabled())-->
+        <div class="field choice">
+          <input type="checkbox"
+                 name="vault[is_enabled]"
+                 class="checkbox"
+                 data-bind="attr: {'id': getCode() + '_enable_vault'}, checked: vaultEnabler.isActivePaymentTokenEnabler"/>
+          <label class="label" data-bind="attr: {'for': getCode() + '_enable_vault'}">
+            <span><!-- ko i18n: 'Save for later use.'--><!-- /ko --></span>
+          </label>
+          <div class="field-tooltip toggle">
+            <span class="field-tooltip-action action-vault"
+                  tabindex="0"
+                  data-toggle="dropdown"
+                  data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                <span translate="'What is this?'"></span>
+            </span>
+            <div class="field-tooltip-content"
+                 data-target="dropdown"
+                 translate="'We store you payment information securely on Stripe servers via SSL.'"></div>
+          </div>
+        </div>
+        <!-- /ko -->
+      </fieldset>
+      <input type="submit" id="stripe_submit"  style="display:none" />
     </form>
 
     <div class="checkout-agreements-block">
@@ -43,13 +61,13 @@
         <button class="action primary checkout"
                 type="submit"
                 data-bind="
-                        click: placeOrder,
-                        attr: {title: $t('Place Order')},
-                        css: {disabled: !isPlaceOrderActionAllowed()},
-                        enable: (getCode() == isChecked())
-                        "
+                    click: placeOrderClick,
+                    attr: {title: $t('Place Order')},
+                    css: {disabled: !isPlaceOrderActionAllowed()},
+                    enable: isButtonActive()
+                "
                 disabled>
-          <span data-bind="text: $t('Place Order')"></span>
+          <span data-bind="i18n: 'Place Order'"></span>
         </button>
       </div>
     </div>

@@ -1,5 +1,4 @@
-define(
-    [
+define([
     'jquery',
     'Magento_Payment/js/view/payment/cc-form',
     'Magento_Checkout/js/action/place-order',
@@ -10,27 +9,33 @@ define(
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/model/quote',
     'stripejs'
-    ],
-    function (
-        $,
-        Component,
-        placeOrderAction,
-        fullScreenLoader,
-        additionalValidators,
-        validator,
-        redirectOnSuccessAction,
-        VaultEnabler,
-        quote
-    ) {
+], function (
+    $,
+    Component,
+    placeOrderAction,
+    fullScreenLoader,
+    additionalValidators,
+    validator,
+    redirectOnSuccessAction,
+    VaultEnabler,
+    quote
+) {
     'use strict';
 
     return Component.extend({
       defaults: {
+        active: false,
         template: 'TNW_Stripe/payment/form',
         stripe: null,
         stripeCardElement: null,
         stripeCard: null,
-        token: null
+        ccCode: null,
+        ccMessageContainer: null,
+        token: null,
+
+        imports: {
+          onActiveChange: 'active'
+        }
       },
 
       initialize: function () {
@@ -40,7 +45,19 @@ define(
         this.vaultEnabler.setPaymentCode(this.getVaultCode());
       },
 
-      initStripeElement: function () {
+      /**
+       * Set list of observable attributes
+       *
+       * @returns {exports.initObservable}
+       */
+      initObservable: function () {
+        this._super()
+            .observe(['active']);
+
+        return this;
+      },
+
+      initStripe: function () {
         var self = this;
         self.stripeCardElement = self.stripe.elements();
         self.stripeCard = self.stripeCardElement.create('card', {
@@ -54,65 +71,61 @@ define(
         self.stripeCard.mount('#stripe-card-element');
       },
 
-      placeOrder: function (data, event) {
-        var self = this,
-          placeOrder;
-
-        if (event) {
-          event.preventDefault();
-        }
-
-        if (this.validate()) {
-          this.isPlaceOrderActionAllowed(false);
-          fullScreenLoader.startLoader();
-
-          $.when(this.createToken()).done(function () {
-            placeOrder = placeOrderAction(self.getData(), self.messageContainer);
-            $.when(placeOrder).done(function () {
-              if (self.redirectAfterPlaceOrder) {
-                redirectOnSuccessAction.execute();
-              }
-            }).fail(function () {
-              fullScreenLoader.stopLoader();
-              self.isPlaceOrderActionAllowed(true);
-            });
-          }).fail(function (result) {
-            fullScreenLoader.stopLoader();
-            self.isPlaceOrderActionAllowed(true);
-
-            self.messageContainer.addErrorMessage({
-              'message': result
-            });
-          });
-
-          return true;
-        }
-        return false;
-      },
-
-      createToken: function () {
-        var self = this;
-
-        var deffer = $.Deferred();
-
-        self.stripe.createToken(self.stripeCard, this.getAddressData()).then(function (response) {
-          if (response.error) {
-            deffer.reject(response.error.message);
-          } else {
-            self.token = response.token;
-            deffer.resolve();
-          }
-        });
-
-        return deffer.promise();
-      },
-
       getCode: function () {
         return 'tnw_stripe';
       },
 
+      /**
+       * Check if payment is active
+       *
+       * @returns {Boolean}
+       */
       isActive: function () {
-        return true;
+        var active = this.getCode() === this.isChecked();
+
+        this.active(active);
+
+        return active;
+      },
+
+      /**
+       * Triggers when payment method change
+       * @param {Boolean} isActive
+       */
+      onActiveChange: function (isActive) {
+        if (!isActive) {
+          return;
+        }
+
+        this.restoreMessageContainer();
+        this.restoreCode();
+
+        this.initStripe();
+      },
+
+      /**
+       * Restore original message container for cc-form component
+       */
+      restoreMessageContainer: function () {
+        this.messageContainer = this.ccMessageContainer;
+      },
+
+      /**
+       * Restore original code for cc-form component
+       */
+      restoreCode: function () {
+        this.code = this.ccCode;
+      },
+
+      /**
+       * @inheritdoc
+       */
+      initChildren: function () {
+        this._super();
+        this.ccMessageContainer = this.messageContainer;
+        this.ccCode = this.code;
+
+        return this;
       },
 
       getData: function () {
@@ -172,7 +185,39 @@ define(
         }
 
         return stripeData;
+      },
+
+      /**
+       * Returns state of place order button
+       * @returns {Boolean}
+       */
+      isButtonActive: function () {
+        return this.isActive() && this.isPlaceOrderActionAllowed();
+      },
+
+      /**
+       * Triggers order placing
+       */
+      placeOrderClick: function () {
+        var self = this;
+
+        this.isPlaceOrderActionAllowed(false);
+        fullScreenLoader.startLoader();
+
+        self.stripe.createToken(self.stripeCard, this.getAddressData())
+          .then(function (response) {
+            if (response.error) {
+              fullScreenLoader.stopLoader();
+              self.isPlaceOrderActionAllowed(true);
+
+              self.messageContainer.addErrorMessage({
+                'message': response.error.message
+              });
+            } else {
+              self.token = response.token;
+              self.placeOrder();
+            }
+          });
       }
     });
-    }
-);
+});
