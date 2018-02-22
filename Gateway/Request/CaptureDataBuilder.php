@@ -15,39 +15,52 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
-use Magento\Braintree\Gateway\Request\PaymentDataBuilder;
 use Magento\Framework\Exception\LocalizedException;
-use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 use TNW\Stripe\Helper\Payment\Formatter;
 
+/**
+ * Class CaptureDataBuilder
+ */
 class CaptureDataBuilder implements BuilderInterface
 {
     use Formatter;
 
     const TRANSACTION_ID = 'transaction_id';
 
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
 
+    /**
+     * CaptureDataBuilder constructor.
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         SubjectReader $subjectReader
     ) {
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * {@inheritdoc}
+     * @throws LocalizedException
+     */
     public function build(array $subject)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
         $payment = $paymentDataObject->getPayment();
-        $transactionId = $payment->getCcTransId();
 
+        $transactionId = $payment->getCcTransId();
         if (!$transactionId) {
             throw new LocalizedException(__('No Authorization Transaction to capture'));
         }
 
         return [
-        self::TRANSACTION_ID => $transactionId,
-        PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject))
+            self::TRANSACTION_ID => $transactionId,
+            PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject))
         ];
     }
 }

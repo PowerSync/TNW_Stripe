@@ -16,14 +16,23 @@
 namespace TNW\Stripe\Gateway\Http\Client;
 
 use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
+use TNW\Stripe\Gateway\Request\RefundDataBuilder;
 
+/**
+ * Transaction Refund
+ */
 class TransactionRefund extends AbstractTransaction
 {
+    /**
+     * @inheritdoc
+     */
     protected function process(array $data)
     {
-        return $this->adapter->refund(
-            $data['transaction_id'],
-            $data[PaymentDataBuilder::AMOUNT]
-        );
+        $storeId = $data['store_id'] ?? null;
+        // sending store id and other additional keys are restricted by Stripe API
+        unset($data['store_id']);
+
+        return $this->adapterFactory->create($storeId)
+            ->refund($data[RefundDataBuilder::TRANSACTION_ID], $data[PaymentDataBuilder::AMOUNT]);
     }
 }

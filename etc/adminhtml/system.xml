@@ -23,73 +23,124 @@
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Enabled</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+          <requires>
+            <group id="stripe_required"/>
+          </requires>
         </field>
-        <field id="payment_action" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Payment Action</label>
-          <source_model>TNW\Stripe\Model\Adminhtml\Source\PaymentAction</source_model>
-        </field>
-        <field id="order_status" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>New Order Status</label>
-          <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
-        </field>
-        <field id="title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-          <label>Title</label>
-        </field>
-        <field id="test_mode" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Test Mode</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="test_secret_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Test Secret Key</label>
-          <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-        </field>
-        <field id="test_publishable_key" translate="label" type="obscure" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Test Publishable Key</label>
-          <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-        </field>
-        <field id="live_secret_key" translate="label" type="obscure" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Live Secret Key</label>
-          <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-        </field>
-        <field id="live_publishable_key" translate="label" type="obscure" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Live Publishable Key</label>
-          <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-        </field>
-        <field id="currency" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Accepted Currency</label>
-          <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
-        </field>
-        <field id="cctypes" translate="label" type="multiselect" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Credit Card Types</label>
-          <source_model>TNW\Stripe\Model\Adminhtml\Source\Cctype</source_model>
-        </field>
-        <field id="useccv" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Credit Card Verification</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Payment from Applicable Countries</label>
-          <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
-        </field>
-        <field id="tnw_stripe_vault_active" translate="label" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Allow Stored Credit Cards</label>
+        <field id="vault_active" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
+          <label>Vault Enabled</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <config_path>payment/tnw_stripe_vault/active</config_path>
+          <requires>
+            <group id="stripe_required"/>
+          </requires>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Payment from Specific Countries</label>
-          <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-        </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Minimum Order Total</label>
-        </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Maximum Order Total</label>
-        </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Sort Order</label>
-          <frontend_class>validate-number</frontend_class>
-        </field>
+        <group id="stripe_required" translate="label" showInDefault="1" showInWebsite="1" sortOrder="5">
+          <label>Basic Stripe Settings</label>
+          <attribute type="expanded">1</attribute>
+          <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+          <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Title</label>
+            <config_path>payment/tnw_stripe/title</config_path>
+          </field>
+          <field id="payment_action" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Payment Action</label>
+            <source_model>TNW\Stripe\Model\Adminhtml\Source\PaymentAction</source_model>
+            <config_path>payment/tnw_stripe/payment_action</config_path>
+          </field>
+          <field id="environment" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Environment</label>
+            <source_model>TNW\Stripe\Model\Adminhtml\Source\Environment</source_model>
+            <config_path>payment/tnw_stripe/environment</config_path>
+          </field>
+          <field id="test_secret_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Secret Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>payment/tnw_stripe/test_secret_key</config_path>
+            <depends>
+              <field id="environment">test</field>
+            </depends>
+          </field>
+          <field id="test_publishable_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Publishable Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>payment/tnw_stripe/test_publishable_key</config_path>
+            <depends>
+              <field id="environment">test</field>
+            </depends>
+          </field>
+          <field id="live_secret_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Secret Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>payment/tnw_stripe/live_secret_key</config_path>
+            <depends>
+              <field id="environment">live</field>
+            </depends>
+          </field>
+          <field id="live_publishable_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Publishable Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>payment/tnw_stripe/live_publishable_key</config_path>
+            <depends>
+              <field id="environment">live</field>
+            </depends>
+          </field>
+        </group>
+        <group id="stripe_advanced" translate="label" showInDefault="1" showInWebsite="1" sortOrder="20">
+          <label>Advanced Stripe Settings</label>
+          <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+          <field id="stripe_vault_title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Vault Title</label>
+            <config_path>payment/tnw_stripe_vault/title</config_path>
+          </field>
+          <field id="order_status" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>New Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <config_path>payment/tnw_stripe/order_status</config_path>
+          </field>
+          <field id="currency" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Accepted Currency</label>
+            <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
+            <config_path>payment/tnw_stripe/currency</config_path>
+          </field>
+          <field id="cctypes" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Credit Card Types</label>
+            <source_model>TNW\Stripe\Model\Adminhtml\Source\Cctype</source_model>
+            <config_path>payment/tnw_stripe/cctypes</config_path>
+          </field>
+          <field id="useccv" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Credit Card Verification</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/tnw_stripe/useccv</config_path>
+          </field>
+          <field id="min_order_total" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Minimum Order Total</label>
+            <config_path>payment/tnw_stripe/min_order_total</config_path>
+          </field>
+          <field id="max_order_total" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Maximum Order Total</label>
+            <config_path>payment/tnw_stripe/max_order_total</config_path>
+          </field>
+          <field id="sort_order" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/tnw_stripe/sort_order</config_path>
+          </field>
+        </group>
+        <group id="stripe_country_specific" translate="label" showInDefault="1" showInWebsite="1" sortOrder="30">
+          <label>Country Specific Settings</label>
+          <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+          <field id="allowspecific" translate="label" type="allowspecific" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Payment from Applicable Countries</label>
+            <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/tnw_stripe/allowspecific</config_path>
+          </field>
+          <field id="specificcountry" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Payment from Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <config_path>payment/tnw_stripe/specificcountry</config_path>
+          </field>
+        </group>
       </group>
     </section>
   </system>

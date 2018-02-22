@@ -15,46 +15,47 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
-use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Helper\Payment\Formatter;
-use Magento\Sales\Api\Data\TransactionInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\Order\Payment;
 
 class RefundDataBuilder implements BuilderInterface
 {
     use Formatter;
 
+    const TRANSACTION_ID = 'transaction_id';
+
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
 
+    /**
+     * RefundDataBuilder constructor.
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         SubjectReader $subjectReader
     ) {
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * {@inheritdoc}
+     * @throws LocalizedException
+     */
     public function build(array $subject)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
+
+        /** @var Payment $payment */
         $payment = $paymentDataObject->getPayment();
-        $amount = null;
-
-        try {
-            $amount = $this->formatPrice($this->subjectReader->readAmount($subject));
-        } catch (\InvalidArgumentException $e) {
-            //nothing
-        }
-
-        $txnId = str_replace(
-            '-' . TransactionInterface::TYPE_CAPTURE,
-            '',
-            $payment->getParentTransactionId()
-        );
 
         return [
-        'transaction_id' => $txnId,
-        PaymentDataBuilder::AMOUNT => $amount
+            self::TRANSACTION_ID => $payment->getParentTransactionId(),
+            PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject))
         ];
     }
 }

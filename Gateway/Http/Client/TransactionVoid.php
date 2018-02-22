@@ -15,10 +15,21 @@
  */
 namespace TNW\Stripe\Gateway\Http\Client;
 
+/**
+ * Transaction Void
+ */
 class TransactionVoid extends AbstractTransaction
 {
+    /**
+     * @inheritdoc
+     */
     protected function process(array $data)
     {
-        return $this->adapter->void($data['transaction_id']);
+        $storeId = $data['store_id'] ?? null;
+        // sending store id and other additional keys are restricted by Stripe API
+        unset($data['store_id']);
+
+        return $this->adapterFactory->create($storeId)
+            ->void($data['transaction_id']);
     }
 }

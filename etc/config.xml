@@ -45,6 +45,7 @@
       <tnw_stripe_vault>
         <model>StripeCreditCardVaultFacade</model>
         <title>Stored Cards (Stripe)</title>
+        <active>0</active>
         <instant_purchase>
           <supported>1</supported>
         </instant_purchase>

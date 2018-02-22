@@ -18,65 +18,66 @@ namespace TNW\Stripe\Model\Adapter;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
-use Stripe\Refund;
-use TNW\Stripe\Gateway\Config\Config;
-use Magento\Framework\Encryption\EncryptorInterface;
 use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 
 class StripeAdapter
 {
-    private $config;
-
-    protected $encryptor;
-
-    public function __construct(
-        Config $config,
-        EncryptorInterface $encryptorInterface
-    ) {
-        $this->encryptor = $encryptorInterface;
-        $this->config = $config;
-        $this->initCredentials();
-    }
-
-    protected function initCredentials()
+    /**
+     * StripeAdapter constructor.
+     * @param string $secretKey
+     */
+    public function __construct($secretKey)
     {
-        Stripe::setApiKey($this->encryptor->decrypt($this->config->getSecretKey()));
+        $this->secretKey($secretKey);
     }
 
+    /**
+     * @param string|null $value
+     */
+    public function secretKey($value = null)
+    {
+        Stripe::setApiKey($value);
+    }
+
+    /**
+     * @param $transactionId
+     * @param null $amount
+     * @return Charge
+     */
     public function refund($transactionId, $amount = null)
     {
-        return Refund::create([
-        'charge' => $transactionId,
-        'amount' => $amount
-        ]);
+        return Charge::retrieve($transactionId)
+            ->refund(['amount' => $amount]);
     }
 
-    public function sale($attributes)
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function sale(array $attributes)
     {
-        if (isset($attributes[PaymentDataBuilder::SAVE_IN_VAULT])) {
-            unset($attributes[PaymentDataBuilder::SAVE_IN_VAULT]);
-            $attributes = $this->_saveCustomerCard($attributes);
-
-            if ($attributes instanceof \Stripe\Error\Card) {
-                return $attributes;
-            }
-        }
-        try {
-            return Charge::create($attributes);
-        } catch (\Stripe\Error\Card $e) {
-            return $e;
-        }
+        return Charge::create($attributes);
     }
 
-    public function submitForSettlement($transactionId, $amount = null)
+    /**
+     * @param string $transactionId
+     * @param null $amount
+     * @return Charge
+     */
+    public function capture($transactionId, $amount = null)
     {
-        $charge = Charge::retrieve($transactionId);
-        return $charge->capture(['amount' => $amount]);
+        return Charge::retrieve($transactionId)
+            ->capture(['amount' => $amount]);
     }
 
+    /**
+     * @param string $transactionId
+     * @return Charge
+     */
     public function void($transactionId)
     {
-        return Refund::create(['charge' => $transactionId]);
+        return Charge::retrieve($transactionId)
+            ->refund();
     }
 
   /**

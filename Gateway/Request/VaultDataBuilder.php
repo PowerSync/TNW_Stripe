@@ -13,23 +13,20 @@
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace TNW\Stripe\Gateway\Http\Client;
+namespace TNW\Stripe\Gateway\Request;
+
+use Magento\Payment\Gateway\Request\BuilderInterface;
 
 /**
- * Transaction Sale
+ * Vault Data Builder
  */
-class TransactionSale extends AbstractTransaction
+class VaultDataBuilder implements BuilderInterface
 {
     /**
      * @inheritdoc
      */
-    protected function process(array $data)
+    public function build(array $buildSubject)
     {
-        $storeId = $data['store_id'] ?? null;
-        // sending store id and other additional keys are restricted by Stripe API
-        unset($data['store_id']);
-
-        return $this->adapterFactory->create($storeId)
-            ->sale($data);
+        return [];
     }
 }

@@ -28,25 +28,21 @@ class PaymentDataBuilder implements BuilderInterface
     use Formatter;
   
     const AMOUNT = 'amount';
+    const CURRENCY = 'currency';
     const SOURCE = 'source';
     const ORDER_ID = 'description';
-    const CURRENCY = 'currency';
-    const CAPTURE = 'capture';
-    const CUSTOMER = 'customer';
-    const SAVE_IN_VAULT = 'save_in_vault';
 
-  /** @var Config  */
-    protected $config;
+    /** @var Config  */
+    private $config;
 
-  /** @var SubjectReader  */
-    protected $subjectReader;
+    /** @var SubjectReader  */
+    private $subjectReader;
 
-  /** @var Session  */
-    protected $customerSession;
+    /** @var Session  */
+    private $customerSession;
 
-  /** @var CustomerRepositoryInterface  */
-    protected $customerRepository;
-
+    /** @var CustomerRepositoryInterface  */
+    private $customerRepository;
 
   /**
    * PaymentDataBuilder constructor.
@@ -75,17 +71,18 @@ class PaymentDataBuilder implements BuilderInterface
     public function build(array $subject)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
+
         $payment = $paymentDataObject->getPayment();
         $order = $paymentDataObject->getOrder();
-    
-        $result = [
-        self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
-        self::ORDER_ID => $order->getOrderIncrementId(),
-        self::CURRENCY => $this->config->getCurrency(),
-        self::SOURCE => $this->getPaymentSource($payment),
-        self::CAPTURE => 'false'
-        ];
 
+        $result = [
+            self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
+            self::ORDER_ID => $order->getOrderIncrementId(),
+            self::CURRENCY => $this->config->getCurrency(),
+            self::SOURCE => $payment->getAdditionalInformation('cc_token'),
+            //self::CAPTURE => 'false'
+        ];
+/*
         if ($this->isSavePaymentInformation($payment)) {
             $stripeCustomerId = $this->getStripeCustomerId();
             if ($stripeCustomerId) {
@@ -93,7 +90,7 @@ class PaymentDataBuilder implements BuilderInterface
                 $result[self::SAVE_IN_VAULT] = true;
             }
         }
-
+*/
         return $result;
     }
 
@@ -142,23 +139,5 @@ class PaymentDataBuilder implements BuilderInterface
     protected function isSavePaymentInformation($payment)
     {
         return $payment->getAdditionalInformation('is_active_payment_token_enabler');
-    }
-
-  /**
-   * @param $payment
-   * @return array
-   */
-    protected function getPaymentSource($payment)
-    {
-        if ($token = $payment->getAdditionalInformation('cc_token')) {
-            return $token;
-        }
-        return [
-        'exp_month' => $payment->getCcExpMonth(),
-        'exp_year' => $payment->getCcExpYear(),
-        'number' => $payment->getCcNumber(),
-        'object' => 'card',
-        'cvc' => $payment->getCcCid(),
-        ];
     }
 }

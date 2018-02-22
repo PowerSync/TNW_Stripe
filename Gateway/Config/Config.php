@@ -15,9 +15,11 @@
  */
 namespace TNW\Stripe\Gateway\Config;
 
+use TNW\Stripe\Model\Adminhtml\Source\Environment;
+
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
-    const KEY_ENVIRONMENT = 'test_mode';
+    const KEY_ENVIRONMENT = 'environment';
     const KEY_ACTIVE = 'active';
     const KEY_LIVE_PUBLISHABLE_KEY = 'live_publishable_key';
     const KEY_LIVE_SECRET_KEY = 'live_secret_key';
@@ -30,88 +32,97 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_ALLOW_SPECIFIC = 'allowspecific';
     const KEY_SPECIFIC_COUNTRY = 'specificcountry';
 
-  /**
-   * @return array
-   */
-    public function getAvailableCardTypes()
+    /**
+     * @param int|null $storeId
+     * @return array
+     */
+    public function getAvailableCardTypes($storeId = null)
     {
-        $ccTypes = $this->getValue(self::KEY_CC_TYPES);
+        $ccTypes = $this->getValue(self::KEY_CC_TYPES, $storeId);
 
         return !empty($ccTypes) ? explode(',', $ccTypes) : [];
     }
 
-  /**
-   * @return array|mixed
-   */
-    public function getCcTypesMapper()
+    /**
+     * @param int|null $storeId
+     * @return array
+     */
+    public function getCcTypesMapper($storeId = null)
     {
         $result = json_decode(
-            $this->getValue(self::KEY_CC_TYPES_STRIPE_MAPPER),
+            $this->getValue(self::KEY_CC_TYPES_STRIPE_MAPPER, $storeId),
             true
         );
 
         return is_array($result) ? $result : [];
     }
 
-  /**
-   * @return mixed
-   */
-    public function getCurrency()
+    /**
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getCurrency($storeId = null)
     {
-        return $this->getValue(self::KEY_CURRENCY);
+        return $this->getValue(self::KEY_CURRENCY, $storeId);
     }
 
-  /**
-   * @return bool
-   */
-    public function isCcvEnabled()
+    /**
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isCcvEnabled($storeId = null)
     {
-        return (bool) $this->getValue(self::KEY_USE_CCV);
+        return (bool) $this->getValue(self::KEY_USE_CCV, $storeId);
     }
 
-  /**
-   * @return mixed
-   */
-    public function getEnvironment()
+    /**
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getEnvironment($storeId = null)
     {
-        return $this->getValue(Config::KEY_ENVIRONMENT);
+        return $this->getValue(Config::KEY_ENVIRONMENT, $storeId);
     }
 
-  /**
-   * @return bool
-   */
-    public function isActive()
+    /**
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isActive($storeId = null)
     {
-        return (bool) $this->getValue(self::KEY_ACTIVE);
+        return (bool) $this->getValue(self::KEY_ACTIVE, $storeId);
     }
 
-  /**
-   * @return mixed
-   */
-    public function getPublishableKey()
+    /**
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getPublishableKey($storeId = null)
     {
         if ($this->isTestMode()) {
-            return $this->getValue(self::KEY_TEST_PUBLISHABLE_KEY);
+            return $this->getValue(self::KEY_TEST_PUBLISHABLE_KEY, $storeId);
         }
-        return $this->getValue(self::KEY_LIVE_PUBLISHABLE_KEY);
+        return $this->getValue(self::KEY_LIVE_PUBLISHABLE_KEY, $storeId);
     }
 
-  /**
-   * @return mixed
-   */
-    public function getSecretKey()
+    /**
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getSecretKey($storeId = null)
     {
         if ($this->isTestMode()) {
-            return $this->getValue(self::KEY_TEST_SECRET_KEY);
+            return $this->getValue(self::KEY_TEST_SECRET_KEY, $storeId);
         }
-        return $this->getValue(self::KEY_LIVE_SECRET_KEY);
+        return $this->getValue(self::KEY_LIVE_SECRET_KEY, $storeId);
     }
 
-  /**
-   * @return bool
-   */
-    public function isTestMode()
+    /**
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isTestMode($storeId = null)
     {
-        return (bool) $this->getValue(self::KEY_ENVIRONMENT);
+        return (bool) $this->getEnvironment($storeId) == Environment::ENVIRONMENT_TEST;
     }
 }

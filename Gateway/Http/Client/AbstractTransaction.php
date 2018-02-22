@@ -15,7 +15,7 @@
  */
 namespace TNW\Stripe\Gateway\Http\Client;
 
-use TNW\Stripe\Model\Adapter\StripeAdapter;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use Magento\Payment\Gateway\Http\ClientException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
@@ -24,29 +24,47 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractTransaction implements ClientInterface
 {
-    protected $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    protected $customLogger;
+    /**
+     * @var Logger
+     */
+    private $customLogger;
 
-    protected $adapter;
+    /**
+     * @var StripeAdapterFactory
+     */
+    protected $adapterFactory;
 
+    /**
+     * AbstractTransaction constructor.
+     * @param LoggerInterface $logger
+     * @param Logger $customLogger
+     * @param StripeAdapterFactory $adapterFactory
+     */
     public function __construct(
         LoggerInterface $logger,
         Logger $customLogger,
-        StripeAdapter $adapter
+        StripeAdapterFactory $adapterFactory
     ) {
         $this->logger = $logger;
         $this->customLogger = $customLogger;
-        $this->adapter = $adapter;
+        $this->adapterFactory = $adapterFactory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function placeRequest(
         TransferInterface $transferObject
     ) {
         $data = $transferObject->getBody();
         $log = [
-        'request' => $data,
-        'client' => static::class
+            'request' => $data,
+            'client' => static::class
         ];
         $response['object'] = [];
 
@@ -56,7 +74,7 @@ abstract class AbstractTransaction implements ClientInterface
             $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
             $this->logger->critical($message);
             throw new ClientException($message);
-        }finally {
+        } finally {
             $log['response'] = (array) $response['object'];
             $this->customLogger->debug($log);
         }
@@ -64,5 +82,10 @@ abstract class AbstractTransaction implements ClientInterface
         return $response;
     }
 
+    /**
+     * Process http request
+     * @param array $data
+     * @return mixed
+     */
     abstract protected function process(array $data);
 }

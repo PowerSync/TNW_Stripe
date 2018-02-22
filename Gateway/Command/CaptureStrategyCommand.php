@@ -30,9 +30,20 @@ use Magento\Sales\Api\Data\TransactionInterface;
 
 class CaptureStrategyCommand implements CommandInterface
 {
+    /**
+     * Stripe authorize and capture command
+     */
     const SALE = 'sale';
 
-    const CAPTURE = 'settlement';
+    /**
+     * Stripe capture command
+     */
+    const CAPTURE = 'capture';
+
+    /**
+     * Stripe vault capture command
+     */
+    const VAULT_CAPTURE = 'vault_capture';
 
     private $commandPool;
     private $transactionRepository;
@@ -57,6 +68,12 @@ class CaptureStrategyCommand implements CommandInterface
         $this->stripeAdapter = $stripeAdapter;
     }
 
+    /**
+     * @param array $commandSubject
+     * @return Command\ResultInterface|null|void
+     * @throws Command\CommandException
+     * @throws \Magento\Framework\Exception\NotFoundException
+     */
     public function execute(array $commandSubject)
     {
         $paymentDataObject = $this->subjectReader->readPayment($commandSubject);
@@ -67,6 +84,10 @@ class CaptureStrategyCommand implements CommandInterface
         $this->commandPool->get($command)->execute($commandSubject);
     }
 
+    /**
+     * @param OrderPaymentInterface $payment
+     * @return string
+     */
     private function getCommand(OrderPaymentInterface $payment)
     {
         $existsCapture = $this->isExistsCaptureTransaction($payment);
@@ -77,25 +98,32 @@ class CaptureStrategyCommand implements CommandInterface
         if (!$existsCapture) {
             return self::CAPTURE;
         }
+
+        // process capture for payment via Vault
+        return self::VAULT_CAPTURE;
     }
 
+    /**
+     * @param OrderPaymentInterface $payment
+     * @return bool
+     */
     private function isExistsCaptureTransaction(OrderPaymentInterface $payment)
     {
         $this->searchCriteriaBuilder->addFilters(
             [
             $this->filterBuilder
-            ->setField('payment_id')
-            ->setValue($payment->getId())
-            ->create()
+                ->setField('payment_id')
+                ->setValue($payment->getId())
+                ->create()
             ]
         );
 
         $this->searchCriteriaBuilder->addFilters(
             [
             $this->filterBuilder
-            ->setField('txn_type')
-            ->setValue(TransactionInterface::TYPE_CAPTURE)
-            ->create()
+                ->setField('txn_type')
+                ->setValue(TransactionInterface::TYPE_CAPTURE)
+                ->create()
             ]
         );
 

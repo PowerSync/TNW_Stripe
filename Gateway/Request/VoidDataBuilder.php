@@ -17,7 +17,6 @@ namespace TNW\Stripe\Gateway\Request;
 
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Sales\Model\Order\Payment;
 
 class VoidDataBuilder implements BuilderInterface
 {
@@ -35,7 +34,7 @@ class VoidDataBuilder implements BuilderInterface
         $payment = $paymentDataObject->getPayment();
 
         return [
-        'transaction_id' => $payment->getParentTransactionId() ?: $payment->getLastTransId()
+            'transaction_id' => $payment->getParentTransactionId() ?: $payment->getLastTransId()
         ];
     }
 }

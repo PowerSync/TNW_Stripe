@@ -15,21 +15,28 @@
  */
 namespace TNW\Stripe\Model\Adminhtml\Source;
 
-use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Framework\Option\ArrayInterface;
 
-class PaymentAction implements ArrayInterface
+class Environment implements ArrayInterface
 {
+    const ENVIRONMENT_LIVE = 'live';
+    const ENVIRONMENT_TEST = 'test';
+
+    /**
+     * Possible environment types
+     *
+     * @return array
+     */
     public function toOptionArray()
     {
         return [
             [
-                'value' => AbstractMethod::ACTION_AUTHORIZE,
-                'label' => __('Authorize')
+                'value' => self::ENVIRONMENT_TEST,
+                'label' => __('Test'),
             ],
             [
-                'value' => AbstractMethod::ACTION_AUTHORIZE_CAPTURE,
-                'label' => __('Authorize and Capture')
+                'value' => self::ENVIRONMENT_LIVE,
+                'label' => __('Live')
             ]
         ];
     }

@@ -15,17 +15,24 @@
  */
 namespace TNW\Stripe\Gateway\Http\Client;
 
-use Magento\Sales\Model\Order\Payment;
 use TNW\Stripe\Gateway\Request\CaptureDataBuilder;
 use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 
-class TransactionSubmitForSettlement extends AbstractTransaction
+/**
+ * Transaction Capture
+ */
+class TransactionCapture extends AbstractTransaction
 {
+    /**
+     * @inheritdoc
+     */
     protected function process(array $data)
     {
-        return $this->adapter->submitForSettlement(
-            $data[CaptureDataBuilder::TRANSACTION_ID],
-            $data[PaymentDataBuilder::AMOUNT]
-        );
+        $storeId = $data['store_id'] ?? null;
+        // sending store id and other additional keys are restricted by Stripe API
+        unset($data['store_id']);
+
+        return $this->adapterFactory->create($storeId)
+            ->capture($data[CaptureDataBuilder::TRANSACTION_ID], $data[PaymentDataBuilder::AMOUNT]);
     }
 }
