@@ -5,25 +5,21 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
-use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Payment\Helper\Formatter;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 
 /**
- * Class VaultCaptureDataBuilder
+ * This builder is used for correct store resolving and used only to retrieve correct store ID.
+ * The data from this build won't be send to Stripe Gateway.
  */
-class VaultCaptureDataBuilder implements BuilderInterface
+class StoreDataBuilder implements BuilderInterface
 {
-    use Formatter;
-
     /**
      * @var SubjectReader
      */
     private $subjectReader;
 
     /**
-     * Constructor
-     *
      * @param SubjectReader $subjectReader
      */
     public function __construct(SubjectReader $subjectReader)
@@ -37,13 +33,10 @@ class VaultCaptureDataBuilder implements BuilderInterface
     public function build(array $buildSubject)
     {
         $paymentDO = $this->subjectReader->readPayment($buildSubject);
+        $order = $paymentDO->getOrder();
 
-        $payment = $paymentDO->getPayment();
-        $extensionAttributes = $payment->getExtensionAttributes();
-        $paymentToken = $extensionAttributes->getVaultPaymentToken();
         return [
-            PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($buildSubject)),
-            'paymentMethodToken' => $paymentToken->getGatewayToken()
+            'store_id' => $order->getStoreId()
         ];
     }
 }

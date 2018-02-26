@@ -16,14 +16,14 @@
 namespace TNW\Stripe\Gateway\Command;
 
 use TNW\Stripe\Model\Adapter\StripeAdapter;
-use TNW\Stripe\Model\Adapter\StripeSearchAdapter;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Payment\Gateway\Command;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\CommandInterface;
 use Magento\Payment\Gateway\Helper\ContextHelper;
-use TNW\Stripe\Gateway\Helper\SubjectReader;
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
@@ -38,7 +38,7 @@ class CaptureStrategyCommand implements CommandInterface
     /**
      * Stripe capture command
      */
-    const CAPTURE = 'capture';
+    const CAPTURE = 'settlement';
 
     /**
      * Stripe vault capture command
@@ -76,20 +76,22 @@ class CaptureStrategyCommand implements CommandInterface
      */
     public function execute(array $commandSubject)
     {
-        $paymentDataObject = $this->subjectReader->readPayment($commandSubject);
-        $paymentInfo = $paymentDataObject->getPayment();
-        ContextHelper::assertOrderPayment($paymentInfo);
+        /** @var \Magento\Payment\Gateway\Data\PaymentDataObjectInterface $paymentDO */
+        $paymentDO = $this->subjectReader->readPayment($commandSubject);
 
-        $command = $this->getCommand($paymentInfo);
+        $command = $this->getCommand($paymentDO);
         $this->commandPool->get($command)->execute($commandSubject);
     }
 
     /**
-     * @param OrderPaymentInterface $payment
+     * @param PaymentDataObjectInterface $paymentDO
      * @return string
      */
-    private function getCommand(OrderPaymentInterface $payment)
+    private function getCommand(PaymentDataObjectInterface $paymentDO)
     {
+        $payment = $paymentDO->getPayment();
+        ContextHelper::assertOrderPayment($payment);
+
         $existsCapture = $this->isExistsCaptureTransaction($payment);
         if (!$payment->getAuthorizationTransaction() && !$existsCapture) {
             return self::SALE;

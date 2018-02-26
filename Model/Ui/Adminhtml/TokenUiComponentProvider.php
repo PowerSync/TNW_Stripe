@@ -60,13 +60,13 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
         $jsonDetails = json_decode($paymentToken->getTokenDetails() ?: '{}', true);
         $component = $this->componentFactory->create(
             [
-            'config' => [
-            'code' => ConfigProvider::CC_VAULT_CODE,
-            TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
-            TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash(),
-            'template' => 'TNW_Stripe::form/vault.phtml'
-            ],
-            'name' => Template::class
+                'config' => [
+                    'code' => ConfigProvider::CC_VAULT_CODE,
+                    TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
+                    TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash(),
+                    'template' => 'TNW_Stripe::form/vault.phtml'
+                ],
+                'name' => Template::class
             ]
         );
 

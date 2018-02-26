@@ -79,28 +79,4 @@ class StripeAdapter
         return Charge::retrieve($transactionId)
             ->refund();
     }
-
-  /**
-   * @param $attributes
-   * @return \Exception|\Stripe\Error\Card|array
-   * @throws \Magento\Framework\Validator\Exception
-   */
-    protected function _saveCustomerCard($attributes)
-    {
-        try {
-            $stripeCustomer = Customer::retrieve($attributes[PaymentDataBuilder::CUSTOMER]);
-
-            $card = $stripeCustomer->sources->create([
-            'source' => $attributes[PaymentDataBuilder::SOURCE]
-            ]);
-
-            $attributes[PaymentDataBuilder::SOURCE] = $card->id;
-
-            return $attributes;
-        } catch (\Stripe\Error\Card $e) {
-            return $e;
-        } catch (\Exception $e) {
-            throw new \Magento\Framework\Validator\Exception(__($e->getMessage()));
-        }
-    }
 }

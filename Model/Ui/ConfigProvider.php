@@ -25,20 +25,13 @@ class ConfigProvider implements ConfigProviderInterface
     const CC_VAULT_CODE = 'tnw_stripe_vault';
 
     /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
      * @var Config
      */
     private $config;
 
     public function __construct(
-        EncryptorInterface $encryptorInterface,
         Config $config
     ) {
-        $this->encryptor = $encryptorInterface;
         $this->config = $config;
     }
 
@@ -59,6 +52,6 @@ class ConfigProvider implements ConfigProviderInterface
 
     public function getPublishableKey()
     {
-        return $this->encryptor->decrypt($this->config->getPublishableKey());
+        return $this->config->getPublishableKey();
     }
 }

@@ -48,16 +48,16 @@ class AddressDataBuilder implements BuilderInterface
         $shippingAddress = $order->getShippingAddress();
         if ($shippingAddress) {
             $result[self::SHIPPING_ADDRESS] = [
-            'address' => [
-              self::STREET_ADDRESS => $shippingAddress->getStreetLine1(),
-              self::EXTENDED_ADDRESS => $shippingAddress->getStreetLine2(),
-              self::LOCALITY => $shippingAddress->getCity(),
-              self::REGION => $shippingAddress->getRegionCode(),
-              self::POSTAL_CODE => $shippingAddress->getPostcode(),
-              self::COUNTRY_CODE => $shippingAddress->getCountryId()
-            ],
-            self::NAME => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
-            self::PHONE => $shippingAddress->getTelephone()
+                'address' => [
+                    self::STREET_ADDRESS => $shippingAddress->getStreetLine1(),
+                    self::EXTENDED_ADDRESS => $shippingAddress->getStreetLine2(),
+                    self::LOCALITY => $shippingAddress->getCity(),
+                    self::REGION => $shippingAddress->getRegionCode(),
+                    self::POSTAL_CODE => $shippingAddress->getPostcode(),
+                    self::COUNTRY_CODE => $shippingAddress->getCountryId()
+                ],
+                self::NAME => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
+                self::PHONE => $shippingAddress->getTelephone()
             ];
         }
 

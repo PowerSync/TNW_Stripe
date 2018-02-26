@@ -30,7 +30,8 @@ class PaymentDataBuilder implements BuilderInterface
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const SOURCE = 'source';
-    const ORDER_ID = 'description';
+    const DESCRIPTION = 'description';
+    const CAPTURE = 'capture';
 
     /** @var Config  */
     private $config;
@@ -70,74 +71,19 @@ class PaymentDataBuilder implements BuilderInterface
    */
     public function build(array $subject)
     {
-        $paymentDataObject = $this->subjectReader->readPayment($subject);
+        $paymentDO = $this->subjectReader->readPayment($subject);
 
-        $payment = $paymentDataObject->getPayment();
-        $order = $paymentDataObject->getOrder();
+        $payment = $paymentDO->getPayment();
+        $order = $paymentDO->getOrder();
 
         $result = [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
-            self::ORDER_ID => $order->getOrderIncrementId(),
+            self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $this->config->getCurrency(),
             self::SOURCE => $payment->getAdditionalInformation('cc_token'),
-            //self::CAPTURE => 'false'
+            self::CAPTURE => false
         ];
-/*
-        if ($this->isSavePaymentInformation($payment)) {
-            $stripeCustomerId = $this->getStripeCustomerId();
-            if ($stripeCustomerId) {
-                $result[self::CUSTOMER] = $stripeCustomerId;
-                $result[self::SAVE_IN_VAULT] = true;
-            }
-        }
-*/
+
         return $result;
-    }
-
-  /**
-   * @return string
-   */
-    protected function getStripeCustomerId()
-    {
-        $customer = $this->customerRepository->getById($this->customerSession->getCustomerId());
-        $stripeCustomerId = $customer->getCustomAttribute('stripe_customer_id');
-
-        if (!$stripeCustomerId) {
-            $stripeCustomerId = $this->createNewStripeCustomer($customer->getEmail());
-            $customer->setCustomAttribute('stripe_customer_id', $stripeCustomerId);
-
-            $this->customerRepository->save($customer);
-
-            return $stripeCustomerId;
-        }
-
-        return $stripeCustomerId->getValue();
-    }
-
-  /**
-   * @param $email
-   * @return string|null
-   * @throws \Magento\Framework\Validator\Exception
-   */
-    protected function createNewStripeCustomer($email)
-    {
-        try {
-            $result = Customer::create([
-            'description' => 'Customer for ' . $email,
-            ]);
-        } catch (\Exception $e) {
-            throw new \Magento\Framework\Validator\Exception(__($e->getMessage()));
-        }
-
-        return $result->id;
-    }
-
-  /**
-   * @param \Magento\Payment\Model\InfoInterface $payment
-   * @return mixed
-   */
-    protected function isSavePaymentInformation($payment)
-    {
-        return $payment->getAdditionalInformation('is_active_payment_token_enabler');
     }
 }

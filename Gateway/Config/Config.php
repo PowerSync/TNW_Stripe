@@ -123,6 +123,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function isTestMode($storeId = null)
     {
-        return (bool) $this->getEnvironment($storeId) == Environment::ENVIRONMENT_TEST;
+        return $this->getEnvironment($storeId) == Environment::ENVIRONMENT_TEST;
     }
 }

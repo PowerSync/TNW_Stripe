@@ -28,11 +28,11 @@ class PaymentDetailsHandler implements HandlerInterface
     const CAPTURE = 'captured';
     const TYPE = 'type';
 
-    protected $additionalInformationMapping = [
-    self::RISK_LEVEL,
-    self::SELLER_MESSAGE,
-    self::CAPTURE,
-    self::TYPE
+    private $additionalInformationMapping = [
+        self::RISK_LEVEL,
+        self::SELLER_MESSAGE,
+        self::CAPTURE,
+        self::TYPE
     ];
 
     private $subjectReader;

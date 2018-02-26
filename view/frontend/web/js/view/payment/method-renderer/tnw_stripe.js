@@ -202,12 +202,12 @@ define([
         var self = this;
 
         this.isPlaceOrderActionAllowed(false);
-        fullScreenLoader.startLoader();
+        //fullScreenLoader.startLoader();
 
         self.stripe.createToken(self.stripeCard, this.getAddressData())
           .then(function (response) {
             if (response.error) {
-              fullScreenLoader.stopLoader();
+              //fullScreenLoader.stopLoader();
               self.isPlaceOrderActionAllowed(true);
 
               self.messageContainer.addErrorMessage({
