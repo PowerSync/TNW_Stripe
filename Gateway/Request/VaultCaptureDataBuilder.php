@@ -5,9 +5,11 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
+use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Payment\Helper\Formatter;
+use TNW\Stripe\Helper\Payment\Formatter;
+use Magento\Sales\Model\Order\Payment;
 
 /**
  * Class VaultCaptureDataBuilder
@@ -17,6 +19,11 @@ class VaultCaptureDataBuilder implements BuilderInterface
     use Formatter;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @var SubjectReader
      */
     private $subjectReader;
@@ -24,10 +31,14 @@ class VaultCaptureDataBuilder implements BuilderInterface
     /**
      * Constructor
      *
+     * @param Config $config
      * @param SubjectReader $subjectReader
      */
-    public function __construct(SubjectReader $subjectReader)
-    {
+    public function __construct(
+        Config $config,
+        SubjectReader $subjectReader
+    ) {
+        $this->config = $config;
         $this->subjectReader = $subjectReader;
     }
 
@@ -38,12 +49,15 @@ class VaultCaptureDataBuilder implements BuilderInterface
     {
         $paymentDO = $this->subjectReader->readPayment($buildSubject);
 
+        /** @var Payment $payment */
         $payment = $paymentDO->getPayment();
         $extensionAttributes = $payment->getExtensionAttributes();
         $paymentToken = $extensionAttributes->getVaultPaymentToken();
+
         return [
             PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($buildSubject)),
-            'paymentMethodToken' => $paymentToken->getGatewayToken()
+            PaymentDataBuilder::CURRENCY => $this->config->getCurrency(),
+            PaymentDataBuilder::CUSTOMER => $paymentToken->getGatewayToken(),
         ];
     }
 }

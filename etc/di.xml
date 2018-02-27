@@ -155,6 +155,7 @@
     <arguments>
       <argument name="builders" xsi:type="array">
         <item name="authorize" xsi:type="string">StripeAuthorizeRequest</item>
+        <item name="settlement" xsi:type="string">TNW\Stripe\Gateway\Request\SettlementDataBuilder</item>
       </argument>
     </arguments>
   </virtualType>
@@ -193,6 +194,7 @@
       <argument name="builders" xsi:type="array">
         <item name="payment" xsi:type="string">TNW\Stripe\Gateway\Request\PaymentDataBuilder</item>
         <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
+        <item name="vault_capture" xsi:type="string">TNW\Stripe\Gateway\Request\VaultCaptureDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
     </arguments>
@@ -208,6 +210,7 @@
     <arguments>
       <argument name="builders" xsi:type="array">
         <item name="authorize" xsi:type="string">StripeVaultAuthorizeRequest</item>
+        <item name="settlement" xsi:type="string">TNW\Stripe\Gateway\Request\SettlementDataBuilder</item>
       </argument>
     </arguments>
   </virtualType>
@@ -217,7 +220,7 @@
     <arguments>
       <argument name="requestBuilder" xsi:type="object">StripeVaultCaptureRequest</argument>
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
-      <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionCapture</argument>
+      <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionSale</argument>
       <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\TransactionIdHandler</argument>
       <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\ResponseValidator</argument>
     </arguments>
@@ -226,6 +229,7 @@
     <arguments>
       <argument name="builders" xsi:type="array">
         <item name="vault_capture" xsi:type="string">TNW\Stripe\Gateway\Request\VaultCaptureDataBuilder</item>
+        <item name="settlement" xsi:type="string">TNW\Stripe\Gateway\Request\SettlementDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
     </arguments>

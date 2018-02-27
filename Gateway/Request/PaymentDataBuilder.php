@@ -21,7 +21,6 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Helper\Payment\Formatter;
 use Magento\Customer\Model\Session;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Stripe\Customer;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -32,6 +31,7 @@ class PaymentDataBuilder implements BuilderInterface
     const SOURCE = 'source';
     const DESCRIPTION = 'description';
     const CAPTURE = 'capture';
+    const CUSTOMER = 'customer';
 
     /** @var Config  */
     private $config;
@@ -73,6 +73,7 @@ class PaymentDataBuilder implements BuilderInterface
     {
         $paymentDO = $this->subjectReader->readPayment($subject);
 
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDO->getPayment();
         $order = $paymentDO->getOrder();
 
@@ -80,9 +81,16 @@ class PaymentDataBuilder implements BuilderInterface
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
             self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $this->config->getCurrency(),
-            self::SOURCE => $payment->getAdditionalInformation('cc_token'),
             self::CAPTURE => false
         ];
+
+        $token = $payment->getAdditionalInformation('cc_token');
+        if (false && $payment->getAdditionalInformation('is_active_payment_token_enabler')) {
+            $customer = '';
+            $result[self::CUSTOMER] = $customer;
+        } else {
+            $result[self::SOURCE] = $token;
+        }
 
         return $result;
     }

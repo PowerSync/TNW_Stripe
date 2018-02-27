@@ -18,7 +18,6 @@ namespace TNW\Stripe\Model\Adapter;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
-use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
 
 class StripeAdapter
 {
@@ -78,5 +77,18 @@ class StripeAdapter
     {
         return Charge::retrieve($transactionId)
             ->refund();
+    }
+
+    /**
+     * @param string $email
+     * @param string $source
+     * @return Customer
+     */
+    public function customer($email, $source)
+    {
+        return Customer::create([
+            "email" => $email,
+            "source" => $source,
+        ]);
     }
 }

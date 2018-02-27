@@ -46,10 +46,12 @@ class CardDetailsHandler implements HandlerInterface
         $payment = $paymentDataObject->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
-        $creditCard = $transaction['source']->__toArray();
-        $payment->setCcLast4($creditCard[self::CARD_LAST4]);
-        $payment->setCcExpMonth($creditCard[self::CARD_EXP_MONTH]);
-        $payment->setCcExpYear($creditCard[self::CARD_EXP_YEAR]);
-        $payment->setCcType($creditCard[self::CARD_TYPE]);
+        /** @var \Stripe\Source $source */
+        $source = $transaction['source'];
+
+        $payment->setCcLast4($source->card[self::CARD_LAST4]);
+        $payment->setCcExpMonth($source->card[self::CARD_EXP_MONTH]);
+        $payment->setCcExpYear($source->card[self::CARD_EXP_YEAR]);
+        $payment->setCcType($source->card[self::CARD_TYPE]);
     }
 }

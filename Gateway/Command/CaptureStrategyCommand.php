@@ -45,24 +45,48 @@ class CaptureStrategyCommand implements CommandInterface
      */
     const VAULT_CAPTURE = 'vault_capture';
 
+    /**
+     * @var CommandPoolInterface
+     */
     private $commandPool;
+
+    /**
+     * @var TransactionRepositoryInterface
+     */
     private $transactionRepository;
-    private $filterBuilder;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
     private $searchCriteriaBuilder;
+
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
+
+    /**
+     * @var StripeAdapter
+     */
     private $stripeAdapter;
 
+    /**
+     * Constructor.
+     * @param CommandPoolInterface $commandPool
+     * @param TransactionRepositoryInterface $repository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param SubjectReader $subjectReader
+     * @param StripeAdapter $stripeAdapter
+     */
     public function __construct(
         CommandPoolInterface $commandPool,
         TransactionRepositoryInterface $repository,
-        FilterBuilder $filterBuilder,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SubjectReader $subjectReader,
         StripeAdapter $stripeAdapter
     ) {
         $this->commandPool = $commandPool;
         $this->transactionRepository = $repository;
-        $this->filterBuilder = $filterBuilder;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->subjectReader = $subjectReader;
         $this->stripeAdapter = $stripeAdapter;
@@ -111,27 +135,15 @@ class CaptureStrategyCommand implements CommandInterface
      */
     private function isExistsCaptureTransaction(OrderPaymentInterface $payment)
     {
-        $this->searchCriteriaBuilder->addFilters(
-            [
-            $this->filterBuilder
-                ->setField('payment_id')
-                ->setValue($payment->getId())
-                ->create()
-            ]
-        );
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter('payment_id', $payment->getId())
+            ->addFilter('txn_type', TransactionInterface::TYPE_CAPTURE)
+            ->create();
 
-        $this->searchCriteriaBuilder->addFilters(
-            [
-            $this->filterBuilder
-                ->setField('txn_type')
-                ->setValue(TransactionInterface::TYPE_CAPTURE)
-                ->create()
-            ]
-        );
+        $count = $this->transactionRepository
+            ->getList($searchCriteria)
+            ->getTotalCount();
 
-        $searchCriteria = $this->searchCriteriaBuilder->create();
-
-        $count = $this->transactionRepository->getList($searchCriteria)->getTotalCount();
         return (boolean) $count;
     }
 }

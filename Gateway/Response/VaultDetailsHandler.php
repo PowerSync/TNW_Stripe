@@ -15,58 +15,70 @@
  */
 namespace TNW\Stripe\Gateway\Response;
 
+use Stripe\Customer;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
-use Magento\Vault\Model\CreditCardTokenFactory;
+use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use TNW\Stripe\Gateway\Config\Config;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 
 class VaultDetailsHandler implements HandlerInterface
 {
-  /**
-   * @var CreditCardTokenFactory
-   */
-    protected $paymentTokenFactory;
+    /**
+     * @var PaymentTokenFactoryInterface
+     */
+    private $paymentTokenFactory;
 
-  /**
-   * @var OrderPaymentExtensionInterfaceFactory
-   */
-    protected $paymentExtensionFactory;
+    /**
+     * @var OrderPaymentExtensionInterfaceFactory
+     */
+    private $paymentExtensionFactory;
 
-  /**
-   * @var SubjectReader
-   */
-    protected $subjectReader;
+    /**
+     * @var StripeAdapterFactory
+     */
+    private $stripeAdapterFactory;
 
-  /** @var Config */
-    protected $config;
+    /**
+     * @var SubjectReader
+     */
+    private $subjectReader;
 
-  /**
-   * Constructor
-   *
-   * @param CreditCardTokenFactory $paymentTokenFactory
-   * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
-   * @param Config $config
-   * @param SubjectReader $subjectReader
-   */
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * Constructor
+     *
+     * @param PaymentTokenFactoryInterface $paymentTokenFactory
+     * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+     * @param StripeAdapterFactory $stripeAdapterFactory
+     * @param SubjectReader $subjectReader
+     * @param Config $config
+     */
     public function __construct(
-        CreditCardTokenFactory $paymentTokenFactory,
+        PaymentTokenFactoryInterface $paymentTokenFactory,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
-        Config $config,
-        SubjectReader $subjectReader
+        StripeAdapterFactory $stripeAdapterFactory,
+        SubjectReader $subjectReader,
+        Config $config
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
+        $this->stripeAdapterFactory = $stripeAdapterFactory;
         $this->subjectReader = $subjectReader;
         $this->config = $config;
     }
 
-  /**
-   * @inheritdoc
-   */
+    /**
+     * @inheritdoc
+     */
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = $this->subjectReader->readPayment($handlingSubject);
@@ -84,42 +96,42 @@ class VaultDetailsHandler implements HandlerInterface
         }
     }
 
-  /**
-   * @param $transaction
-   * @return PaymentTokenInterface|null
-   */
+    /**
+     * @param $transaction
+     * @return PaymentTokenInterface|null
+     */
     private function getVaultPaymentToken($transaction)
     {
         // Check token existing in gateway response
-        $source = $transaction['source']->__toArray();
+        $source = $transaction['source'];
         if (!isset($source['id'])) {
             return null;
         }
 
         /** @var PaymentTokenInterface $paymentToken */
-        $paymentToken = $this->paymentTokenFactory->create();
+        $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
         $paymentToken->setGatewayToken($source['id']);
         $paymentToken->setExpiresAt($this->getExpirationDate($source));
 
         $paymentToken->setTokenDetails($this->convertDetailsToJSON([
-        'type' => $this->getCreditCardType($source['brand']),
-        'maskedCC' => $source['last4'],
-        'expirationDate' => $source['exp_month'] . '/' . $source['exp_year']
+            'type' => $this->getCreditCardType($source->card['brand']),
+            'maskedCC' => $source->card['last4'],
+            'expirationDate' => "{$source->card['exp_month']}/{$source->card['exp_year']}"
         ]));
 
         return $paymentToken;
     }
 
-  /**
-   * @param array $source
-   * @return string
-   */
+    /**
+     * @param array $source
+     * @return string
+     */
     private function getExpirationDate($source)
     {
         $expDate = new \DateTime(
-            $source['exp_year']
+            $source->card['exp_year']
             . '-'
-            . $source['exp_month']
+            . $source->card['exp_month']
             . '-'
             . '01'
             . ' '
@@ -130,23 +142,23 @@ class VaultDetailsHandler implements HandlerInterface
         return $expDate->format('Y-m-d 00:00:00');
     }
 
-  /**
-   * Convert payment token details to JSON
-   * @param array $details
-   * @return string
-   */
+    /**
+     * Convert payment token details to JSON
+     * @param array $details
+     * @return string
+     */
     private function convertDetailsToJSON($details)
     {
         $json = \Zend_Json::encode($details);
         return $json ? $json : '{}';
     }
 
-  /**
-   * Get type of credit card mapped from Stripe
-   *
-   * @param string $type
-   * @return array
-   */
+    /**
+     * Get type of credit card mapped from Stripe
+     *
+     * @param string $type
+     * @return array
+     */
     private function getCreditCardType($type)
     {
         $replaced = str_replace(' ', '-', strtolower($type));
@@ -155,11 +167,11 @@ class VaultDetailsHandler implements HandlerInterface
         return $mapper[$replaced];
     }
 
-  /**
-   * Get payment extension attributes
-   * @param InfoInterface $payment
-   * @return OrderPaymentExtensionInterface
-   */
+    /**
+     * Get payment extension attributes
+     * @param InfoInterface $payment
+     * @return OrderPaymentExtensionInterface
+     */
     private function getExtensionAttributes(InfoInterface $payment)
     {
         $extensionAttributes = $payment->getExtensionAttributes();
