@@ -28,10 +28,8 @@ class PaymentDataBuilder implements BuilderInterface
   
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
-    const SOURCE = 'source';
     const DESCRIPTION = 'description';
     const CAPTURE = 'capture';
-    const CUSTOMER = 'customer';
 
     /** @var Config  */
     private $config;
@@ -45,13 +43,13 @@ class PaymentDataBuilder implements BuilderInterface
     /** @var CustomerRepositoryInterface  */
     private $customerRepository;
 
-  /**
-   * PaymentDataBuilder constructor.
-   * @param Config $config
-   * @param SubjectReader $subjectReader
-   * @param Session $customerSession
-   * @param CustomerRepositoryInterface $customerRepository
-   */
+    /**
+     * PaymentDataBuilder constructor.
+     * @param Config $config
+     * @param SubjectReader $subjectReader
+     * @param Session $customerSession
+     * @param CustomerRepositoryInterface $customerRepository
+     */
     public function __construct(
         Config $config,
         SubjectReader $subjectReader,
@@ -64,34 +62,20 @@ class PaymentDataBuilder implements BuilderInterface
         $this->customerRepository = $customerRepository;
     }
 
-  /**
-   * @param array $subject
-   * @return array
-   * @throws \Magento\Framework\Validator\Exception
-   */
+    /**
+     * @param array $subject
+     * @return array
+     */
     public function build(array $subject)
     {
         $paymentDO = $this->subjectReader->readPayment($subject);
-
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
-        $payment = $paymentDO->getPayment();
         $order = $paymentDO->getOrder();
 
-        $result = [
+        return [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
             self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $this->config->getCurrency(),
             self::CAPTURE => false
         ];
-
-        $token = $payment->getAdditionalInformation('cc_token');
-        if (false && $payment->getAdditionalInformation('is_active_payment_token_enabler')) {
-            $customer = '';
-            $result[self::CUSTOMER] = $customer;
-        } else {
-            $result[self::SOURCE] = $token;
-        }
-
-        return $result;
     }
 }

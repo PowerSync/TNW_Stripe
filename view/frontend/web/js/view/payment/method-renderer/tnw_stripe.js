@@ -31,7 +31,7 @@ define([
         stripeCard: null,
         ccCode: null,
         ccMessageContainer: null,
-        source: null,
+          token: null,
 
         imports: {
           onActiveChange: 'active'
@@ -131,14 +131,14 @@ define([
       getData: function () {
         var data = this._super();
 
-        if (this.source) {
-          var card = this.source.card;
+        if (this.token) {
+          var card = this.token.card;
 
           data.additional_data.cc_exp_month = card.exp_month;
           data.additional_data.cc_exp_year = card.exp_year;
           data.additional_data.cc_last4 = card.last4;
           data.additional_data.cc_type = card.brand;
-          data.additional_data.cc_token = this.source.id;
+          data.additional_data.cc_token = this.token.id;
         }
 
         this.vaultEnabler.visitAdditionalData(data);
@@ -164,6 +164,34 @@ define([
       },
 
       /**
+       * Address
+       * @return {{name: string, address_country: string, address_line1: *}}
+       */
+      getAddressData: function () {
+        var billingAddress = quote.billingAddress();
+
+        var stripeData = {
+          name: billingAddress.firstname + ' ' + billingAddress.lastname,
+          address_country: billingAddress.countryId,
+          address_line1: billingAddress.street[0]
+        };
+
+        if (billingAddress.street.length === 2) {
+          stripeData.address_line2 = billingAddress.street[1];
+        }
+
+        if (billingAddress.hasOwnProperty('postcode')) {
+          stripeData.address_zip = billingAddress.postcode;
+        }
+
+        if (billingAddress.hasOwnProperty('regionCode')) {
+          stripeData.address_state = billingAddress.regionCode;
+        }
+
+        return stripeData;
+      },
+
+      /**
        * Returns state of place order button
        * @returns {Boolean}
        */
@@ -178,21 +206,18 @@ define([
         var self = this;
         this.isPlaceOrderActionAllowed(false);
 
-        self.stripe.createSource(self.stripeCard, {
-          usage: 'reusable',
-          flow: 'none'
-        }).then(function (response) {
-          if (response.error) {
-            self.isPlaceOrderActionAllowed(true);
-
-            self.messageContainer.addErrorMessage({
+        self.stripe.createToken(self.stripeCard, this.getAddressData())
+          .then(function (response) {
+            if (response.error) {
+              self.isPlaceOrderActionAllowed(true);
+              self.messageContainer.addErrorMessage({
                 'message': response.error.message
-            });
-          } else {
-            self.source = response.source;
-            self.placeOrder();
-          }
-        });
+              });
+            } else {
+              self.token = response.token;
+              self.placeOrder();
+            }
+          });
       }
     });
 });

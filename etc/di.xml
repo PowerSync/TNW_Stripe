@@ -140,6 +140,7 @@
       <argument name="builders" xsi:type="array">
         <item name="payment" xsi:type="string">TNW\Stripe\Gateway\Request\PaymentDataBuilder</item>
         <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
+        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\TokenDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
     </arguments>
@@ -194,7 +195,7 @@
       <argument name="builders" xsi:type="array">
         <item name="payment" xsi:type="string">TNW\Stripe\Gateway\Request\PaymentDataBuilder</item>
         <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
-        <item name="vault_capture" xsi:type="string">TNW\Stripe\Gateway\Request\VaultCaptureDataBuilder</item>
+        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\VaultTokenDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
     </arguments>
@@ -228,7 +229,9 @@
   <virtualType name="StripeVaultCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
     <arguments>
       <argument name="builders" xsi:type="array">
-        <item name="vault_capture" xsi:type="string">TNW\Stripe\Gateway\Request\VaultCaptureDataBuilder</item>
+        <item name="payment" xsi:type="string">TNW\Stripe\Gateway\Request\PaymentDataBuilder</item>
+        <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
+        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\VaultTokenDataBuilder</item>
         <item name="settlement" xsi:type="string">TNW\Stripe\Gateway\Request\SettlementDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
@@ -274,22 +277,38 @@
   <!-- Void Command -->
   <virtualType name="StripeVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
     <arguments>
+      <argument name="requestBuilder" xsi:type="object">StripeVoidRequest</argument>
       <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionVoid</argument>
-      <argument name="requestBuilder" xsi:type="object">TNW\Stripe\Gateway\Request\VoidDataBuilder</argument>
       <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\VoidHandler</argument>
       <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\GeneralResponseValidator</argument>
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="StripeVoidRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <arguments>
+      <argument name="builders" xsi:type="array">
+        <item name="void" xsi:type="string">TNW\Stripe\Gateway\Request\VoidDataBuilder</item>
+        <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
+      </argument>
     </arguments>
   </virtualType>
 
   <!-- Refund Command -->
   <virtualType name="StripeRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
     <arguments>
+      <argument name="requestBuilder" xsi:type="object">StripeRefundRequest</argument>
       <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionRefund</argument>
-      <argument name="requestBuilder" xsi:type="object">TNW\Stripe\Gateway\Request\RefundDataBuilder</argument>
       <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\GeneralResponseValidator</argument>
       <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\RefundHandler</argument>
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="StripeRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <arguments>
+      <argument name="builders" xsi:type="array">
+        <item name="refund" xsi:type="string">TNW\Stripe\Gateway\Request\RefundDataBuilder</item>
+        <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
+      </argument>
     </arguments>
   </virtualType>
 

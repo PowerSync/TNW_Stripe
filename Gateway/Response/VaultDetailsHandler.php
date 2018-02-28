@@ -15,7 +15,6 @@
  */
 namespace TNW\Stripe\Gateway\Response;
 
-use Stripe\Customer;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\InfoInterface;
@@ -24,7 +23,6 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use TNW\Stripe\Gateway\Config\Config;
-use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 
 class VaultDetailsHandler implements HandlerInterface
 {
@@ -37,11 +35,6 @@ class VaultDetailsHandler implements HandlerInterface
      * @var OrderPaymentExtensionInterfaceFactory
      */
     private $paymentExtensionFactory;
-
-    /**
-     * @var StripeAdapterFactory
-     */
-    private $stripeAdapterFactory;
 
     /**
      * @var SubjectReader
@@ -58,20 +51,17 @@ class VaultDetailsHandler implements HandlerInterface
      *
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
-     * @param StripeAdapterFactory $stripeAdapterFactory
      * @param SubjectReader $subjectReader
      * @param Config $config
      */
     public function __construct(
         PaymentTokenFactoryInterface $paymentTokenFactory,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
-        StripeAdapterFactory $stripeAdapterFactory,
         SubjectReader $subjectReader,
         Config $config
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
-        $this->stripeAdapterFactory = $stripeAdapterFactory;
         $this->subjectReader = $subjectReader;
         $this->config = $config;
     }
@@ -103,35 +93,37 @@ class VaultDetailsHandler implements HandlerInterface
     private function getVaultPaymentToken($transaction)
     {
         // Check token existing in gateway response
-        $source = $transaction['source'];
-        if (!isset($source['id'])) {
+        if (!isset($transaction['customer'])) {
             return null;
         }
 
+        /** @var \Stripe\Card $source */
+        $source = $transaction['source'];
+
         /** @var PaymentTokenInterface $paymentToken */
         $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
-        $paymentToken->setGatewayToken($source['id']);
+        $paymentToken->setGatewayToken($transaction['customer']);
         $paymentToken->setExpiresAt($this->getExpirationDate($source));
 
         $paymentToken->setTokenDetails($this->convertDetailsToJSON([
-            'type' => $this->getCreditCardType($source->card['brand']),
-            'maskedCC' => $source->card['last4'],
-            'expirationDate' => "{$source->card['exp_month']}/{$source->card['exp_year']}"
+            'type' => $this->getCreditCardType($source->brand),
+            'maskedCC' => $source->last4,
+            'expirationDate' => "{$source->exp_month}/{$source->exp_year}"
         ]));
 
         return $paymentToken;
     }
 
     /**
-     * @param array $source
+     * @param \Stripe\Card $source
      * @return string
      */
     private function getExpirationDate($source)
     {
         $expDate = new \DateTime(
-            $source->card['exp_year']
+            $source->exp_year
             . '-'
-            . $source->card['exp_month']
+            . $source->exp_month
             . '-'
             . '01'
             . ' '
