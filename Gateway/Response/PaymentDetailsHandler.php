@@ -15,8 +15,6 @@
  */
 namespace TNW\Stripe\Gateway\Response;
 
-use TNW\Stripe\Observer\DataAssignObserver;
-use Magento\Payment\Gateway\Helper\ContextHelper;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
@@ -47,12 +45,17 @@ class PaymentDetailsHandler implements HandlerInterface
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
         $transaction = $this->subjectReader->readTransaction($response);
+
+        /** @var OrderPaymentInterface $payment */
         $payment = $paymentDataObject->getPayment();
 
         $payment->setCcTransId($transaction['id']);
         $payment->setLastTransId($transaction['id']);
 
-        $outcome = $transaction['outcome']->__toArray();
+        $outcome = $transaction['outcome'];
+
+        //remove previously set payment token
+        $payment->unsAdditionalInformation('cc_token');
         foreach ($this->additionalInformationMapping as $item) {
             if (!isset($outcome[$item])) {
                 continue;

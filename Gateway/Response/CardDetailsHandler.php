@@ -27,10 +27,23 @@ class CardDetailsHandler implements HandlerInterface
     const CARD_EXP_MONTH = 'exp_month';
     const CARD_EXP_YEAR = 'exp_year';
     const CARD_LAST4 = 'last4';
+    const CARD_NUMBER = 'cc_number';
 
+    /**
+     * @var Config
+     */
     private $config;
+
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
 
+    /**
+     * Constructor.
+     * @param Config $config
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         Config $config,
         SubjectReader $subjectReader
@@ -39,10 +52,16 @@ class CardDetailsHandler implements HandlerInterface
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * @inheritdoc
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function handle(array $subject, array $response)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
         $transaction = $this->subjectReader->readTransaction($response);
+
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
@@ -52,6 +71,11 @@ class CardDetailsHandler implements HandlerInterface
         $payment->setCcLast4($source->card[self::CARD_LAST4]);
         $payment->setCcExpMonth($source->card[self::CARD_EXP_MONTH]);
         $payment->setCcExpYear($source->card[self::CARD_EXP_YEAR]);
+
         $payment->setCcType($source->card[self::CARD_TYPE]);
+
+        // set card details to additional info
+        $payment->setAdditionalInformation(self::CARD_NUMBER, 'xxxx-' . $source->card[self::CARD_LAST4]);
+        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $source->card[self::CARD_TYPE]);
     }
 }
