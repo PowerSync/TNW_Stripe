@@ -31,6 +31,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_USE_CCV = 'useccv';
     const KEY_ALLOW_SPECIFIC = 'allowspecific';
     const KEY_SPECIFIC_COUNTRY = 'specificcountry';
+    const KEY_SDK_URL = 'sdk_url';
 
     /**
      * @param int|null $storeId
@@ -124,5 +125,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isTestMode($storeId = null)
     {
         return $this->getEnvironment($storeId) == Environment::ENVIRONMENT_TEST;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSdkUrl()
+    {
+        return $this->getValue(self::KEY_SDK_URL);
     }
 }

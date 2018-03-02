@@ -170,19 +170,11 @@ define([
       var self = this;
       var container = $('#' + this.container);
 
-      var cardInfo = {
-        number: container.find('#' + self.code + '_cc_number').val(),
-
-        exp_month: container.find('#' + self.code + '_expiration').val(),
-        exp_year: container.find('#' + self.code + '_expiration_yr').val(),
-        cvc: container.find('#' + self.code + '_cc_cid').val()
-      };
-
       var defer = $.Deferred();
 
       self.stripe.createToken(self.stripeCard).then(function (response) {
         if (response.error) {
-          deffer.reject(response.error.message);
+          defer.reject(response.error.message);
         } else {
           var card = response.token.card;
           container.find('#' + self.code + '_expiration').val(card.exp_month);
