@@ -45,7 +45,7 @@
         <privateInfoKeys>risk_level,seller_message,captured,type</privateInfoKeys>
         <paymentInfoKeys>cc_type,cc_number,risk_level,seller_message,captured,type</paymentInfoKeys>
         <useccv>1</useccv>
-        <cctypes_stripe_mapper><![CDATA[{"american-express":"AE","discover":"DI","jcb":"JCB","mastercard":"MC","master-card":"MC","visa":"VI","maestro":"MI","diners-club":"DN","unionpay":"CUP"}]]></cctypes_stripe_mapper>
+        <cctypes_stripe_mapper><![CDATA[{"american-express":"AE","amex":"AE","discover":"DI","jcb":"JCB","mastercard":"MC","master-card":"MC","visa":"VI","maestro":"MI","diners-club":"DN","diners":"DN","unionpay":"CUP"}]]></cctypes_stripe_mapper>
         <order_status>processing</order_status>
         <sdk_url><![CDATA[https://js.stripe.com/v3/]]></sdk_url>
       </tnw_stripe>

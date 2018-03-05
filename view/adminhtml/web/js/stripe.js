@@ -48,6 +48,7 @@ define([
       domObserver.get('#' + self.container, function () {
         if (self.scriptLoaded()) {
           self.$selector.off('submit');
+          self.initStripe();
         }
       });
 
@@ -100,6 +101,18 @@ define([
       require(['https://js.stripe.com/v3/'], function () {
         state(true);
         self.stripe = window.Stripe(self.publishableKey);
+        self.initStripe();
+        $('body').trigger('processStop');
+      });
+    },
+
+    /**
+     * Create and mount card Stripe
+     */
+    initStripe: function () {
+      var self = this;
+
+      try {
         self.stripeCardElement = self.stripe.elements();
         self.stripeCard = self.stripeCardElement.create('card', {
           style: {
@@ -109,8 +122,9 @@ define([
           }
         });
         self.stripeCard.mount('#stripe-card-element');
-        $('body').trigger('processStop');
-      });
+      } catch (e) {
+        self.error(e.message);
+      }
     },
 
     /**

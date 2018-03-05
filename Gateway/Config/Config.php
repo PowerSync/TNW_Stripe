@@ -15,7 +15,9 @@
  */
 namespace TNW\Stripe\Gateway\Config;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Stripe\Model\Adminhtml\Source\Environment;
+use Magento\Framework\Serialize\Serializer\Json;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
@@ -25,13 +27,53 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_LIVE_SECRET_KEY = 'live_secret_key';
     const KEY_TEST_PUBLISHABLE_KEY = 'test_publishable_key';
     const KEY_TEST_SECRET_KEY = 'test_secret_key';
+    const KEY_COUNTRY_CREDIT_CARD = 'countrycreditcard';
     const KEY_CURRENCY = 'currency';
     const KEY_CC_TYPES = 'cctypes';
     const KEY_CC_TYPES_STRIPE_MAPPER = 'cctypes_stripe_mapper';
-    const KEY_USE_CCV = 'useccv';
+    const KEY_USE_CVV = 'useccv';
     const KEY_ALLOW_SPECIFIC = 'allowspecific';
     const KEY_SPECIFIC_COUNTRY = 'specificcountry';
     const KEY_SDK_URL = 'sdk_url';
+
+    /**
+     * @var Json
+     */
+    private $serializer;
+
+    /**
+     * Constructor.
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Json $serializer
+     * @param null $methodCode
+     * @param string $pathPattern
+     */
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        Json $serializer,
+        $methodCode = null,
+        $pathPattern = self::DEFAULT_PATH_PATTERN
+    ) {
+        parent::__construct($scopeConfig, $methodCode, $pathPattern);
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * Return the country specific card type config
+     *
+     * @param int|null $storeId
+     * @return array
+     */
+    public function getCountrySpecificCardTypeConfig($storeId = null)
+    {
+        $countryCardTypes = $this->getValue(self::KEY_COUNTRY_CREDIT_CARD, $storeId);
+        if (!$countryCardTypes) {
+            return [];
+        }
+
+        $countryCardTypes = $this->serializer->unserialize($countryCardTypes);
+        return is_array($countryCardTypes) ? $countryCardTypes : [];
+    }
 
     /**
      * @param int|null $storeId
@@ -59,6 +101,31 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Gets list of card types available for country.
+     *
+     * @param string $country
+     * @param int|null $storeId
+     * @return array
+     */
+    public function getCountryAvailableCardTypes($country, $storeId = null)
+    {
+        $types = $this->getCountrySpecificCardTypeConfig($storeId);
+
+        return (!empty($types[$country])) ? $types[$country] : [];
+    }
+
+    /**
+     * Checks if cvv field is enabled.
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isCvvEnabled($storeId = null)
+    {
+        return (bool) $this->getValue(self::KEY_USE_CVV, $storeId);
+    }
+
+    /**
      * @param int|null $storeId
      * @return string
      */
@@ -70,10 +137,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /**
      * @param int|null $storeId
      * @return bool
+     * @deprecated
+     * @see isCvvEnabled($storeId = null)
      */
     public function isCcvEnabled($storeId = null)
     {
-        return (bool) $this->getValue(self::KEY_USE_CCV, $storeId);
+        return $this->isCvvEnabled($storeId);
     }
 
     /**
@@ -103,6 +172,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         if ($this->isTestMode()) {
             return $this->getValue(self::KEY_TEST_PUBLISHABLE_KEY, $storeId);
         }
+
         return $this->getValue(self::KEY_LIVE_PUBLISHABLE_KEY, $storeId);
     }
 
@@ -115,6 +185,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         if ($this->isTestMode()) {
             return $this->getValue(self::KEY_TEST_SECRET_KEY, $storeId);
         }
+
         return $this->getValue(self::KEY_LIVE_SECRET_KEY, $storeId);
     }
 

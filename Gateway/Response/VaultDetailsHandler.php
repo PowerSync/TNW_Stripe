@@ -149,12 +149,16 @@ class VaultDetailsHandler implements HandlerInterface
      * Get type of credit card mapped from Stripe
      *
      * @param string $type
-     * @return array
+     * @return string
      */
     private function getCreditCardType($type)
     {
         $replaced = str_replace(' ', '-', strtolower($type));
         $mapper = $this->config->getCctypesMapper();
+
+        if (empty($mapper[$replaced])) {
+            return $type;
+        }
 
         return $mapper[$replaced];
     }

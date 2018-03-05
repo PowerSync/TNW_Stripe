@@ -41,12 +41,17 @@ class PaymentDetailsHandler implements HandlerInterface
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * @param array $subject
+     * @param array $response
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function handle(array $subject, array $response)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
         $transaction = $this->subjectReader->readTransaction($response);
 
-        /** @var OrderPaymentInterface $payment */
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
 
         $payment->setCcTransId($transaction['id']);
@@ -60,6 +65,7 @@ class PaymentDetailsHandler implements HandlerInterface
             if (!isset($outcome[$item])) {
                 continue;
             }
+
             $payment->setAdditionalInformation($item, $outcome[$item]);
         }
     }

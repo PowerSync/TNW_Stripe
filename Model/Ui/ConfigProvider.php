@@ -16,9 +16,12 @@
 namespace TNW\Stripe\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Session\SessionManagerInterface;
 use TNW\Stripe\Gateway\Config\Config;
 
+/**
+ * Config Provider
+ */
 class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'tnw_stripe';
@@ -29,10 +32,22 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $config;
 
+    /**
+     * @var SessionManagerInterface
+     */
+    private $session;
+
+    /**
+     * Constructor.
+     * @param Config $config
+     * @param SessionManagerInterface $session
+     */
     public function __construct(
-        Config $config
+        Config $config,
+        SessionManagerInterface $session
     ) {
         $this->config = $config;
+        $this->session = $session;
     }
 
     /**
@@ -40,18 +55,19 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
+        $storeId = $this->session->getStoreId();
         return [
             'payment' => [
                 self::CODE => [
-                  'publishableKey' => $this->getPublishableKey(),
-                  'vaultCode' => self::CC_VAULT_CODE,
+                    'publishableKey' => $this->config->getPublishableKey(),
+                    'vaultCode' => self::CC_VAULT_CODE,
+                    'ccTypesMapper' => $this->config->getCctypesMapper(),
+                    'sdkUrl' => $this->config->getSdkUrl(),
+                    'countrySpecificCardTypes' => $this->config->getCountrySpecificCardTypeConfig($storeId),
+                    'availableCardTypes' => $this->config->getAvailableCardTypes($storeId),
+                    'useCvv' => $this->config->isCvvEnabled($storeId),
                 ]
             ]
         ];
-    }
-
-    public function getPublishableKey()
-    {
-        return $this->config->getPublishableKey();
     }
 }

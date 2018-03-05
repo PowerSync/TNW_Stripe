@@ -23,10 +23,6 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
 
 class CardDetailsHandler implements HandlerInterface
 {
-    const CARD_TYPE = 'brand';
-    const CARD_EXP_MONTH = 'exp_month';
-    const CARD_EXP_YEAR = 'exp_year';
-    const CARD_LAST4 = 'last4';
     const CARD_NUMBER = 'cc_number';
 
     /**
@@ -65,17 +61,16 @@ class CardDetailsHandler implements HandlerInterface
         $payment = $paymentDataObject->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
-        /** @var \Stripe\Source $source */
+        /** @var \Stripe\Card $source */
         $source = $transaction['source'];
 
-        $payment->setCcLast4($source->card[self::CARD_LAST4]);
-        $payment->setCcExpMonth($source->card[self::CARD_EXP_MONTH]);
-        $payment->setCcExpYear($source->card[self::CARD_EXP_YEAR]);
-
-        $payment->setCcType($source->card[self::CARD_TYPE]);
+        $payment->setCcLast4($source->last4);
+        $payment->setCcExpMonth($source->exp_month);
+        $payment->setCcExpYear($source->exp_year);
+        $payment->setCcType($source->brand);
 
         // set card details to additional info
-        $payment->setAdditionalInformation(self::CARD_NUMBER, 'xxxx-' . $source->card[self::CARD_LAST4]);
-        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $source->card[self::CARD_TYPE]);
+        $payment->setAdditionalInformation(self::CARD_NUMBER, 'xxxx-' . $source->last4);
+        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $source->brand);
     }
 }
