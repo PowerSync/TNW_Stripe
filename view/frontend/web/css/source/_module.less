@@ -1,0 +1,80 @@
+// /**
+// * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+//  * See TNW_LICENSE.txt for license details.
+// */
+
+@stripe-input-border__color: @color-gray76;
+
+@stripe-error__color: @color-red10;
+@stripe-focus__color: @color-blue2;
+@stripe-success__color: @color-dark-green1;
+
+& when (@media-common = true) {
+    .payment-method-tnw_stripe {
+
+        .hosted-date-wrap {
+            &:extend(.abs-add-clearfix all);
+        }
+
+        .hosted-control {
+            .lib-form-element-input(@_type: input-text);
+            position: relative;
+            width: 225px;
+            padding: 5px 9px;
+
+            &.stripe-hosted-fields-focused {
+                border-color: @stripe-focus__color;
+            }
+
+            &.stripe-hosted-fields-invalid:not(.stripe-hosted-fields-focused) {
+                border-color: @stripe-error__color;
+
+                & ~ .hosted-error {
+                    height: auto;
+                    opacity: 1;
+                }
+            }
+
+            &.stripe-hosted-fields-valid {
+                border-color: @stripe-success__color;
+            }
+
+            &.hosted-cid {
+                width: 6rem;
+            }
+
+            &.hosted-date {
+                float: left;
+                margin-bottom: 7px;
+                width: 9rem;
+            }
+        }
+
+        .field-tooltip {
+            right: 0;
+        }
+
+        .hosted-error {
+            clear: both;
+            color: @stripe-error__color;
+            font-size: 1.2rem;
+            height: 0;
+            margin-top: 7px;
+            opacity: 0;
+        }
+    }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .payment-method-tnw_stripe {
+        .cvv {
+            .field-tooltip {
+                left: 6rem;
+            }
+        }
+    }
+}

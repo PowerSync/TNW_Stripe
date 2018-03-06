@@ -15,9 +15,7 @@
  */
 namespace TNW\Stripe\Gateway\Command;
 
-use TNW\Stripe\Model\Adapter\StripeAdapter;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
-use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Payment\Gateway\Command;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
@@ -66,30 +64,22 @@ class CaptureStrategyCommand implements CommandInterface
     private $subjectReader;
 
     /**
-     * @var StripeAdapter
-     */
-    private $stripeAdapter;
-
-    /**
      * Constructor.
      * @param CommandPoolInterface $commandPool
      * @param TransactionRepositoryInterface $repository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SubjectReader $subjectReader
-     * @param StripeAdapter $stripeAdapter
      */
     public function __construct(
         CommandPoolInterface $commandPool,
         TransactionRepositoryInterface $repository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        SubjectReader $subjectReader,
-        StripeAdapter $stripeAdapter
+        SubjectReader $subjectReader
     ) {
         $this->commandPool = $commandPool;
         $this->transactionRepository = $repository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->subjectReader = $subjectReader;
-        $this->stripeAdapter = $stripeAdapter;
     }
 
     /**

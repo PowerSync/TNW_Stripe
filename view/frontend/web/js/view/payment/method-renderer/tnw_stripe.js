@@ -72,7 +72,7 @@ define([
 
             var style = {
               base: {
-                fontSize: '20px'
+                fontSize: '17px'
               }
             };
 

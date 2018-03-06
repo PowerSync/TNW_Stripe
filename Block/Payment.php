@@ -45,9 +45,9 @@ class Payment extends Template
         $this->config = $config;
     }
 
-  /**
-   * @return string
-   */
+    /**
+     * @return string
+     */
     public function getPaymentConfig()
     {
         $payment = $this->config->getConfig()['payment'];

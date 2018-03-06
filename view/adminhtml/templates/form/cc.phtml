@@ -18,29 +18,84 @@
 
 $code = $block->escapeHtml($block->getMethodCode());
 $ccType = $block->getInfoData('cc_type');
-$ccExpMonth = $block->getInfoData('cc_exp_month');
-$ccExpYear = $block->getInfoData('cc_exp_year');
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>"
-          style="display:none">
-  <div id="stripe-card-element">
-    <!-- a Stripe Element will be inserted here. -->
-  </div>
-  <?php if($block->isVaultEnabled()): ?>
-    <div class="field-tooltip-content">
-      <input type="checkbox"
-             id="<?php /* @noEscape */ echo $code; ?>_vault"
-             name="payment[is_active_payment_token_enabler]"
-             class="admin__control-checkbox"/>
-      <label class="label" for="<?php /* @noEscape */ echo $code; ?>_vault">
-        <span><?php echo $block->escapeHtml('Save for later use.'); ?></span>
-      </label>
+<fieldset class="admin__fieldset payment-method payment-method-tnw_stripe"
+          id="payment_form_<?php /* @noEscape */ echo $code; ?>"
+          style="display:none"
+    >
+    <div class="admin__field _required">
+        <label class="label admin__field-label" for="<?php echo /* @noEscape */ $code ?>_cc_type" >
+            <span><?php echo $block->escapeHtml(__('Credit Card Type')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <select id="<?php echo /* @noEscape */ $code ?>_cc_type" name="payment[cc_type]"
+                    class="required-entry select admin__control-select validate-cc-type-select">
+                <?php foreach ($block->getCcAvailableTypes() as $typeCode => $typeName) :?>
+                    <option value="<?php echo $block->escapeHtml($typeCode) ?>"
+                        <?php if ($typeCode == $ccType) :?> selected="selected"<?php endif; ?>>
+                        <?php echo $block->escapeHtml($typeName) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
     </div>
-  <?php endif; ?>
-  <input type="hidden" name="payment[cc_token]" id="<?php echo $code ?>_cc_token" />
-  <input type="hidden" name="payment[expiration]" id="<?php echo $code ?>_expiration" />
-  <input type="hidden" name="payment[expiration_yr]" id="<?php echo $code ?>_expiration_yr" />
-  <input type="hidden" name="payment[cc_type]" id="<?php echo $code ?>_cc_type" />
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Credit Card Number')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <div id="<?php echo /* @noEscape */ $code ?>_cc_number"
+                 class="admin__control-text shosted-control"></div>
+            <div class="shosted-error">
+                <?php echo $block->escapeHtml(__('Please, enter valid Credit Card Number')) ?>
+            </div>
+        </div>
+    </div>
 
-  <input type="submit" name="Submit" style="display: none;">
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Expiration Date')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <div class="shosted-date-wrap">
+                <div id="<?php echo /* @noEscape */ $code ?>_cc_exp"
+                     class="admin__control-text shosted-control shosted-date"></div>
+
+                <div class="shosted-error">
+                    <?php echo $block->escapeHtml(__('Please, enter valid Expiration Date')) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php if ($block->hasVerification()) :?>
+        <div class="admin__field _required">
+            <label class="label admin__field-label">
+                <span><?php echo $block->escapeHtml(__('Card Verification Number')) ?></span>
+            </label>
+            <div class="admin__field-control control">
+                <div id="<?php echo /* @noEscape */ $code ?>_cc_cid"
+                     class="admin__control-text shosted-control shosted-cid"></div>
+
+                <div class="shosted-error">
+                    <?php echo $block->escapeHtml(__('Please, enter valid Card Verification Number')) ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?php if ($block->isVaultEnabled()) :?>
+        <div class="field-tooltip-content">
+            <input type="checkbox"
+                   id="<?php /* @noEscape */ echo $code; ?>_vault"
+                   name="payment[is_active_payment_token_enabler]"
+                   class="admin__control-checkbox"/>
+            <label class="label" for="<?php /* @noEscape */ echo $code; ?>_vault">
+                <span><?php echo $block->escapeHtml('Save for later use.'); ?></span>
+            </label>
+        </div>
+    <?php endif; ?>
+
+    <input type="hidden" name="payment[cc_token]"
+           id="<?php echo $code ?>_cc_token" />
+
+    <input type="submit" name="Submit" style="display: none;">
 </fieldset>

@@ -59,6 +59,7 @@ class ConfigProvider implements ConfigProviderInterface
         return [
             'payment' => [
                 self::CODE => [
+                    'isActive' => $this->config->isActive($storeId),
                     'publishableKey' => $this->config->getPublishableKey(),
                     'vaultCode' => self::CC_VAULT_CODE,
                     'ccTypesMapper' => $this->config->getCctypesMapper(),
