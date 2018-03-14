@@ -108,6 +108,11 @@
             <source_model>TNW\Stripe\Model\Adminhtml\Source\CcType</source_model>
             <config_path>payment/tnw_stripe/cctypes</config_path>
           </field>
+          <field id="debug" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Debug</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/tnw_stripe/debug</config_path>
+          </field>
           <field id="useccv" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Credit Card Verification</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
