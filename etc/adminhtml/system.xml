@@ -20,6 +20,7 @@
     <section id="payment">
       <group id="tnw_stripe" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Stripe</label>
+        <comment><![CDATA[Accept online payments in Magento 2 using the Stripe Payment Gateway. If you do not yet have a Stripe account, please <a href="https://dashboard.stripe.com/register" target="_blank">click here</a> to register.]]></comment>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Enabled</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -35,6 +36,10 @@
             <group id="stripe_required"/>
           </requires>
         </field>
+        <group id="configuration_details" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="4">
+          <comment>https://technweb.atlassian.net/wiki/</comment>
+          <frontend_model>TNW\Stripe\Block\Adminhtml\System\Config\Fieldset\Hint</frontend_model>
+        </group>
         <group id="stripe_required" translate="label" showInDefault="1" showInWebsite="1" sortOrder="5">
           <label>Basic Stripe Settings</label>
           <attribute type="expanded">1</attribute>
