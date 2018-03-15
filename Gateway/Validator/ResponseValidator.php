@@ -22,22 +22,16 @@ class ResponseValidator extends GeneralResponseValidator
         return array_merge(
             parent::getResponseValidators(),
             [
-            function ($response) {
-                if (isset($response['error'])) {
-                    return [false, [$response['message']]];
+                function ($response) {
+                    if (isset($response['error'])) {
+                        return [false, [$response['message']]];
+                    }
+
+                    return [
+                        in_array($response['status'], ['succeeded', 'pending', 'failed']),
+                        [__('Wrong transaction status')]
+                    ];
                 }
-                return [
-                in_array(
-                    $response['status'],
-                    [
-                    'succeeded',
-                    'pending',
-                    'failed'
-                    ]
-                ),
-                [__('Wrong transaction status')]
-                ];
-            }
             ]
         );
     }

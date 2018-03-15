@@ -54,18 +54,19 @@ class GeneralResponseValidator extends AbstractValidator
     protected function getResponseValidators()
     {
         return [
-        function ($response) {
-            if (isset($response['error'])) {
+            function ($response) {
+                if (isset($response['error'])) {
+                    return [
+                        false,
+                        [$response['message']]
+                    ];
+                }
+
                 return [
-                false,
-                [$response['message']]
+                    $response['status'] === 'succeeded',
+                    [__('Stripe error response.')]
                 ];
             }
-            return [
-            $response['status'] === 'succeeded',
-            [__('Stripe error response.')]
-            ];
-        }
         ];
     }
 }

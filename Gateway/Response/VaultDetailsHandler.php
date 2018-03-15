@@ -75,10 +75,6 @@ class VaultDetailsHandler implements HandlerInterface
         $transaction = $this->subjectReader->readTransaction($response);
         $payment = $paymentDO->getPayment();
 
-        if (!$payment->getAdditionalInformation('is_active_payment_token_enabler')) {
-            return;
-        }
-
         $paymentToken = $this->getVaultPaymentToken($transaction);
         if (null !== $paymentToken) {
             $extensionAttributes = $this->getExtensionAttributes($payment);
@@ -93,16 +89,16 @@ class VaultDetailsHandler implements HandlerInterface
     private function getVaultPaymentToken($transaction)
     {
         // Check token existing in gateway response
-        if (!isset($transaction['customer'])) {
+        if (!isset($transaction['id'])) {
             return null;
         }
 
         /** @var \Stripe\Card $source */
-        $source = $transaction['source'];
+        $source = $transaction['sources']->autoPagingIterator()->current();
 
         /** @var PaymentTokenInterface $paymentToken */
         $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
-        $paymentToken->setGatewayToken($transaction['customer']);
+        $paymentToken->setGatewayToken($transaction['id']);
         $paymentToken->setExpiresAt($this->getExpirationDate($source));
 
         $paymentToken->setTokenDetails($this->convertDetailsToJSON([

@@ -80,15 +80,11 @@ class StripeAdapter
     }
 
     /**
-     * @param string $email
-     * @param string $source
+     * @param array $attributes
      * @return Customer
      */
-    public function customer($email, $source)
+    public function customer(array $attributes)
     {
-        return Customer::create([
-            "email" => $email,
-            "source" => $source,
-        ]);
+        return Customer::create($attributes);
     }
 }

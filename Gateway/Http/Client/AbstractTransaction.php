@@ -75,7 +75,7 @@ abstract class AbstractTransaction implements ClientInterface
             $this->logger->critical($message);
             throw new ClientException($message);
         } finally {
-            $log['response'] = (array) $response['object'];
+            $log['response'] = (array) $response['object']->__toArray(true);
             $this->customLogger->debug($log);
         }
 

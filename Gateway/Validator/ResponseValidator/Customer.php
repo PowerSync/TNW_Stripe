@@ -15,22 +15,19 @@
  */
 namespace TNW\Stripe\Gateway\Validator\ResponseValidator;
 
-use TNW\Stripe\Gateway\Validator\ResponseValidator;
+use TNW\Stripe\Gateway\Validator\GeneralResponseValidator;
 
-class Authorize extends ResponseValidator
+class Customer extends GeneralResponseValidator
 {
     protected function getResponseValidators()
     {
-        return array_merge(
-            parent::getResponseValidators(),
-            [
-                function ($response) {
-                    return [
-                        $response['outcome']['network_status'] === 'approved_by_network',
-                        [__('Transaction has been declined')]
-                    ];
-                }
-            ]
-        );
+        return [
+            function ($response) {
+                return [
+                    isset($response['id']),
+                    [__('Transaction has been declined')]
+                ];
+            }
+        ];
     }
 }

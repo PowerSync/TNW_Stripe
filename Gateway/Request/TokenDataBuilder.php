@@ -6,6 +6,7 @@
 namespace TNW\Stripe\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 
@@ -50,15 +51,13 @@ class TokenDataBuilder implements BuilderInterface
 
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDO->getPayment();
+        $extensionAttributes = $payment->getExtensionAttributes();
+        $paymentToken = $extensionAttributes->getVaultPaymentToken();
 
-        $token = $payment->getAdditionalInformation('cc_token');
-        if ($payment->getAdditionalInformation('is_active_payment_token_enabler')) {
-            $customer = $this->stripeAdapterFactory->create($payment->getOrder()->getStoreId())
-                ->customer($payment->getOrder()->getCustomerEmail(), $token);
-
-            $result[self::CUSTOMER] = $customer['id'];
+        if ($paymentToken instanceof PaymentTokenInterface) {
+            $result[self::CUSTOMER] = $paymentToken->getGatewayToken();
         } else {
-            $result[self::SOURCE] = $token;
+            $result[self::SOURCE] = $payment->getAdditionalInformation('cc_token');
         }
 
         return $result;

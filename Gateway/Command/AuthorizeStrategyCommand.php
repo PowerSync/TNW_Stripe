@@ -21,26 +21,17 @@ use Magento\Payment\Gateway\Command;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\CommandInterface;
 use Magento\Payment\Gateway\Helper\ContextHelper;
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
 
-class CaptureStrategyCommand implements CommandInterface
+class AuthorizeStrategyCommand implements CommandInterface
 {
     /**
-     * Stripe authorize and capture command
+     * Stripe authorize command
      */
-    const SALE = 'sale';
-
-    /**
-     * Stripe capture command
-     */
-    const CAPTURE = 'capture';
-
-    /**
-     * Stripe vault capture command
-     */
-    const VAULT_CAPTURE = 'vault_capture';
+    const AUTHORIZE = 'authorize';
 
     /**
      * Stripe customer command
@@ -96,8 +87,6 @@ class CaptureStrategyCommand implements CommandInterface
     {
         /** @var \Magento\Payment\Gateway\Data\PaymentDataObjectInterface $paymentDO */
         $paymentDO = $this->subjectReader->readPayment($commandSubject);
-
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDO->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
@@ -105,44 +94,6 @@ class CaptureStrategyCommand implements CommandInterface
             $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
         }
 
-        $command = $this->getCommand($payment);
-        $this->commandPool->get($command)->execute($commandSubject);
-    }
-
-    /**
-     * @param OrderPaymentInterface $payment
-     * @return string
-     */
-    private function getCommand(OrderPaymentInterface $payment)
-    {
-        $existsCapture = $this->isExistsCaptureTransaction($payment);
-        if (!$payment->getAuthorizationTransaction() && !$existsCapture) {
-            return self::SALE;
-        }
-
-        if (!$existsCapture) {
-            return self::CAPTURE;
-        }
-
-        // process capture for payment via Vault
-        return self::VAULT_CAPTURE;
-    }
-
-    /**
-     * @param OrderPaymentInterface $payment
-     * @return bool
-     */
-    private function isExistsCaptureTransaction(OrderPaymentInterface $payment)
-    {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter('payment_id', $payment->getId())
-            ->addFilter('txn_type', TransactionInterface::TYPE_CAPTURE)
-            ->create();
-
-        $count = $this->transactionRepository
-            ->getList($searchCriteria)
-            ->getTotalCount();
-
-        return (boolean) $count;
+        $this->commandPool->get(self::AUTHORIZE)->execute($commandSubject);
     }
 }

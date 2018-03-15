@@ -86,18 +86,20 @@
       <argument name="customLogger" xsi:type="object">StripeLoggerForTransactionSale</argument>
     </arguments>
   </type>
+  <type name="TNW\Stripe\Gateway\Http\Client\TransactionCustomer">
+    <arguments>
+      <argument name="customLogger" xsi:type="object">StripeLoggerForTransactionSale</argument>
+    </arguments>
+  </type>
 
   <!-- CommandPool -->
   <virtualType name="StripeCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
     <arguments>
       <argument name="commands" xsi:type="array">
-        <item name="authorize" xsi:type="string">StripeAuthorizeCommand</item>
-        <item name="sale" xsi:type="string">StripeSaleCommand</item>
+        <item name="authorize" xsi:type="string">StripeAuthorizeStrategyCommand</item>
         <item name="capture" xsi:type="string">StripeCaptureStrategyCommand</item>
-        <item name="settlement" xsi:type="string">StripeCaptureCommand</item>
         <item name="vault_authorize" xsi:type="string">StripeVaultAuthorizeCommand</item>
         <item name="vault_sale" xsi:type="string">StripeVaultSaleCommand</item>
-        <item name="vault_capture" xsi:type="string">StripeVaultCaptureCommand</item>
         <item name="void" xsi:type="string">StripeVoidCommand</item>
         <item name="refund" xsi:type="string">StripeRefundCommand</item>
         <item name="cancel" xsi:type="string">StripeVoidCommand</item>
@@ -105,9 +107,25 @@
       </argument>
     </arguments>
   </virtualType>
+  <virtualType name="StripeAuthorizeStrategyCommand" type="TNW\Stripe\Gateway\Command\AuthorizeStrategyCommand">
+    <arguments>
+      <argument name="commandPool" xsi:type="object">StripeStrategyCommandPool</argument>
+    </arguments>
+  </virtualType>
   <virtualType name="StripeCaptureStrategyCommand" type="TNW\Stripe\Gateway\Command\CaptureStrategyCommand">
     <arguments>
-      <argument name="commandPool" xsi:type="object">StripeCommandPool</argument>
+      <argument name="commandPool" xsi:type="object">StripeStrategyCommandPool</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="StripeStrategyCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+    <arguments>
+      <argument name="commands" xsi:type="array">
+        <item name="authorize" xsi:type="string">StripeAuthorizeCommand</item>
+        <item name="capture" xsi:type="string">StripeCaptureCommand</item>
+        <item name="sale" xsi:type="string">StripeSaleCommand</item>
+        <item name="customer" xsi:type="string">StripeCustomerCommand</item>
+        <item name="vault_capture" xsi:type="string">StripeVaultCaptureCommand</item>
+      </argument>
     </arguments>
   </virtualType>
 
@@ -180,6 +198,25 @@
     </arguments>
   </virtualType>
 
+  <!-- Customer Command -->
+  <virtualType name="StripeCustomerCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+    <arguments>
+      <argument name="requestBuilder" xsi:type="object">StripeCustomerRequest</argument>
+      <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
+      <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionCustomer</argument>
+      <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\VaultDetailsHandler</argument>
+      <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\ResponseValidator\Customer</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="StripeCustomerRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <arguments>
+      <argument name="builders" xsi:type="array">
+        <item name="capture" xsi:type="string">TNW\Stripe\Gateway\Request\CustomerDataBuilder</item>
+        <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
+      </argument>
+    </arguments>
+  </virtualType>
+
   <!-- Vault Authorization command -->
   <virtualType name="StripeVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
     <arguments>
@@ -195,7 +232,7 @@
       <argument name="builders" xsi:type="array">
         <item name="payment" xsi:type="string">TNW\Stripe\Gateway\Request\PaymentDataBuilder</item>
         <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
-        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\VaultTokenDataBuilder</item>
+        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\TokenDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
     </arguments>
@@ -231,7 +268,7 @@
       <argument name="builders" xsi:type="array">
         <item name="payment" xsi:type="string">TNW\Stripe\Gateway\Request\PaymentDataBuilder</item>
         <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
-        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\VaultTokenDataBuilder</item>
+        <item name="token" xsi:type="string">TNW\Stripe\Gateway\Request\TokenDataBuilder</item>
         <item name="settlement" xsi:type="string">TNW\Stripe\Gateway\Request\SettlementDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
@@ -259,7 +296,6 @@
         <item name="payment_details" xsi:type="string">TNW\Stripe\Gateway\Response\PaymentDetailsHandler</item>
         <item name="txn_id" xsi:type="string">TNW\Stripe\Gateway\Response\TransactionIdHandler</item>
         <item name="card_details" xsi:type="string">TNW\Stripe\Gateway\Response\CardDetailsHandler</item>
-        <item name="vault_details" xsi:type="string">TNW\Stripe\Gateway\Response\VaultDetailsHandler</item>
       </argument>
     </arguments>
   </virtualType>
@@ -269,7 +305,6 @@
         <item name="payment_details" xsi:type="string">TNW\Stripe\Gateway\Response\PaymentDetailsHandler</item>
         <item name="txn_id" xsi:type="string">TNW\Stripe\Gateway\Response\TransactionIdHandler</item>
         <item name="card_details" xsi:type="string">TNW\Stripe\Gateway\Response\CardDetailsHandler</item>
-        <!--<item name="vault_details" xsi:type="string">TNW\Stripe\Gateway\Response\VaultDetailsHandler</item>-->
       </argument>
     </arguments>
   </virtualType>
