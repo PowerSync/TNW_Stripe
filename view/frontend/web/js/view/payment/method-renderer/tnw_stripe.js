@@ -190,25 +190,27 @@ define([
        * Address
        * @return {{name: string, address_country: string, address_line1: *}}
        */
-      getAddressData: function () {
+      getOwnerData: function () {
         var billingAddress = quote.billingAddress();
 
         var stripeData = {
           name: billingAddress.firstname + ' ' + billingAddress.lastname,
-          address_country: billingAddress.countryId,
-          address_line1: billingAddress.street[0]
+          address: {
+              country: billingAddress.countryId,
+              line1: billingAddress.street[0]
+          }
         };
 
         if (billingAddress.street.length === 2) {
-          stripeData.address_line2 = billingAddress.street[1];
+          stripeData.address.line2 = billingAddress.street[1];
         }
 
         if (billingAddress.hasOwnProperty('postcode')) {
-          stripeData.address_zip = billingAddress.postcode;
+          stripeData.address.postal_code = billingAddress.postcode;
         }
 
         if (billingAddress.hasOwnProperty('regionCode')) {
-          stripeData.address_state = billingAddress.regionCode;
+          stripeData.address.state = billingAddress.regionCode;
         }
 
         return stripeData;
@@ -284,7 +286,7 @@ define([
           this.isPlaceOrderActionAllowed(false);
 
           var self = this;
-          self.stripe.createToken(self.stripeCardNumber, this.getAddressData())
+          self.stripe.createSource(self.stripeCardNumber, {owner: self.getOwnerData()})
             .then(function (response) {
               if (response.error) {
                 self.isPlaceOrderActionAllowed(true);
@@ -292,8 +294,8 @@ define([
                   'message': response.error.message
                 });
               } else {
-                self.token = response.token;
-                self.placeOrder();
+                //self.token = response.token;
+                //self.placeOrder();
               }
             });
         }
