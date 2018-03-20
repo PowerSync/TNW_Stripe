@@ -2,8 +2,9 @@ define([
     'jquery',
     'Magento_Payment/js/view/payment/cc-form',
     'Magento_Checkout/js/model/full-screen-loader',
+    'Magento_Checkout/js/action/set-payment-information',
+    'TNW_Stripe/js/view/payment/adapter',
     'TNW_Stripe/js/validator',
-    'Magento_Checkout/js/action/redirect-on-success',
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/model/quote',
     'stripejs'
@@ -11,8 +12,9 @@ define([
     $,
     Component,
     fullScreenLoader,
+    setPaymentInformationAction,
+    adapter,
     validator,
-    redirectOnSuccessAction,
     VaultEnabler,
     quote
 ) {
@@ -22,14 +24,24 @@ define([
       defaults: {
         active: false,
         template: 'TNW_Stripe/payment/form',
-        stripe: null,
-        stripeCardElement: null,
-        stripeCard: null,
         ccCode: null,
         ccMessageContainer: null,
-        token: null,
+        paymentMethodToken: null,
         isValidCardNumber: false,
 
+        /**
+         * Additional payment data
+         *
+         * {Object}
+         */
+        additionalData: {},
+
+        /**
+         * Stripe client configuration
+         *
+         * {Object}
+         */
+        clientConfig: {},
         imports: {
           onActiveChange: 'active'
         }
@@ -47,6 +59,16 @@ define([
       },
 
       /**
+       * Init config
+       */
+      initClientConfig: function () {
+        this._super();
+
+        // Hosted fields settings
+        this.clientConfig.hostedFields = this.getHostedFields();
+      },
+
+      /**
        * Set list of observable attributes
        *
        * @returns {exports}
@@ -56,6 +78,7 @@ define([
         this._super()
             .observe(['active']);
 
+        this.initClientConfig();
         return this;
       },
 
@@ -67,31 +90,42 @@ define([
           if ($('#tnw_stripe_cc_number').length) {
             clearInterval(intervalId);
 
-            self.stripe = Stripe(self.getPublishableKey());
-            self.stripeCardElement = self.stripe.elements();
-
-            var style = {
-              base: {
-                fontSize: '17px'
-              }
-            };
-
-            self.stripeCardNumber = self.stripeCardElement.create('cardNumber', {style: style});
-            self.stripeCardNumber.mount('#tnw_stripe_cc_number');
-            self.stripeCardNumber.on('change', function (event) {
-              self.isValidCardNumber = event.complete;
-              self.selectedCardType(
-                validator.getMageCardType(event.brand, self.getCcAvailableTypes())
-              );
-            });
-
-            self.stripeCardExpiry = self.stripeCardElement.create('cardExpiry', {style: style});
-            self.stripeCardExpiry.mount('#tnw_stripe_expiration');
-
-            self.stripeCardExpiry = self.stripeCardElement.create('cardCvc', {style: style});
-            self.stripeCardExpiry.mount('#tnw_stripe_cc_cid');
+            adapter.setConfig(self.clientConfig);
+            adapter.setup();
           }
         }, 500);
+      },
+
+      /**
+       * Get Stripe Hosted Fields
+       * @returns {Object}
+       */
+      getHostedFields: function () {
+         var self = this,
+           fields = {
+             number: {
+               selector: self.getSelector('cc_number')
+             },
+             expiry: {
+               selector: self.getSelector('expiration')
+             },
+             cvc: {
+               selector: self.getSelector('cc_cid')
+             }
+           };
+
+          /**
+           * Triggers on Hosted Field changes
+           * @param {Object} event
+           */
+          fields.onFieldEvent = function (event) {
+            self.isValidCardNumber = event.complete;
+            self.selectedCardType(
+              validator.getMageCardType(event.brand, self.getCcAvailableTypes())
+            );
+          };
+
+          return fields;
       },
 
       getCode: function () {
@@ -152,18 +186,14 @@ define([
       },
 
       getData: function () {
-        var data = this._super();
+        var data = {
+          'method': this.getCode(),
+          'additional_data': {
+            'cc_token': this.paymentMethodToken
+          }
+        };
 
-        if (this.token) {
-          var card = this.token.card;
-
-          data.additional_data.cc_exp_month = card.exp_month;
-          data.additional_data.cc_exp_year = card.exp_year;
-          data.additional_data.cc_last4 = card.last4;
-          data.additional_data.cc_type = card.brand;
-          data.additional_data.cc_token = this.token.id;
-        }
-
+        data['additional_data'] = _.extend(data['additional_data'], this.additionalData);
         this.vaultEnabler.visitAdditionalData(data);
 
         return data;
@@ -271,6 +301,14 @@ define([
       },
 
       /**
+       * Set payment token
+       * @param {String} paymentMethodToken
+       */
+      setPaymentMethodToken: function (paymentMethodToken) {
+        this.paymentMethodToken = paymentMethodToken;
+      },
+
+      /**
        * Returns state of place order button
        * @returns {Boolean}
        */
@@ -286,19 +324,64 @@ define([
           this.isPlaceOrderActionAllowed(false);
 
           var self = this;
-          self.stripe.createSource(self.stripeCardNumber, {owner: self.getOwnerData()})
-            .then(function (response) {
-              if (response.error) {
-                self.isPlaceOrderActionAllowed(true);
-                self.messageContainer.addErrorMessage({
-                  'message': response.error.message
-                });
-              } else {
-                //self.token = response.token;
-                //self.placeOrder();
-              }
+          adapter.createSourceByCart({owner: self.getOwnerData()})
+            .done(function (response) {
+              var card = response.source.card;
+
+              self.setPaymentMethodToken(response.source.id);
+              self.additionalData = _.extend(self.additionalData, {
+                cc_exp_month: card.exp_month,
+                cc_exp_year: card.exp_year,
+                cc_last4: card.last4,
+                cc_type: card.brand,
+                cc_3dsecure: card.three_d_secure === 'required'
+              });
+
+              self.placeOrder();
+            })
+            .fail(function() {
+              fullScreenLoader.stopLoader();
+              self.isPlaceOrderActionAllowed(true);
             });
         }
+      },
+
+      setPaymentInformationAndRedirect: function(response){
+          $.when(
+            setPaymentInformationAction(self.messageContainer, {method: self.getCode()})
+          )
+          .done(function () {
+            window.location.replace(response.source.redirect.url);
+          });
+      },
+
+      /**
+       * Action to place order
+       */
+      placeOrder: function () {
+        var self = this,
+            totalAmount = quote.totals()['base_grand_total'] + '';
+
+        if (!this.additionalData.cc_3dsecure) {
+            return this._super();
+        }
+
+        adapter.createSource({
+          type: 'three_d_secure',
+          amount: totalAmount.replace('.', ''),
+          currency: "eur",
+          three_d_secure: {
+            card: context.paymentMethodToken
+          },
+          redirect: {
+            return_url: this.getReturnUrl()
+          }
+        })
+        .done(self.setPaymentInformationAndRedirect.bind(self));
+      },
+
+      getReturnUrl: function () {
+        return window.checkoutConfig.payment[this.getCode()].returnUrl;
       }
     });
 });
