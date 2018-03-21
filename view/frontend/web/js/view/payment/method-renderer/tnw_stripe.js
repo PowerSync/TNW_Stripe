@@ -5,6 +5,7 @@ define([
     'Magento_Checkout/js/action/set-payment-information',
     'TNW_Stripe/js/view/payment/adapter',
     'TNW_Stripe/js/validator',
+    'TNW_Stripe/js/featherlight',
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/model/quote',
     'stripejs'
@@ -15,6 +16,7 @@ define([
     setPaymentInformationAction,
     adapter,
     validator,
+    featherlight,
     VaultEnabler,
     quote
 ) {
@@ -326,58 +328,59 @@ define([
           var self = this;
           adapter.createSourceByCart({owner: self.getOwnerData()})
             .done(function (response) {
-              var card = response.source.card;
+              var card = response.source.card,
+                  totalAmount = quote.totals()['base_grand_total'] + '';
 
               self.setPaymentMethodToken(response.source.id);
               self.additionalData = _.extend(self.additionalData, {
                 cc_exp_month: card.exp_month,
                 cc_exp_year: card.exp_year,
                 cc_last4: card.last4,
-                cc_type: card.brand,
-                cc_3dsecure: card.three_d_secure === 'required'
+                cc_type: card.brand
               });
 
-              self.placeOrder();
+              if (card.three_d_secure !== 'required') {
+                self.placeOrder();
+                return;
+              }
+
+              adapter.createSource({
+                  type: 'three_d_secure',
+                  amount: totalAmount.replace('.', ''),
+                  currency: "eur",
+                  three_d_secure: {
+                      card: self.paymentMethodToken
+                  },
+                  redirect: {
+                      return_url: self.getReturnUrl()
+                  }
+              })
+              .done(function (response) {
+                featherlight({
+                  iframe: response.source.redirect.url,
+                  iframeWidth: '800',
+                  iframeHeight: '600',
+                  afterClose: function() {
+                    adapter.retrieveSource({
+                      id: response.source.id,
+                      client_secret: response.source.client_secret
+                    }).done(function(result) {
+                      if (result.source.status === 'chargeable') {
+                          self.placeOrder()
+                      } else {
+                          self.isPlaceOrderActionAllowed(true);
+                          adapter.showError("3D Secure authentication failed.");
+                      }
+                    });
+                  }
+                });
+              });
             })
             .fail(function() {
               fullScreenLoader.stopLoader();
               self.isPlaceOrderActionAllowed(true);
             });
         }
-      },
-
-      setPaymentInformationAndRedirect: function(response){
-          $.when(
-            setPaymentInformationAction(self.messageContainer, {method: self.getCode()})
-          )
-          .done(function () {
-            window.location.replace(response.source.redirect.url);
-          });
-      },
-
-      /**
-       * Action to place order
-       */
-      placeOrder: function () {
-        var self = this,
-            totalAmount = quote.totals()['base_grand_total'] + '';
-
-        if (!this.additionalData.cc_3dsecure) {
-            return this._super();
-        }
-
-        adapter.createSource({
-          type: 'three_d_secure',
-          amount: totalAmount.replace('.', ''),
-          currency: "eur",
-          three_d_secure: {
-            card: context.paymentMethodToken
-          },
-          redirect: {
-            return_url: this.getReturnUrl()
-          }
-        })
-        .done(self.setPaymentInformationAndRedirect.bind(self));
       },
 
       getReturnUrl: function () {

@@ -91,6 +91,27 @@ define([
         },
 
         /**
+         * @return {jQuery.Deferred}
+         */
+        retrieveSource: function() {
+            var self = this,
+                dfd = $.Deferred();
+
+            this.getApiClient()
+                .retrieveSource.apply(this.getApiClient(), arguments)
+                .then(function (response) {
+                    if (response.error) {
+                        self.showError(response.error.message);
+                        dfd.reject(response);
+                    } else {
+                        dfd.resolve(response);
+                    }
+                });
+
+            return dfd;
+        },
+
+        /**
          * Get payment name
          * @returns {String}
          */

@@ -93,8 +93,8 @@ class VaultDetailsHandler implements HandlerInterface
             return null;
         }
 
-        /** @var \Stripe\Card $source */
-        $source = $transaction['sources']->autoPagingIterator()->current();
+        /** @var \Stripe\Source $source */
+        $source = $transaction['sources']->autoPagingIterator()->current()->card;
 
         /** @var PaymentTokenInterface $paymentToken */
         $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
