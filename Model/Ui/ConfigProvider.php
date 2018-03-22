@@ -17,6 +17,7 @@ namespace TNW\Stripe\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\UrlInterface;
 use TNW\Stripe\Gateway\Config\Config;
 
 /**
@@ -38,16 +39,24 @@ class ConfigProvider implements ConfigProviderInterface
     private $session;
 
     /**
+     * @var UrlInterface
+     */
+    private $url;
+
+    /**
      * Constructor.
      * @param Config $config
      * @param SessionManagerInterface $session
+     * @param UrlInterface $url
      */
     public function __construct(
         Config $config,
-        SessionManagerInterface $session
+        SessionManagerInterface $session,
+        UrlInterface $url
     ) {
         $this->config = $config;
         $this->session = $session;
+        $this->url = $url;
     }
 
     /**
@@ -64,7 +73,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'vaultCode' => self::CC_VAULT_CODE,
                     'ccTypesMapper' => $this->config->getCctypesMapper(),
                     'sdkUrl' => $this->config->getSdkUrl(),
-                    'returnUrl' => 'http://magento.sub22.local/',
+                    'returnUrl' => $this->url->getUrl('tnw_stripe/window/close'),
                     'countrySpecificCardTypes' => $this->config->getCountrySpecificCardTypeConfig($storeId),
                     'availableCardTypes' => $this->config->getAvailableCardTypes($storeId),
                     'useCvv' => $this->config->isCvvEnabled($storeId),

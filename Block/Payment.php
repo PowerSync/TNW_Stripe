@@ -24,18 +24,18 @@ use Magento\Framework\View\Element\Template\Context;
  */
 class Payment extends Template
 {
-  /**
-   * @var ConfigProvider
-   */
+    /**
+     * @var ConfigProvider
+     */
     private $config;
 
-  /**
-   * Constructor
-   *
-   * @param Context $context
-   * @param ConfigProvider $config
-   * @param array $data
-   */
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param ConfigProvider $config
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         ConfigProvider $config,
@@ -56,9 +56,9 @@ class Payment extends Template
         return json_encode($config, JSON_UNESCAPED_SLASHES);
     }
 
-  /**
-   * @return string
-   */
+    /**
+     * @return string
+     */
     public function getCode()
     {
         return ConfigProvider::CODE;

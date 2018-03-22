@@ -74,7 +74,7 @@ class PaymentDataBuilder implements BuilderInterface
         return [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
             self::DESCRIPTION => $order->getOrderIncrementId(),
-            self::CURRENCY => $this->config->getCurrency(),
+            self::CURRENCY => $order->getCurrencyCode(),
             self::CAPTURE => false
         ];
     }

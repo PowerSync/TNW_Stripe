@@ -322,65 +322,72 @@ define([
        * Triggers order placing
        */
       placeOrderClick: function () {
-        if (this.validateCardType()) {
-          this.isPlaceOrderActionAllowed(false);
+        var self = this;
 
-          var self = this;
-          adapter.createSourceByCart({owner: self.getOwnerData()})
-            .done(function (response) {
-              var card = response.source.card,
-                  totalAmount = quote.totals()['base_grand_total'] + '';
-
-              self.setPaymentMethodToken(response.source.id);
-              self.additionalData = _.extend(self.additionalData, {
-                cc_exp_month: card.exp_month,
-                cc_exp_year: card.exp_year,
-                cc_last4: card.last4,
-                cc_type: card.brand
-              });
-
-              if (card.three_d_secure !== 'required') {
-                self.placeOrder();
-                return;
-              }
-
-              adapter.createSource({
-                  type: 'three_d_secure',
-                  amount: totalAmount.replace('.', ''),
-                  currency: "eur",
-                  three_d_secure: {
-                      card: self.paymentMethodToken
-                  },
-                  redirect: {
-                      return_url: self.getReturnUrl()
-                  }
-              })
-              .done(function (response) {
-                featherlight({
-                  iframe: response.source.redirect.url,
-                  iframeWidth: '800',
-                  iframeHeight: '600',
-                  afterClose: function() {
-                    adapter.retrieveSource({
-                      id: response.source.id,
-                      client_secret: response.source.client_secret
-                    }).done(function(result) {
-                      if (result.source.status === 'chargeable') {
-                          self.placeOrder()
-                      } else {
-                          self.isPlaceOrderActionAllowed(true);
-                          adapter.showError("3D Secure authentication failed.");
-                      }
-                    });
-                  }
-                });
-              });
-            })
-            .fail(function() {
-              fullScreenLoader.stopLoader();
-              self.isPlaceOrderActionAllowed(true);
-            });
+        if (!this.validateCardType()) {
+          return;
         }
+
+        this.isPlaceOrderActionAllowed(false);
+        fullScreenLoader.startLoader();
+
+        adapter.createSourceByCart({owner: self.getOwnerData()})
+          .done(function (response) {
+            var card = response.source.card,
+                totalAmount = parseFloat(quote.totals()['base_grand_total']).toFixed(2).replace('.', ''),
+                currencyCode = quote.totals()['base_currency_code'];
+
+            self.setPaymentMethodToken(response.source.id);
+            self.additionalData = _.extend(self.additionalData, {
+              cc_exp_month: card.exp_month,
+              cc_exp_year: card.exp_year,
+              cc_last4: card.last4,
+              cc_type: card.brand
+            });
+
+            if (card.three_d_secure !== 'required') {
+              self.placeOrder();
+              return;
+            }
+
+            adapter.createSource({
+              type: 'three_d_secure',
+              amount: totalAmount,
+              currency: currencyCode,
+              three_d_secure: {
+                card: self.paymentMethodToken
+              },
+              redirect: {
+                return_url: self.getReturnUrl()
+              }
+            })
+            .done(function (response) {
+              featherlight({
+                iframe: response.source.redirect.url,
+                iframeWidth: '800',
+                iframeHeight: '600',
+                afterClose: function() {
+                  adapter.retrieveSource({
+                    id: response.source.id,
+                    client_secret: response.source.client_secret
+                  }).done(function(result) {
+                    if (result.source.status === 'chargeable') {
+                      self.placeOrder()
+                    } else {
+                      self.isPlaceOrderActionAllowed(true);
+                      self.messageContainer.addErrorMessage({message:"3D Secure authentication failed."});
+                    }
+
+                    fullScreenLoader.stopLoader(true);
+                  });
+                }
+              });
+            });
+          })
+          .fail(function() {
+            fullScreenLoader.stopLoader(true);
+            self.isPlaceOrderActionAllowed(true);
+          });
       },
 
       getReturnUrl: function () {

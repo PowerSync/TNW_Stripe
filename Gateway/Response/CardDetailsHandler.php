@@ -62,7 +62,7 @@ class CardDetailsHandler implements HandlerInterface
         ContextHelper::assertOrderPayment($payment);
 
         /** @var \Stripe\Card $source */
-        $source = $transaction['source'];
+        $source = $transaction['source']['card'];
 
         $payment->setCcLast4($source->last4);
         $payment->setCcExpMonth($source->exp_month);

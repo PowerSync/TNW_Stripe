@@ -24,10 +24,10 @@ use TNW\Stripe\Model\Ui\ConfigProvider;
 
 class Form extends Cc
 {
-  /** @var GatewayConfig $gatewayConfig */
+    /** @var GatewayConfig $gatewayConfig */
     protected $gatewayConfig;
 
-  /** @var Helper $paymentDataHelper */
+    /** @var Helper $paymentDataHelper */
     private $paymentDataHelper;
 
     public function __construct(
@@ -47,10 +47,11 @@ class Form extends Cc
         return $this->gatewayConfig->isCcvEnabled();
     }
 
-  /**
-   * Check if vault enabled
-   * @return bool
-   */
+    /**
+     * Check if vault enabled
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function isVaultEnabled()
     {
         $storeId = $this->_storeManager->getStore()->getId();
@@ -58,10 +59,11 @@ class Form extends Cc
         return $vaultPayment->isActive($storeId);
     }
 
-  /**
-   * Get configured vault payment for Braintree
-   * @return VaultPaymentInterface
-   */
+    /**
+     * Get configured vault payment for Braintree
+     * @return \Magento\Payment\Model\MethodInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     private function getVaultPayment()
     {
         return $this->paymentDataHelper->getMethodInstance(ConfigProvider::CC_VAULT_CODE);
