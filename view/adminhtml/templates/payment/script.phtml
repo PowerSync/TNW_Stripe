@@ -22,16 +22,17 @@ $code = $block->escapeHtml($block->getCode());
   //<![CDATA[
   require(
     [
-      'TNW_Stripe/js/stripe',
       'jquery',
+      'TNW_Stripe/js/stripe',
+      'Magento_Sales/order/create/form',
       'domReady!'
-    ], function(PmStripe, $) {
+    ], function($, Stripe) {
       var config = <?php /* @noEscape */ echo $block->getPaymentConfig(); ?>,
         payment,
         form = $('#payment_form_<?php /* @noEscape */ echo $code; ?>');
 
       config.active = form.length > 0 && !form.is(':hidden');
-      payment = new PmStripe(config);
+      payment = new Stripe(config);
     });
   //]]>
 </script>

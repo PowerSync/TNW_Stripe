@@ -11,7 +11,7 @@ define([
         rendererList.push(
             {
                 type: stripeType,
-                component: 'TNW_Stripe/js/view/payment/method-renderer/tnw_stripe'
+                component: 'TNW_Stripe/js/view/payment/method-renderer/stripe'
             }
         );
     }

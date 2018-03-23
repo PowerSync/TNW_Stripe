@@ -19,7 +19,6 @@ define([
       active: false,
       scriptLoaded: false,
       stripe: null,
-      stripeCardElement: null,
       token: null,
       selectedCardType: null,
       imports: {
@@ -115,10 +114,11 @@ define([
      * Create and mount card Stripe
      */
     initStripe: function () {
-      var self = this;
+      var self = this,
+          stripeCardElement;
 
       try {
-        self.stripeCardElement = self.stripe.elements();
+        stripeCardElement = self.stripe.elements();
 
         var style = {
           base: {
@@ -126,7 +126,7 @@ define([
           }
         };
 
-        self.stripeCardNumber = self.stripeCardElement.create('cardNumber', {style: style});
+        self.stripeCardNumber = stripeCardElement.create('cardNumber', {style: style});
         self.stripeCardNumber.mount(this.getSelector('cc_number'));
         self.stripeCardNumber.on('change', function (event) {
           if (event.empty === false) {
@@ -138,11 +138,13 @@ define([
           );
         });
 
-        self.stripeCardExpiry = self.stripeCardElement.create('cardExpiry', {style: style});
-        self.stripeCardExpiry.mount(this.getSelector('cc_exp'));
+        stripeCardElement
+            .create('cardExpiry', {style: style})
+            .mount(this.getSelector('cc_exp'));
 
-        self.stripeCardExpiry = self.stripeCardElement.create('cardCvc', {style: style});
-        self.stripeCardExpiry.mount(this.getSelector('cc_cid'));
+        stripeCardElement
+            .create('cardCvc', {style: style})
+            .mount(this.getSelector('cc_cid'));
       } catch (e) {
         self.error(e.message);
       }
@@ -209,11 +211,11 @@ define([
 
       var defer = $.Deferred();
 
-      self.stripe.createToken(self.stripeCardNumber).then(function (response) {
+      self.stripe.createSource(self.stripeCardNumber).then(function (response) {
         if (response.error) {
           defer.reject(response.error.message);
         } else {
-          container.find('#' + self.code + '_cc_token').val(response.token.id);
+          container.find('#' + self.code + '_cc_token').val(response.source.id);
           defer.resolve();
         }
       });
