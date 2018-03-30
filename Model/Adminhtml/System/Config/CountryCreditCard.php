@@ -10,7 +10,6 @@ use Magento\Framework\Math\Random;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
-use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Class CountryCreditCard
@@ -23,11 +22,6 @@ class CountryCreditCard extends Value
     private $mathRandom;
 
     /**
-     * @var \Magento\Framework\Serialize\Serializer\Json
-     */
-    private $serializer;
-
-    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -36,7 +30,6 @@ class CountryCreditCard extends Value
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
-     * @param \Magento\Framework\Serialize\Serializer\Json $serializer
      */
     public function __construct(
         Context $context,
@@ -44,7 +37,6 @@ class CountryCreditCard extends Value
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         Random $mathRandom,
-        Json $serializer,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -52,7 +44,6 @@ class CountryCreditCard extends Value
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
 
         $this->mathRandom = $mathRandom;
-        $this->serializer = $serializer;
     }
 
     /**
@@ -76,7 +67,7 @@ class CountryCreditCard extends Value
             }
         }
 
-        $this->setValue($this->serializer->serialize($result));
+        $this->setValue(serialize($result));
         return $this;
     }
 
@@ -88,7 +79,7 @@ class CountryCreditCard extends Value
     public function afterLoad()
     {
         if ($this->getValue()) {
-            $value = $this->serializer->unserialize($this->getValue());
+            $value = unserialize($this->getValue());
             if (is_array($value)) {
                 $this->setValue($this->encodeArrayFieldValue($value));
             }
