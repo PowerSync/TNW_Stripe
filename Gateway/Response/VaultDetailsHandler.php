@@ -20,14 +20,13 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
-use Magento\Vault\Api\Data\PaymentTokenInterface;
-use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterfaceFactory;
 use TNW\Stripe\Gateway\Config\Config;
 
 class VaultDetailsHandler implements HandlerInterface
 {
     /**
-     * @var PaymentTokenFactoryInterface
+     * @var PaymentTokenInterfaceFactory
      */
     private $paymentTokenFactory;
 
@@ -49,13 +48,13 @@ class VaultDetailsHandler implements HandlerInterface
     /**
      * Constructor
      *
-     * @param PaymentTokenFactoryInterface $paymentTokenFactory
+     * @param PaymentTokenInterfaceFactory $paymentTokenFactory
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param SubjectReader $subjectReader
      * @param Config $config
      */
     public function __construct(
-        PaymentTokenFactoryInterface $paymentTokenFactory,
+        PaymentTokenInterfaceFactory $paymentTokenFactory,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         SubjectReader $subjectReader,
         Config $config
@@ -84,7 +83,7 @@ class VaultDetailsHandler implements HandlerInterface
 
     /**
      * @param $transaction
-     * @return PaymentTokenInterface|null
+     * @return \Magento\Vault\Api\Data\PaymentTokenInterface|null
      */
     private function getVaultPaymentToken($transaction)
     {
@@ -93,11 +92,11 @@ class VaultDetailsHandler implements HandlerInterface
             return null;
         }
 
-        /** @var \Stripe\Source $source */
+        /** @var \Stripe\Card $source */
         $source = $transaction['sources']->autoPagingIterator()->current()->card;
 
-        /** @var PaymentTokenInterface $paymentToken */
-        $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
+        /** @var \Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken */
+        $paymentToken = $this->paymentTokenFactory->create();
         $paymentToken->setGatewayToken($transaction['id']);
         $paymentToken->setExpiresAt($this->getExpirationDate($source));
 

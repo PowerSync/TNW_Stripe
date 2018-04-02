@@ -276,6 +276,11 @@
   </virtualType>
 
   <!-- Value Handlers -->
+  <type name="TNW\Stripe\Gateway\Response\VaultDetailsHandler">
+    <arguments>
+      <argument name="paymentTokenFactory" xsi:type="object">Magento\Vault\Model\CreditCardTokenFactory</argument>
+    </arguments>
+  </type>
   <virtualType name="StripeValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
     <arguments>
       <argument name="handlers" xsi:type="array">
