@@ -19,7 +19,4 @@
   <event name="payment_method_assign_data">
     <observer name="tnw_stripe_data_assign" instance="TNW\Stripe\Observer\DataAssignObserver" />
   </event>
-  <event name="vault_payment_token_save_commit_after">
-    <observer name="tnw_stripe_vault_payment_token_save_commit_after" instance="TNW\Stripe\Observer\VaultTokenObserver" />
-  </event>
 </config>
