@@ -20,20 +20,24 @@ use Magento\Payment\Observer\AbstractDataAssignObserver;
 
 class DataAssignObserver extends AbstractDataAssignObserver
 {
-  /**
-   * @param Observer $observer
-   * @return void
-   */
+    /** additional information key */
+    const KEY_ADDITIONAL_DATA = 'additional_data';
+
+    /**
+     * @param Observer $observer
+     * @return void
+     */
     public function execute(Observer $observer)
     {
-        $method = $this->readMethodArgument($observer);
         $data = $this->readDataArgument($observer);
-        $paymentInfo = $method->getInfoInstance();
-        if (key_exists('cc_token', $data->getDataByKey('additional_data'))) {
-            $paymentInfo->setAdditionalInformation(
-                'cc_token',
-                $data->getDataByKey('additional_data')['cc_token']
-            );
+        $additionalData = $data->getData(self::KEY_ADDITIONAL_DATA);
+
+        if (is_array($additionalData)) {
+            $paymentInfo = $this->readPaymentModelArgument($observer);
+
+            foreach ($additionalData as $key => $value) {
+                $paymentInfo->setAdditionalInformation($key, $value);
+            }
         }
     }
 }
