@@ -337,7 +337,6 @@ define([
                 totalAmount = parseFloat(quote.totals()['base_grand_total']).toFixed(2).replace('.', ''),
                 currencyCode = quote.totals()['base_currency_code'];
 
-            self.setPaymentMethodToken(response.source.id);
             self.additionalData = _.extend(self.additionalData, {
               cc_exp_month: card.exp_month,
               cc_exp_year: card.exp_year,
@@ -346,6 +345,7 @@ define([
             });
 
             if (card.three_d_secure !== 'required') {
+              self.setPaymentMethodToken(response.source.id);
               self.placeOrder();
               return;
             }
@@ -355,7 +355,7 @@ define([
               amount: totalAmount,
               currency: currencyCode,
               three_d_secure: {
-                card: self.paymentMethodToken
+                card: response.source.id
               },
               redirect: {
                 return_url: self.getReturnUrl()
@@ -366,12 +366,14 @@ define([
                 iframe: response.source.redirect.url,
                 iframeWidth: '800',
                 iframeHeight: '600',
+                loading: 'waiting',
                 afterClose: function() {
                   adapter.retrieveSource({
                     id: response.source.id,
                     client_secret: response.source.client_secret
                   }).done(function(result) {
                     if (result.source.status === 'chargeable') {
+                      self.setPaymentMethodToken(response.source.id);
                       self.placeOrder()
                     } else {
                       self.isPlaceOrderActionAllowed(true);
