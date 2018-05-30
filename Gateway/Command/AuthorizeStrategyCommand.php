@@ -69,10 +69,17 @@ class AuthorizeStrategyCommand implements CommandInterface
         $payment = $paymentDO->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
-        if ($payment->getAdditionalInformation('is_active_payment_token_enabler')) {
+        $threeDs = $payment->getAdditionalInformation('cc_3ds');
+        $tokenEnabler = $payment->getAdditionalInformation('is_active_payment_token_enabler');
+
+        if ($tokenEnabler && !$threeDs) {
             $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
         }
 
         $this->commandPool->get(self::AUTHORIZE)->execute($commandSubject);
+
+        if ($tokenEnabler && $threeDs) {
+            $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
+        }
     }
 }
