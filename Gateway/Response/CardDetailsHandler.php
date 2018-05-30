@@ -55,22 +55,18 @@ class CardDetailsHandler implements HandlerInterface
     public function handle(array $subject, array $response)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
-        $transaction = $this->subjectReader->readTransaction($response);
 
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
-        /** @var \Stripe\Card $source */
-        $source = $transaction['source']['card'];
-
-        $payment->setCcLast4($source->last4);
-        $payment->setCcExpMonth($source->exp_month);
-        $payment->setCcExpYear($source->exp_year);
-        $payment->setCcType($source->brand);
+        $payment->setCcLast4($payment->getAdditionalInformation('cc_last4'));
+        $payment->setCcExpMonth($payment->getAdditionalInformation('cc_exp_month'));
+        $payment->setCcExpYear($payment->getAdditionalInformation('cc_exp_year'));
+        $payment->setCcType($payment->getAdditionalInformation('cc_type'));
 
         // set card details to additional info
-        $payment->setAdditionalInformation(self::CARD_NUMBER, 'xxxx-' . $source->last4);
-        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $source->brand);
+        $payment->setAdditionalInformation(self::CARD_NUMBER, 'xxxx-' . $payment->getAdditionalInformation('cc_last4'));
+        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $payment->getAdditionalInformation('cc_type'));
     }
 }
