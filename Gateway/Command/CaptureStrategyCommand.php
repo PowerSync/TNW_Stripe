@@ -101,12 +101,19 @@ class CaptureStrategyCommand implements CommandInterface
         $payment = $paymentDO->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
-        if ($payment->getAdditionalInformation('is_active_payment_token_enabler')) {
+        $threeDs = $payment->getAdditionalInformation('cc_3ds');
+        $tokenEnabler = $payment->getAdditionalInformation('is_active_payment_token_enabler');
+
+        if ($tokenEnabler && !$threeDs) {
             $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
         }
 
         $command = $this->getCommand($payment);
         $this->commandPool->get($command)->execute($commandSubject);
+
+        if ($tokenEnabler && $threeDs) {
+            $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
+        }
     }
 
     /**
@@ -116,7 +123,7 @@ class CaptureStrategyCommand implements CommandInterface
     private function getCommand(OrderPaymentInterface $payment)
     {
         $existsCapture = $this->isExistsCaptureTransaction($payment);
-        if (!$payment->getAuthorizationTransaction() && !$existsCapture) {
+        if (!$existsCapture && !$payment->getAuthorizationTransaction()) {
             return self::SALE;
         }
 

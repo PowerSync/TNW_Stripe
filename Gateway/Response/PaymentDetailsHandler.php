@@ -60,7 +60,7 @@ class PaymentDetailsHandler implements HandlerInterface
         $outcome = $transaction['outcome'];
 
         //remove previously set payment token
-        $payment->unsAdditionalInformation('cc_token');
+        //$payment->unsAdditionalInformation('cc_token');
         foreach ($this->additionalInformationMapping as $item) {
             if (!isset($outcome[$item])) {
                 continue;

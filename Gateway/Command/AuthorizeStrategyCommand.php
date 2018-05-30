@@ -16,15 +16,10 @@
 namespace TNW\Stripe\Gateway\Command;
 
 use TNW\Stripe\Gateway\Helper\SubjectReader;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Payment\Gateway\Command;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\CommandInterface;
 use Magento\Payment\Gateway\Helper\ContextHelper;
-use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
-use Magento\Sales\Api\TransactionRepositoryInterface;
-use Magento\Sales\Api\Data\TransactionInterface;
 
 class AuthorizeStrategyCommand implements CommandInterface
 {
@@ -44,16 +39,6 @@ class AuthorizeStrategyCommand implements CommandInterface
     private $commandPool;
 
     /**
-     * @var TransactionRepositoryInterface
-     */
-    private $transactionRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
      * @var SubjectReader
      */
     private $subjectReader;
@@ -61,19 +46,13 @@ class AuthorizeStrategyCommand implements CommandInterface
     /**
      * Constructor.
      * @param CommandPoolInterface $commandPool
-     * @param TransactionRepositoryInterface $repository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SubjectReader $subjectReader
      */
     public function __construct(
         CommandPoolInterface $commandPool,
-        TransactionRepositoryInterface $repository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
         SubjectReader $subjectReader
     ) {
         $this->commandPool = $commandPool;
-        $this->transactionRepository = $repository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->subjectReader = $subjectReader;
     }
 

@@ -374,6 +374,7 @@ define([
                   }).done(function(result) {
                     if (result.source.status === 'chargeable') {
                       self.setPaymentMethodToken(response.source.id);
+                      self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
                       self.placeOrder()
                     } else {
                       self.isPlaceOrderActionAllowed(true);

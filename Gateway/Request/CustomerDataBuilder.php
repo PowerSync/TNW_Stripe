@@ -15,7 +15,6 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use TNW\Stripe\Helper\Payment\Formatter;
@@ -44,7 +43,6 @@ class CustomerDataBuilder implements BuilderInterface
 
     /**
      * {@inheritdoc}
-     * @throws LocalizedException
      */
     public function build(array $subject)
     {
