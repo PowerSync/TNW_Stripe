@@ -350,6 +350,9 @@ define([
               return;
             }
 
+            // Disable Payment Token
+            self.vaultEnabler.isActivePaymentTokenEnabler(false);
+
             adapter.createSource({
               type: 'three_d_secure',
               amount: totalAmount,
@@ -366,7 +369,7 @@ define([
                 iframe: response.source.redirect.url,
                 iframeWidth: '800',
                 iframeHeight: '600',
-                loading: 'waiting',
+                loading: '<img alt="Loading..." src="'+self.getImgLoadingUrl()+'">',
                 afterClose: function() {
                   adapter.retrieveSource({
                     id: response.source.id,
@@ -395,6 +398,10 @@ define([
 
       getReturnUrl: function () {
         return window.checkoutConfig.payment[this.getCode()].returnUrl;
+      },
+
+      getImgLoadingUrl: function () {
+          return window.checkoutConfig.payment[this.getCode()].imgLoading;
       }
     });
 });
