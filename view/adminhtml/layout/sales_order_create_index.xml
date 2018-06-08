@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -19,21 +19,21 @@
   <body>
     <referenceBlock name="order_create_billing_form">
       <action method="setMethodFormTemplate">
-        <argument name="method" xsi:type="string">pmclain_stripe</argument>
-        <argument name="template" xsi:type="string">Pmclain_Stripe::form/cc.phtml</argument>
+        <argument name="method" xsi:type="string">tnw_stripe</argument>
+        <argument name="template" xsi:type="string">TNW_Stripe::form/cc.phtml</argument>
       </action>
     </referenceBlock>
     <referenceBlock name="order_create_billing_form">
       <action method="setMethodFormTemplate">
-        <argument name="method" xsi:type="string">pmclain_stripe_vault</argument>
+        <argument name="method" xsi:type="string">tnw_stripe_vault</argument>
         <argument name="template" xsi:type="string">Magento_Vault::form/vault.phtml</argument>
       </action>
     </referenceBlock>
     <referenceBlock name="content">
-      <block name="pmclain_stripe_payment_script"
-             as="pmclain_stripe_payment_script"
-             template="Pmclain_Stripe::payment/script.phtml"
-             class="Pmclain\Stripe\Block\Payment"
+      <block name="tnw_stripe_payment_script"
+             as="tnw_stripe_payment_script"
+             template="TNW_Stripe::payment/script.phtml"
+             class="TNW\Stripe\Block\Payment"
              after="billing_method"/>
     </referenceBlock>
   </body>

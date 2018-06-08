@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,51 +8,54 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Gateway\Request;
+namespace TNW\Stripe\Gateway\Request;
 
-use Pmclain\Stripe\Gateway\Request\PaymentDataBuilder;
-use Pmclain\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Pmclain\Stripe\Helper\Payment\Formatter;
-use Magento\Sales\Api\Data\TransactionInterface;
+use TNW\Stripe\Helper\Payment\Formatter;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\Order\Payment;
 
-class RefundDataBuilder implements BuilderInterface {
-  use Formatter;
+class RefundDataBuilder implements BuilderInterface
+{
+    use Formatter;
 
-  private $subjectReader;
+    const TRANSACTION_ID = 'transaction_id';
 
-  public function __construct(
-    SubjectReader $subjectReader
-  ) {
-    $this->subjectReader = $subjectReader;
-  }
+    /**
+     * @var SubjectReader
+     */
+    private $subjectReader;
 
-  public function build(array $subject) {
-    $paymentDataObject = $this->subjectReader->readPayment($subject);
-    $payment = $paymentDataObject->getPayment();
-    $amount = null;
-
-    try {
-      $amount = $this->formatPrice($this->subjectReader->readAmount($subject));
-    }catch (\InvalidArgumentException $e) {
-      //nothing
+    /**
+     * RefundDataBuilder constructor.
+     * @param SubjectReader $subjectReader
+     */
+    public function __construct(
+        SubjectReader $subjectReader
+    ) {
+        $this->subjectReader = $subjectReader;
     }
 
-    $txnId = str_replace(
-      '-' . TransactionInterface::TYPE_CAPTURE,
-      '',
-      $payment->getParentTransactionId()
-    );
+    /**
+     * {@inheritdoc}
+     * @throws LocalizedException
+     */
+    public function build(array $subject)
+    {
+        $paymentDataObject = $this->subjectReader->readPayment($subject);
 
-    return [
-      'transaction_id' => $txnId,
-      PaymentDataBuilder::AMOUNT => $amount
-    ];
-  }
+        /** @var Payment $payment */
+        $payment = $paymentDataObject->getPayment();
+
+        return [
+            self::TRANSACTION_ID => $payment->getParentTransactionId(),
+            PaymentDataBuilder::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject))
+        ];
+    }
 }

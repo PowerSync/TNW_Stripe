@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,13 +8,13 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
 
-/** @var Pmclain\Stripe\Block\Payment $block */
+/** @var TNW\Stripe\Block\Payment $block */
 
 $code = $block->escapeHtml($block->getCode());
 ?>
@@ -22,16 +22,17 @@ $code = $block->escapeHtml($block->getCode());
   //<![CDATA[
   require(
     [
-      'Pmclain_Stripe/js/stripe',
       'jquery',
+      'TNW_Stripe/js/stripe',
+      'Magento_Sales/order/create/form',
       'domReady!'
-    ], function(PmStripe, $) {
+    ], function($, Stripe) {
       var config = <?php /* @noEscape */ echo $block->getPaymentConfig(); ?>,
         payment,
         form = $('#payment_form_<?php /* @noEscape */ echo $code; ?>');
 
       config.active = form.length > 0 && !form.is(':hidden');
-      payment = new PmStripe(config);
+      payment = new Stripe(config);
     });
   //]]>
 </script>

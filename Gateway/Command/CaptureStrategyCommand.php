@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,97 +8,148 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Gateway\Command;
+namespace TNW\Stripe\Gateway\Command;
 
-use Pmclain\Stripe\Model\Adapter\StripeAdapter;
-use Pmclain\Stripe\Model\Adapter\StripeSearchAdapter;
-use Magento\Framework\Api\FilterBuilder;
+use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Payment\Gateway\Command;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\CommandInterface;
 use Magento\Payment\Gateway\Helper\ContextHelper;
-use Pmclain\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
 
 class CaptureStrategyCommand implements CommandInterface
 {
-  const SALE = 'sale';
+    /**
+     * Stripe authorize and capture command
+     */
+    const SALE = 'sale';
 
-  const CAPTURE = 'settlement';
+    /**
+     * Stripe capture command
+     */
+    const CAPTURE = 'capture';
 
-  private $commandPool;
-  private $transactionRepository;
-  private $filterBuilder;
-  private $searchCriteriaBuilder;
-  private $subjectReader;
-  private $stripeAdapter;
+    /**
+     * Stripe vault capture command
+     */
+    const VAULT_CAPTURE = 'vault_capture';
 
-  public function __construct(
-    CommandPoolInterface $commandPool,
-    TransactionRepositoryInterface $repository,
-    FilterBuilder $filterBuilder,
-    SearchCriteriaBuilder $searchCriteriaBuilder,
-    SubjectReader $subjectReader,
-    StripeAdapter $stripeAdapter
-  ) {
-    $this->commandPool = $commandPool;
-    $this->transactionRepository = $repository;
-    $this->filterBuilder = $filterBuilder;
-    $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-    $this->subjectReader = $subjectReader;
-    $this->stripeAdapter = $stripeAdapter;
-  }
+    /**
+     * Stripe customer command
+     */
+    const CUSTOMER = 'customer';
 
-  public function execute(array $commandSubject) {
-    $paymentDataObject = $this->subjectReader->readPayment($commandSubject);
-    $paymentInfo = $paymentDataObject->getPayment();
-    ContextHelper::assertOrderPayment($paymentInfo);
+    /**
+     * @var CommandPoolInterface
+     */
+    private $commandPool;
 
-    $command = $this->getCommand($paymentInfo);
-    $this->commandPool->get($command)->execute($commandSubject);
-  }
+    /**
+     * @var TransactionRepositoryInterface
+     */
+    private $transactionRepository;
 
-  private function getCommand(OrderPaymentInterface $payment) {
-    $existsCapture = $this->isExistsCaptureTransaction($payment);
-    if(!$payment->getAuthorizationTransaction() && !$existsCapture) {
-      return self::SALE;
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var SubjectReader
+     */
+    private $subjectReader;
+
+    /**
+     * Constructor.
+     * @param CommandPoolInterface $commandPool
+     * @param TransactionRepositoryInterface $repository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param SubjectReader $subjectReader
+     */
+    public function __construct(
+        CommandPoolInterface $commandPool,
+        TransactionRepositoryInterface $repository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        SubjectReader $subjectReader
+    ) {
+        $this->commandPool = $commandPool;
+        $this->transactionRepository = $repository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->subjectReader = $subjectReader;
     }
 
-    if(!$existsCapture) {
-      return self::CAPTURE;
+    /**
+     * @param array $commandSubject
+     * @return Command\ResultInterface|null|void
+     * @throws Command\CommandException
+     * @throws \Magento\Framework\Exception\NotFoundException
+     */
+    public function execute(array $commandSubject)
+    {
+        /** @var \Magento\Payment\Gateway\Data\PaymentDataObjectInterface $paymentDO */
+        $paymentDO = $this->subjectReader->readPayment($commandSubject);
+
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        $payment = $paymentDO->getPayment();
+        ContextHelper::assertOrderPayment($payment);
+
+        $threeDs = $payment->getAdditionalInformation('cc_3ds');
+        $tokenEnabler = $payment->getAdditionalInformation('is_active_payment_token_enabler');
+
+        if ($tokenEnabler && !$threeDs) {
+            $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
+        }
+
+        $command = $this->getCommand($payment);
+        $this->commandPool->get($command)->execute($commandSubject);
+
+        if ($tokenEnabler && $threeDs) {
+            $this->commandPool->get(self::CUSTOMER)->execute($commandSubject);
+        }
     }
-  }
 
-  private function isExistsCaptureTransaction(OrderPaymentInterface $payment) {
-    $this->searchCriteriaBuilder->addFilters(
-      [
-        $this->filterBuilder
-          ->setField('payment_id')
-          ->setValue($payment->getId())
-          ->create()
-      ]
-    );
+    /**
+     * @param OrderPaymentInterface $payment
+     * @return string
+     */
+    private function getCommand(OrderPaymentInterface $payment)
+    {
+        $existsCapture = $this->isExistsCaptureTransaction($payment);
+        if (!$existsCapture && !$payment->getAuthorizationTransaction()) {
+            return self::SALE;
+        }
 
-    $this->searchCriteriaBuilder->addFilters(
-      [
-        $this->filterBuilder
-          ->setField('txn_type')
-          ->setValue(TransactionInterface::TYPE_CAPTURE)
-          ->create()
-      ]
-    );
+        if (!$existsCapture) {
+            return self::CAPTURE;
+        }
 
-    $searchCriteria = $this->searchCriteriaBuilder->create();
+        // process capture for payment via Vault
+        return self::VAULT_CAPTURE;
+    }
 
-    $count = $this->transactionRepository->getList($searchCriteria)->getTotalCount();
-    return (boolean) $count;
-  }
+    /**
+     * @param OrderPaymentInterface $payment
+     * @return bool
+     */
+    private function isExistsCaptureTransaction(OrderPaymentInterface $payment)
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter('payment_id', $payment->getId())
+            ->addFilter('txn_type', TransactionInterface::TYPE_CAPTURE)
+            ->create();
+
+        $count = $this->transactionRepository
+            ->getList($searchCriteria)
+            ->getTotalCount();
+
+        return (boolean) $count;
+    }
 }

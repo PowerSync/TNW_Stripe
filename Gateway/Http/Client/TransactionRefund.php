@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,21 +8,31 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Gateway\Http\Client;
+namespace TNW\Stripe\Gateway\Http\Client;
 
-use Pmclain\Stripe\Gateway\Request\PaymentDataBuilder;
+use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
+use TNW\Stripe\Gateway\Request\RefundDataBuilder;
 
+/**
+ * Transaction Refund
+ */
 class TransactionRefund extends AbstractTransaction
 {
-  protected function process(array $data) {
-    return $this->adapter->refund(
-      $data['transaction_id'],
-      $data[PaymentDataBuilder::AMOUNT]
-    );
-  }
+    /**
+     * @inheritdoc
+     */
+    protected function process(array $data)
+    {
+        $storeId = $data['store_id'] ?? null;
+        // sending store id and other additional keys are restricted by Stripe API
+        unset($data['store_id']);
+
+        return $this->adapterFactory->create($storeId)
+            ->refund($data[RefundDataBuilder::TRANSACTION_ID], $data[PaymentDataBuilder::AMOUNT]);
+    }
 }

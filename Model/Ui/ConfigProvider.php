@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,63 +8,87 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Model\Ui;
+namespace TNW\Stripe\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Asset\Repository;
+use TNW\Stripe\Gateway\Config\Config;
 
+/**
+ * Config Provider
+ */
 class ConfigProvider implements ConfigProviderInterface
 {
-  const CODE = 'pmclain_stripe';
-  const CC_VAULT_CODE = 'pmclain_stripe_vault';
+    const CODE = 'tnw_stripe';
+    const CC_VAULT_CODE = 'tnw_stripe_vault';
 
-  protected $_config;
-  protected $_encryptor;
+    /**
+     * @var Config
+     */
+    private $config;
 
-  public function __construct(
-    ScopeConfigInterface $configInterface,
-    EncryptorInterface $encryptorInterface
-  ){
-    $this->_config = $configInterface;
-    $this->_encryptor = $encryptorInterface;
-  }
+    /**
+     * @var SessionManagerInterface
+     */
+    private $session;
 
-  public function getConfig()
-  {
-    return [
-      'payment' => [
-        self::CODE => [
-          'publishableKey' => $this->getPublishableKey(),
-          'vaultCode' => self::CC_VAULT_CODE,
-        ]
-      ]
-    ];
-  }
+    /**
+     * @var UrlInterface
+     */
+    private $url;
 
-  public function getPublishableKey() {
-    if ($this->_isTestMode()) {
-      return $this->_getEncryptedConfig('test_publishable_key');
+    /**
+     * @var Repository
+     */
+    private $assetRepo;
+
+    /**
+     * Constructor.
+     * @param Config $config
+     * @param SessionManagerInterface $session
+     * @param UrlInterface $url
+     * @param Repository $assetRepo
+     */
+    public function __construct(
+        Config $config,
+        SessionManagerInterface $session,
+        UrlInterface $url,
+        Repository $assetRepo
+    ) {
+        $this->config = $config;
+        $this->session = $session;
+        $this->url = $url;
+        $this->assetRepo = $assetRepo;
     }
-    return $this->_getEncryptedConfig('live_publishable_key');
-  }
 
-  protected function _isTestMode() {
-    return $this->_getConfig('test_mode');
-  }
-
-  protected function _getEncryptedConfig($value) {
-    $config = $this->_getConfig($value);
-    return $this->_encryptor->decrypt($config);
-  }
-
-  protected function _getConfig($value) {
-    return $this->_config->getValue('payment/pmclain_stripe/' . $value, ScopeInterface::SCOPE_STORE);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfig()
+    {
+        $storeId = $this->session->getStoreId();
+        return [
+            'payment' => [
+                self::CODE => [
+                    'isActive' => $this->config->isActive($storeId),
+                    'publishableKey' => $this->config->getPublishableKey(),
+                    'vaultCode' => self::CC_VAULT_CODE,
+                    'ccTypesMapper' => $this->config->getCctypesMapper(),
+                    'sdkUrl' => $this->config->getSdkUrl(),
+                    'returnUrl' => $this->url->getUrl('tnw_stripe/window/close'),
+                    'countrySpecificCardTypes' => $this->config->getCountrySpecificCardTypeConfig($storeId),
+                    'availableCardTypes' => $this->config->getAvailableCardTypes($storeId),
+                    'useCvv' => $this->config->isCvvEnabled($storeId),
+                    'imgLoading' => $this->assetRepo->getUrl('TNW_Stripe::images/loader.gif')
+                ]
+            ]
+        ];
+    }
 }
