@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -18,8 +18,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
   <default>
     <payment>
-      <pmclain_stripe>
+      <tnw_stripe>
         <model>StripeFacade</model>
+        <title>Credit Card (Stripe)</title>
         <payment_action>authorize</payment_action>
         <active>0</active>
         <is_gateway>1</is_gateway>
@@ -38,17 +39,26 @@
         <can_review_payment>1</can_review_payment>
         <can_deny_payment>1</can_deny_payment>
         <cctypes>AE,VI,MC,DI,JCB,CUP,DN,MI</cctypes>
+        <test_secret_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+        <test_publishable_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+        <live_secret_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+        <live_publishable_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+        <privateInfoKeys>risk_level,seller_message,captured,type</privateInfoKeys>
+        <paymentInfoKeys>cc_type,cc_number,risk_level,seller_message,captured,type</paymentInfoKeys>
+        <debugReplaceKeys />
         <useccv>1</useccv>
-        <cctypes_stripe_mapper><![CDATA[{"american-express":"AE","discover":"DI","jcb":"JCB","mastercard":"MC","master-card":"MC","visa":"VI","maestro":"MI","diners-club":"DN","unionpay":"CUP"}]]></cctypes_stripe_mapper>
+        <cctypes_stripe_mapper><![CDATA[{"american-express":"AE","amex":"AE","discover":"DI","jcb":"JCB","mastercard":"MC","master-card":"MC","visa":"VI","maestro":"MI","diners-club":"DN","diners":"DN","unionpay":"CUP"}]]></cctypes_stripe_mapper>
         <order_status>processing</order_status>
-      </pmclain_stripe>
-      <pmclain_stripe_vault>
+        <sdk_url><![CDATA[https://js.stripe.com/v3/]]></sdk_url>
+      </tnw_stripe>
+      <tnw_stripe_vault>
         <model>StripeCreditCardVaultFacade</model>
         <title>Stored Cards (Stripe)</title>
+        <active>0</active>
         <instant_purchase>
           <supported>1</supported>
         </instant_purchase>
-      </pmclain_stripe_vault>
+      </tnw_stripe_vault>
     </payment>
   </default>
 </config>

@@ -5,8 +5,9 @@ define([
   'uiComponent',
   'Magento_Ui/js/modal/alert',
   'Magento_Ui/js/lib/view/utils/dom-observer',
-  'mage/translate'
-], function ($, Class, alert, domObserver, $t) {
+  'mage/translate',
+  'TNW_Stripe/js/validator'
+], function ($, Class, alert, domObserver, $t, validator) {
   'use strict';
 
   return Class.extend({
@@ -14,13 +15,12 @@ define([
     defaults: {
       $selector: null,
       selector: 'edit_form',
-      container: 'payment_form_pmclain_stripe',
+      container: 'payment_form_tnw_stripe',
       active: false,
       scriptLoaded: false,
       stripe: null,
-      stripeCardElement: null,
-      stripeCard: null,
       token: null,
+      selectedCardType: null,
       imports: {
         onActiveChange: 'active'
       }
@@ -33,11 +33,14 @@ define([
     initObservable: function () {
       var self = this;
 
+      validator.setConfig(this);
+
       self.$selector = $('#' + self.selector);
       this._super()
         .observe([
           'active',
-          'scriptLoaded'
+          'scriptLoaded',
+          'selectedCardType'
         ]);
 
       // re-init payment method events
@@ -48,6 +51,7 @@ define([
       domObserver.get('#' + self.container, function () {
         if (self.scriptLoaded()) {
           self.$selector.off('submit');
+          self.initStripe();
         }
       });
 
@@ -62,7 +66,6 @@ define([
      */
     changePaymentMethod: function (event, method) {
       this.active(method === this.code);
-
       return this;
     },
 
@@ -72,27 +75,29 @@ define([
      */
     onActiveChange: function (isActive) {
       if (!isActive) {
-        this.$selector.off('submitOrder.pmclain_stripe');
-
+        this.$selector.off('submitOrder.tnw_stripe');
         return;
       }
+
       this.disableEventListeners();
       window.order.addExcludedPaymentMethod(this.code);
 
       if (!this.publishableKey) {
         this.error($.mage.__('This payment is not available'));
-
         return;
       }
 
       this.enableEventListeners();
 
-      if(!this.scriptLoaded()) {
+      if (!this.scriptLoaded()) {
         this.loadScript();
       }
     },
 
-    loadScript: function() {
+    /**
+     * Load external Stripe SDK
+     */
+    loadScript: function () {
       var self = this;
       var state = self.scriptLoaded;
 
@@ -100,17 +105,49 @@ define([
       require(['https://js.stripe.com/v3/'], function () {
         state(true);
         self.stripe = window.Stripe(self.publishableKey);
-        self.stripeCardElement = self.stripe.elements();
-        self.stripeCard = self.stripeCardElement.create('card', {
-          style: {
-            base: {
-              fontSize: '20px'
-            }
-          }
-        });
-        self.stripeCard.mount('#stripe-card-element');
+        self.initStripe();
         $('body').trigger('processStop');
       });
+    },
+
+    /**
+     * Create and mount card Stripe
+     */
+    initStripe: function () {
+      var self = this,
+          stripeCardElement;
+
+      try {
+        stripeCardElement = self.stripe.elements();
+
+        var style = {
+          base: {
+            fontSize: '17px'
+          }
+        };
+
+        self.stripeCardNumber = stripeCardElement.create('cardNumber', {style: style});
+        self.stripeCardNumber.mount(this.getSelector('cc_number'));
+        self.stripeCardNumber.on('change', function (event) {
+          if (event.empty === false) {
+            self.validateCardType();
+          }
+
+          self.selectedCardType(
+            validator.getMageCardType(event.brand, self.getCcAvailableTypes())
+          );
+        });
+
+        stripeCardElement
+            .create('cardExpiry', {style: style})
+            .mount(this.getSelector('cc_exp'));
+
+        stripeCardElement
+            .create('cardCvc', {style: style})
+            .mount(this.getSelector('cc_cid'));
+      } catch (e) {
+        self.error(e.message);
+      }
     },
 
     /**
@@ -127,7 +164,7 @@ define([
      * Enable form event listeners
      */
     enableEventListeners: function () {
-      this.$selector.on('submitOrder.pmclain_stripe', this.submitOrder.bind(this));
+      this.$selector.on('submitOrder.tnw_stripe', this.submitOrder.bind(this));
     },
 
     /**
@@ -145,17 +182,19 @@ define([
       var self = this;
       this.$selector.validate().form();
       this.$selector.trigger('afterValidate.beforeSubmit');
+      $('body').trigger('processStop');
 
       // validate parent form
       if (this.$selector.validate().errorList.length) {
-        $('body').trigger('processStop');
         return false;
       }
 
-      $.when(this.createToken()).done(function() {
+      $.when(this.createToken()).done(function () {
         $('body').trigger('processStop');
-        $('#' + self.container).find('[type="submit"]').trigger('click');
-      }).fail(function(result) {
+        if (self.validateCardType()) {
+          self.placeOrder();
+        }
+      }).fail(function (result) {
         $('body').trigger('processStop');
         self.error(result);
 
@@ -166,29 +205,17 @@ define([
     /**
      * Convert card information to stripe token
      */
-    createToken: function() {
+    createToken: function () {
       var self = this;
       var container = $('#' + this.container);
 
-      var cardInfo = {
-        number: container.find('#' + self.code + '_cc_number').val(),
-
-        exp_month: container.find('#' + self.code + '_expiration').val(),
-        exp_year: container.find('#' + self.code + '_expiration_yr').val(),
-        cvc: container.find('#' + self.code + '_cc_cid').val()
-      };
-
       var defer = $.Deferred();
 
-      self.stripe.createToken(self.stripeCard).then(function(response) {
+      self.stripe.createSource(self.stripeCardNumber).then(function (response) {
         if (response.error) {
-          deffer.reject(response.error.message);
-        }else {
-          var card = response.token.card;
-          container.find('#' + self.code + '_expiration').val(card.exp_month);
-          container.find('#' + self.code + '_expiration_yr').val(card.exp_year);
-          container.find('#' + self.code + '_cc_type').val(card.brand);
-          container.find('#' + self.code + '_cc_token').val(response.token.id);
+          defer.reject(response.error.message);
+        } else {
+          container.find('#' + self.code + '_cc_token').val(response.source.id);
           defer.resolve();
         }
       });
@@ -216,6 +243,23 @@ define([
       });
 
       return types;
+    },
+
+    /**
+     * Validate current entered card type
+     * @returns {Boolean}
+     */
+    validateCardType: function () {
+      var $input = $(this.getSelector('cc_number'));
+      $input.removeClass('stripe-shosted-fields-invalid');
+
+      if (!this.selectedCardType()) {
+        $input.addClass('stripe-shosted-fields-invalid');
+        return false;
+      }
+
+      $(this.getSelector('cc_type')).val(this.selectedCardType());
+      return true;
     },
 
     /**

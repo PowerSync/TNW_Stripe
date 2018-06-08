@@ -1,5 +1,5 @@
 # Magento 2 Stripe Integration
-[![Build Status](https://travis-ci.org/pmclain/module-stripe.svg?branch=master)](https://travis-ci.org/pmclain/module-stripe)  
+[![Build Status](https://travis-ci.org/tnw/module-stripe.svg?branch=master)](https://travis-ci.org/tnw/module-stripe)  
 
 Accept credit card payments through the Stripe payment gateway.
 
@@ -19,13 +19,13 @@ corresponding Stripe customer profile.
 ## Installation
 #### Composer
 In your Magento 2 root directory run  
-`composer require pmclain/module-stripe`  
+`composer require tnw/module-stripe`  
 `bin/magento setup:upgrade`  
 
 #### Manual
 The module can be installed without Composer by downloading the desired
-release from https://github.com/pmclain/module-stripe/releases and placing
-the contents in `app/code/Pmclain/Stripe/`  
+release from https://github.com/tnw/module-stripe/releases and placing
+the contents in `app/code/TNW/Stripe/`  
 The module depends on the Stripe PHP-SDK which should be added to your
 project via composer by running `composer require stripe/stripe-php:5.2.0`
 With the module files in place and the Stripe SDK installed,

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -9,8 +9,8 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -19,11 +19,11 @@
   <type name="Magento\Checkout\Model\CompositeConfigProvider">
     <arguments>
       <argument name="configProviders" xsi:type="array">
-        <item name="pmclain_stripe_config_provider" xsi:type="object">Pmclain\Stripe\Model\Ui\ConfigProvider</item>
+        <item name="tnw_stripe_config_provider" xsi:type="object">TNW\Stripe\Model\Ui\ConfigProvider</item>
       </argument>
     </arguments>
   </type>
-  <type name="Pmclain\Stripe\Block\Info">
+  <type name="TNW\Stripe\Block\Info">
     <arguments>
       <argument name="data" xsi:type="array">
         <item xsi:type="string" name="is_secure_mode">1</item>
@@ -33,14 +33,14 @@
   <type name="Magento\Payment\Model\CcGenericConfigProvider">
     <arguments>
       <argument name="methodCodes" xsi:type="array">
-        <item name="pmclain_stripe" xsi:type="const">Pmclain\Stripe\Model\Ui\ConfigProvider::CODE</item>
+        <item name="tnw_stripe" xsi:type="const">TNW\Stripe\Model\Ui\ConfigProvider::CODE</item>
       </argument>
     </arguments>
   </type>
   <type name="Magento\Vault\Model\Ui\TokensConfigProvider">
     <arguments>
       <argument name="tokenUiComponentProviders" xsi:type="array">
-        <item name="pmclain_stripe" xsi:type="object">Pmclain\Stripe\Model\Ui\TokenUiComponentProvider</item>
+        <item name="tnw_stripe" xsi:type="object">TNW\Stripe\Model\Ui\TokenUiComponentProvider</item>
       </argument>
     </arguments>
   </type>

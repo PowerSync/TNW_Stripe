@@ -1,0 +1,57 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  _____________________________________________
+
+@stripe-error__color: @color-apricot;
+@stripe-focus__color: @color-blue-pure;
+@stripe-success__color: @color-green-apple;
+
+.payment-method-tnw_stripe {
+    .shosted-date-wrap {
+        &:extend(.abs-clearfix all);
+    }
+
+    .shosted-control {
+        height: 3.4rem;
+        position: relative;
+
+        &.stripe-shosted-fields-focused {
+            border-color: @stripe-focus__color;
+        }
+
+        &.stripe-shosted-fields-invalid:not(.stripe-shosted-fields-focused) {
+            border-color: @stripe-error__color;
+
+            & ~ .shosted-error {
+                height: auto;
+                opacity: 1;
+            }
+        }
+
+        &.stripe-shosted-fields-valid {
+            border-color: @stripe-success__color;
+        }
+
+        &.shosted-date {
+            float: left;
+            margin-bottom: .2rem;
+            width: 9rem;
+        }
+
+        &.shosted-cid {
+            width: 7rem;
+        }
+    }
+
+    .shosted-error {
+        clear: both;
+        color: @stripe-error__color;
+        height: 0;
+        opacity: 0;
+    }
+}

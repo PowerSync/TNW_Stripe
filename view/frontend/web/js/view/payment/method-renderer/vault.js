@@ -22,7 +22,7 @@ define([
       return this.details.type;
     },
 
-    getToken: function() {
+    getToken: function () {
       return this.publicHash;
     }
   });

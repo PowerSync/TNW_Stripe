@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,14 +8,14 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Gateway\Http\Client;
+namespace TNW\Stripe\Gateway\Http\Client;
 
-use Pmclain\Stripe\Model\Adapter\StripeAdapter;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use Magento\Payment\Gateway\Http\ClientException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
@@ -24,45 +24,71 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractTransaction implements ClientInterface
 {
-  protected $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-  protected $customLogger;
+    /**
+     * @var Logger
+     */
+    private $customLogger;
 
-  protected $adapter;
+    /**
+     * @var StripeAdapterFactory
+     */
+    protected $adapterFactory;
 
-  public function __construct(
-    LoggerInterface $logger,
-    Logger $customLogger,
-    StripeAdapter $adapter
-  ) {
-    $this->logger = $logger;
-    $this->customLogger = $customLogger;
-    $this->adapter = $adapter;
-  }
-
-  public function placeRequest(
-    TransferInterface $transferObject
-  ) {
-    $data = $transferObject->getBody();
-    $log = [
-      'request' => $data,
-      'client' => static::class
-    ];
-    $response['object'] = [];
-
-    try {
-      $response['object'] = $this->process($data);
-    }catch (\Exception $e) {
-      $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
-      $this->logger->critical($message);
-      throw new ClientException($message);
-    }finally {
-      $log['response'] = (array) $response['object'];
-      $this->customLogger->debug($log);
+    /**
+     * AbstractTransaction constructor.
+     * @param LoggerInterface $logger
+     * @param Logger $customLogger
+     * @param StripeAdapterFactory $adapterFactory
+     */
+    public function __construct(
+        LoggerInterface $logger,
+        Logger $customLogger,
+        StripeAdapterFactory $adapterFactory
+    ) {
+        $this->logger = $logger;
+        $this->customLogger = $customLogger;
+        $this->adapterFactory = $adapterFactory;
     }
 
-    return $response;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function placeRequest(
+        TransferInterface $transferObject
+    ) {
+        $data = $transferObject->getBody();
+        $log = [
+            'request' => $data,
+            'client' => static::class
+        ];
+        $response['object'] = [];
 
-  abstract protected function process(array $data);
+        try {
+            $response['object'] = $this->process($data);
+        } catch (\Exception $e) {
+            $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
+            $this->logger->critical($message);
+            throw new ClientException($message);
+        } finally {
+            $log['response'] = is_object($response['object'])
+                ? $response['object']->__toArray(true)
+                : $response['object'];
+
+            $this->customLogger->debug($log);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Process http request
+     * @param array $data
+     * @return mixed
+     */
+    abstract protected function process(array $data);
 }

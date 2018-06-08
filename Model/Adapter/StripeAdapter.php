@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmclain_Stripe extension
+ * TNW_Stripe extension
  * NOTICE OF LICENSE
  *
  * This source file is subject to the OSL 3.0 License
@@ -8,92 +8,83 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  Pmclain
- * @package   Pmclain_Stripe
+ * @category  TNW
+ * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace Pmclain\Stripe\Model\Adapter;
+namespace TNW\Stripe\Model\Adapter;
 
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
-use Stripe\Refund;
-use Pmclain\Stripe\Gateway\Config\Config;
-use Magento\Framework\Encryption\EncryptorInterface;
-use Pmclain\Stripe\Gateway\Request\PaymentDataBuilder;
 
 class StripeAdapter
 {
-  private $config;
-
-  protected $encryptor;
-
-  public function __construct(
-    Config $config,
-    EncryptorInterface $encryptorInterface
-  ) {
-    $this->encryptor = $encryptorInterface;
-    $this->config = $config;
-    $this->initCredentials();
-  }
-
-  protected function initCredentials() {
-    Stripe::setApiKey($this->encryptor->decrypt($this->config->getSecretKey()));
-  }
-
-  public function refund($transactionId, $amount = null) {
-    return Refund::create([
-      'charge' => $transactionId,
-      'amount' => $amount
-    ]);
-  }
-
-  public function sale($attributes) {
-    if(isset($attributes[PaymentDataBuilder::SAVE_IN_VAULT])) {
-      unset($attributes[PaymentDataBuilder::SAVE_IN_VAULT]);
-      $attributes = $this->_saveCustomerCard($attributes);
-
-      if($attributes instanceof \Stripe\Error\Card) {
-        return $attributes;
-      }
+    /**
+     * StripeAdapter constructor.
+     * @param string $secretKey
+     */
+    public function __construct($secretKey)
+    {
+        $this->secretKey($secretKey);
     }
-    try {
-      return Charge::create($attributes);
-    }catch (\Stripe\Error\Card $e) {
-      return $e;
+
+    /**
+     * @param string|null $value
+     */
+    public function secretKey($value = null)
+    {
+        Stripe::setApiKey($value);
     }
-  }
 
-  public function submitForSettlement($transactionId, $amount = null) {
-    $charge = Charge::retrieve($transactionId);
-    return $charge->capture(['amount' => $amount]);
-  }
-
-  public function void($transactionId) {
-    return Refund::create(['charge' => $transactionId]);
-  }
-
-  /**
-   * @param $attributes
-   * @return \Exception|\Stripe\Error\Card|array
-   * @throws \Magento\Framework\Validator\Exception
-   */
-  protected function _saveCustomerCard($attributes) {
-    try {
-      $stripeCustomer = Customer::retrieve($attributes[PaymentDataBuilder::CUSTOMER]);
-
-      $card = $stripeCustomer->sources->create([
-        'source' => $attributes[PaymentDataBuilder::SOURCE]
-      ]);
-
-      $attributes[PaymentDataBuilder::SOURCE] = $card->id;
-
-      return $attributes;
-    }catch (\Stripe\Error\Card $e) {
-      return $e;
-    }catch (\Exception $e) {
-      throw new \Magento\Framework\Validator\Exception(__($e->getMessage()));
+    /**
+     * @param $transactionId
+     * @param null $amount
+     * @return Charge
+     */
+    public function refund($transactionId, $amount = null)
+    {
+        return Charge::retrieve($transactionId)
+            ->refund(['amount' => $amount]);
     }
-  }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function sale(array $attributes)
+    {
+        return Charge::create($attributes);
+    }
+
+    /**
+     * @param string $transactionId
+     * @param null $amount
+     * @return Charge
+     */
+    public function capture($transactionId, $amount = null)
+    {
+        return Charge::retrieve($transactionId)
+            ->capture(['amount' => $amount]);
+    }
+
+    /**
+     * @param string $transactionId
+     * @return Charge
+     */
+    public function void($transactionId)
+    {
+        return Charge::retrieve($transactionId)
+            ->refund();
+    }
+
+    /**
+     * @param array $attributes
+     * @return Customer
+     */
+    public function customer(array $attributes)
+    {
+        return Customer::create($attributes);
+    }
 }
