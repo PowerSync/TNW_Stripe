@@ -19,7 +19,7 @@
   <system>
     <section id="payment">
       <group id="tnw_stripe" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>Stripe Payment</label>
+        <label>Stripe</label>
         <comment><![CDATA[Accept online payments in Magento 2 using the Stripe Payment Gateway. If you do not yet have a Stripe account, please <a href="https://dashboard.stripe.com/register" target="_blank">click here</a> to register.]]></comment>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Enabled</label>
@@ -37,7 +37,7 @@
           </requires>
         </field>
         <group id="configuration_details" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="4">
-          <comment>https://technweb.atlassian.net/wiki/</comment>
+          <comment>https://technweb.atlassian.net/wiki/spaces/SG/pages/275513413/Configuration</comment>
           <frontend_model>TNW\Stripe\Block\Adminhtml\System\Config\Fieldset\Hint</frontend_model>
         </group>
         <group id="stripe_required" translate="label" showInDefault="1" showInWebsite="1" sortOrder="5">
