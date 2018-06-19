@@ -31,7 +31,7 @@ before_install:
  - ./magento2/bin/magento --version # check
  
 script:
- - mkdir -p magento2/app/code # link our module to the Magento2 folder to check installation process
+ - mkdir -p magento2/app/code/TNW # link our module to the Magento2 folder to check installation process
  - ln -s $TRAVIS_BUILD_DIR magento2/app/code/TNW/Stripe
  - rm -rf ./magento2/generated/*
  - ./magento2/bin/magento module:status
