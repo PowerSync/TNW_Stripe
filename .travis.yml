@@ -5,9 +5,16 @@ php:
   - 7.1
 services:
   - mysql
+cache:
+  directories:
+    - $COMPOSER_CACHE_DIR
+    - $HOME/.composer/cache/files
 env:
   - MAGENTO_VERSION=2.2.4
-#  - MAGENTO_VERSION=2.1.12
+  - MAGENTO_VERSION=2.2.3
+  - MAGENTO_VERSION=2.2.2
+  - MAGENTO_VERSION=2.2.1
+  - MAGENTO_VERSION=2.2.0
 before_install:
  - mysql -e 'CREATE DATABASE magento;' # create database
  - cd ../..
@@ -22,14 +29,10 @@ before_install:
  - cd ..
  - ./magento2/bin/magento setup:install --db-host=localhost --db-prefix=tnw --db-name=magento --db-user=root --backend-frontname=admin --base-url=http://magento-qa.box/ --language=en_US --timezone=America/Chicago --currency=USD --admin-lastname=Admin --admin-firstname=Admin --admin-email=admin@example.com --admin-user=admin --admin-password=admin123 --cleanup-database --use-rewrites=1
  - ./magento2/bin/magento --version # check
- - composer require tnw/soap-client=1.0.8
- - ./magento2/bin/magento setup:upgrade
- - ./magento2/bin/magento setup:di:compile
  
-
 script:
  - mkdir -p magento2/app/code # link our module to the Magento2 folder to check installation process
- - ln -s $TRAVIS_BUILD_DIR magento2/app/code/TNW
+ - ln -s $TRAVIS_BUILD_DIR magento2/app/code/TNW/Stripe
  - rm -rf ./magento2/generated/*
  - ./magento2/bin/magento module:status
  - ./magento2/bin/magento module:enable TNW_Stripe
