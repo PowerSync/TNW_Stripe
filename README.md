@@ -1,5 +1,5 @@
 # Magento 2 Stripe Integration
-[![Build Status](https://travis-ci.org/tnw/module-stripe.svg?branch=master)](https://travis-ci.org/tnw/module-stripe)  
+[![Build Status](https://travis-ci.com/PowerSync/TNW_Stripe.svg?token=wTy7W42WZpomVzzpPmp4&branch=develop)](https://travis-ci.com/PowerSync/TNW_Stripe)
 
 Accept credit card payments through the Stripe payment gateway.
 
