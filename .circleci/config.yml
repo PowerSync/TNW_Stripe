@@ -3,16 +3,15 @@ version: 2
 jobs:
   build:
     docker:
-      - image: alexcheng/magento2:2.2.2
+      - image: alexcheng/magento2:2.2.2-git
     working_directory: ~/tnw_extension
     steps:
-      - setup_remote_docker:
-          install-magento
       - run:
           name: Install Git
           command: |
-            apt-get update
-            apt-get install -y git
+          #  apt-get update
+          #  apt-get install -y git
+            install-magento  
       - checkout
       - run:
           name: Get Magento Code Quality Tool
