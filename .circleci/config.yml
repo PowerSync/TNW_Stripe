@@ -8,11 +8,32 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Refresh Magetno and Install Extension
+          name: Prepare & Restart Apache + MySQL
           command: |
             sudo a2enmod rewrite && sudo service apache2 restart && sudo service mysql restart
-            cd /var/www/html/magento22/app && sudo mkdir code && cd code && sudo mkdir TNW && cd TNW && sudo mkdir Stripe && sudo cp -R ~/tnw_extension/* Stripe/
-            cd /var/www/html/magento22 && sudo php bin/magento setup:upgrade && sudo php bin/magento setup:di:compile && sudo chmod -R 777 .
+      - run:
+          name: Create the Folder for the Extension
+          command: |
+            cd /var/www/html/magento22/app
+            sudo mkdir code
+            cd code
+            sudo mkdir TNW
+            cd TNW
+            sudo mkdir Stripe           
+      - run:
+          name: Copy the Extension Files
+          command: |
+            sudo cp -R ~/tnw_extension/* /var/www/html/magento22/app/code/TNW/Stripe/
+      - run:
+          name: Install the Extension
+          command: |
+            cd /var/www/html/magento22
+            sudo php bin/magento setup:upgrade
+      - run:
+          name: Compile the Code
+          command: |
+            cd /var/www/html/magento22
+            sudo php bin/magento setup:di:compile      
       #- run:
       #    name: Install dependencies
       #    command: |
