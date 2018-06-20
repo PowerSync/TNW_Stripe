@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: alexcheng/magento2
+      - image: circleci/php:7.2-apache
     working_directory: ~/tnw_extension
     steps:
       - run:
