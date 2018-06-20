@@ -12,13 +12,13 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y git
       - checkout
-      - run:
-          name: Get Magento Code Quality Tool
-          command: |
-            cd /var/www/html/
-            git clone https://github.com/magento/marketplace-eqp magento-coding-standard
-            cd magento-coding-standard
-            composer install
+      #- run:
+      #    name: Get Magento Code Quality Tool
+      #    command: |
+      #      cd /var/www/html/
+      #      git clone https://github.com/magento/marketplace-eqp magento-coding-standard
+      #      cd magento-coding-standard
+      #      composer install
       #- run:
       #    name: Installing Magento
       #    command: |
@@ -51,7 +51,8 @@ jobs:
       - run:
           name: TEST
           command: |
-            docker ps
+            cd ~
+            ls -al
            
       #- run:
       #    name: Install dependencies
