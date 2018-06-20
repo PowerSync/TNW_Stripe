@@ -11,7 +11,7 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get -y install zip git zlib1g-dev wget
-            sudo apt-get -y install php71-bcmath php71-gd php71-imap php71-mbstring php71-mysqlnd php71-opcache php71-pdo php71-pecl-apcu php71-mcrypt php71-intl php71-zip php71-soap php71-fpm
+            sudo apt-get -y install php7.1-bcmath php7.1-gd php7.1-imap php7.1-mbstring php7.1-mysqlnd php7.1-opcache php7.1-pdo php7.1-pecl-apcu php7.1-mcrypt php7.1-intl php7.1-zip php7.1-soap php7.1-fpm
       - run:
           name: Permissions
           command: |
