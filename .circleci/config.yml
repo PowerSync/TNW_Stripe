@@ -11,14 +11,19 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install -y git
+      - run:
+          name: Permissions
+          command: |
+            cd /var/www/
+            sudo chown -R circleci:circleci html
       - checkout
-      #- run:
-      #    name: Get Magento Code Quality Tool
-      #    command: |
-      #      cd /var/www/html/
-      #      git clone https://github.com/magento/marketplace-eqp magento-coding-standard
-      #      cd magento-coding-standard
-      #      composer install
+      - run:
+          name: Get Magento Code Quality Tool
+          command: |
+            cd /var/www/html/
+            git clone https://github.com/magento/marketplace-eqp magento-coding-standard
+            cd magento-coding-standard
+            composer install
       #- run:
       #    name: Installing Magento
       #    command: |
