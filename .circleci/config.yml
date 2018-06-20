@@ -3,14 +3,15 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/php:7.2-apache
+      - image: circleci/php:7.1-apache
     working_directory: ~/tnw_extension
     steps:
       - run:
           name: Install Git
           command: |
             sudo apt-get update
-            sudo apt-get install -y git
+            sudo apt-get -y install zip git zlib1g-dev wget
+            sudo apt-get -y install php71-bcmath php71-gd php71-imap php71-mbstring php71-mysqlnd php71-opcache php71-pdo php71-pecl-apcu php71-mcrypt php71-intl php71-zip php71-soap php71-fpm
       - run:
           name: Permissions
           command: |
