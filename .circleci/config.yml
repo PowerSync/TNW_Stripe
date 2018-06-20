@@ -20,6 +20,12 @@ jobs:
             cd magento-coding-standard
             composer install
       - run:
+          name: Installing Magento
+          code: |
+            cd /var/www/html
+            php bin/magento setup:install --db-host=db --db-prefix=tnw --db-name=magento --db-user=magento --db-password=magento --backend-frontname=admin --base-url=http://magento-qa.box/ --language=en_US --timezone=America/Chicago --currency=USD --admin-lastname=Admin --admin-firstname=Admin --admin-email=admin@example.com --admin-user=admin --admin-password=admin123 --cleanup-database --use-rewrites=1
+            php bin/magento --version
+      - run:
           name: Create the Folder for the Extension
           command: |
             cd /var/www/html/app
