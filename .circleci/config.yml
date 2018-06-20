@@ -51,7 +51,7 @@ jobs:
       - run:
           name: TEST
           command: |
-            cd /home/magento2
+            cd /home/magento2/magento2
             ls -al
            
       #- run:
