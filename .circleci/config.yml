@@ -6,7 +6,7 @@ jobs:
       - image: alexcheng/magento2:2.2.2
     working_directory: ~/tnw_extension
     steps:
-      - run: 'sudo apt install git-all'
+      - run: 'apt install git-all'
       - checkout
       - run:
           name: Prepare & Restart Apache + MySQL
