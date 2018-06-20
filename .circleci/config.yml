@@ -12,6 +12,13 @@ jobs:
           command: |
             sudo a2enmod rewrite && sudo service apache2 restart && sudo service mysql restart
       - run:
+          name: Get Magento Code Quality Tool
+          command: |
+            cd /var/www/html/
+            git clone https://github.com/magento/marketplace-eqp magento-coding-standard
+            cd magento-coding-standard
+            composer install
+      - run:
           name: Create the Folder for the Extension
           command: |
             cd /var/www/html/magento22/app
