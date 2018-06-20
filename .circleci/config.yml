@@ -24,28 +24,32 @@ jobs:
             cd magento-coding-standard
             composer install
       - run:
-          name: Create the Folder for the Extension
+          name: TEST
           command: |
-            cd /var/www/html/magento22/app
-            sudo mkdir code
-            cd code
-            sudo mkdir TNW
-            cd TNW
-            sudo mkdir Stripe           
-      - run:
-          name: Copy the Extension Files
-          command: |
-            sudo cp -R ~/tnw_extension/* /var/www/html/magento22/app/code/TNW/Stripe/
-      - run:
-          name: Install the Extension
-          command: |
-            cd /var/www/html/magento22
-            sudo php bin/magento setup:upgrade
-      - run:
-          name: Compile the Code
-          command: |
-            cd /var/www/html/magento22
-            sudo php bin/magento setup:di:compile      
+            ls -al
+      #- run:
+      #    name: Create the Folder for the Extension
+      #    command: |
+      #      cd /var/www/html/magento22/app
+      #      sudo mkdir code
+      #      cd code
+      #      sudo mkdir TNW
+      #      cd TNW
+      #      sudo mkdir Stripe           
+      #- run:
+      #    name: Copy the Extension Files
+      #    command: |
+      #      sudo cp -R ~/tnw_extension/* /var/www/html/magento22/app/code/TNW/Stripe/
+      #- run:
+      #    name: Install the Extension
+      #    command: |
+      #      cd /var/www/html/magento22
+      #      sudo php bin/magento setup:upgrade
+      #- run:
+      #    name: Compile the Code
+      #    command: |
+      #      cd /var/www/html/magento22
+      #      sudo php bin/magento setup:di:compile      
       #- run:
       #    name: Install dependencies
       #    command: |
