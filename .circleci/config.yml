@@ -23,25 +23,25 @@ jobs:
           name: Create the Folder for the Extension
           command: |
             cd /var/www/html/app
-            sudo mkdir code
+            mkdir code
             cd code
-            sudo mkdir TNW
+            mkdir TNW
             cd TNW
-            sudo mkdir Stripe           
+            mkdir Stripe           
       - run:
           name: Copy the Extension Files
           command: |
-            sudo cp -R ~/tnw_extension/* /var/www/html/app/code/TNW/Stripe/
+            cp -R ~/tnw_extension/* /var/www/html/app/code/TNW/Stripe/
       - run:
           name: Install the Extension
           command: |
             cd /var/www/html
-            sudo php bin/magento setup:upgrade
+            php bin/magento setup:upgrade
       - run:
           name: Compile the Code
           command: |
             cd /var/www/html
-            sudo php bin/magento setup:di:compile 
+            php bin/magento setup:di:compile 
       #- run:
       #    name: TEST
       #    command: |
