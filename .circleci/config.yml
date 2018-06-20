@@ -8,7 +8,9 @@ jobs:
     steps:
       - run:
           name: Install Git
-          command: 'apt-get install -y git'
+          command: |
+            apt-get update
+            apt-get install -y git
       - checkout
       - run:
           name: Prepare & Restart Apache + MySQL
