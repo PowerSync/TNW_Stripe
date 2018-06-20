@@ -12,10 +12,6 @@ jobs:
             apt-get update
             apt-get install -y git
       - checkout
-      #- run:
-      #    name: Prepare & Restart Apache + MySQL
-      #    command: |
-      #      sudo a2enmod rewrite && sudo service apache2 restart && sudo service mysql restart
       - run:
           name: Get Magento Code Quality Tool
           command: |
@@ -24,33 +20,34 @@ jobs:
             cd magento-coding-standard
             composer install
       - run:
-          name: TEST
+          name: Create the Folder for the Extension
           command: |
-            cd /var/www/html/
-            ls -al
+            cd /var/www/html/app
+            sudo mkdir code
+            cd code
+            sudo mkdir TNW
+            cd TNW
+            sudo mkdir Stripe           
+      - run:
+          name: Copy the Extension Files
+          command: |
+            sudo cp -R ~/tnw_extension/* /var/www/html/app/code/TNW/Stripe/
+      - run:
+          name: Install the Extension
+          command: |
+            cd /var/www/html
+            sudo php bin/magento setup:upgrade
+      - run:
+          name: Compile the Code
+          command: |
+            cd /var/www/html
+            sudo php bin/magento setup:di:compile 
       #- run:
-      #    name: Create the Folder for the Extension
+      #    name: TEST
       #    command: |
-      #      cd /var/www/html/magento22/app
-      #      sudo mkdir code
-      #      cd code
-      #      sudo mkdir TNW
-      #      cd TNW
-      #      sudo mkdir Stripe           
-      #- run:
-      #    name: Copy the Extension Files
-      #    command: |
-      #      sudo cp -R ~/tnw_extension/* /var/www/html/magento22/app/code/TNW/Stripe/
-      #- run:
-      #    name: Install the Extension
-      #    command: |
-      #      cd /var/www/html/magento22
-      #      sudo php bin/magento setup:upgrade
-      #- run:
-      #    name: Compile the Code
-      #    command: |
-      #      cd /var/www/html/magento22
-      #      sudo php bin/magento setup:di:compile      
+      #      cd /var/www/html/
+      #      ls -al
+           
       #- run:
       #    name: Install dependencies
       #    command: |
