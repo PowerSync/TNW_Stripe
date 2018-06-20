@@ -12,10 +12,10 @@ jobs:
             apt-get update
             apt-get install -y git
       - checkout
-      - run:
-          name: Prepare & Restart Apache + MySQL
-          command: |
-            sudo a2enmod rewrite && sudo service apache2 restart && sudo service mysql restart
+      #- run:
+      #    name: Prepare & Restart Apache + MySQL
+      #    command: |
+      #      sudo a2enmod rewrite && sudo service apache2 restart && sudo service mysql restart
       - run:
           name: Get Magento Code Quality Tool
           command: |
