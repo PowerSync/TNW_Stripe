@@ -3,14 +3,14 @@ version: 2
 jobs:
   build:
     docker:
-      - image: magento/magento2devbox-web
+      - image: alexcheng/magento2
     working_directory: ~/tnw_extension
     steps:
-      #- run:
-      #    name: Install Git
-      #    command: |
-      #      apt-get update
-      #      apt-get install -y git
+      - run:
+          name: Install Git
+          command: |
+            apt-get update
+            apt-get install -y git
       - checkout
       - run:
           name: Get Magento Code Quality Tool
@@ -51,10 +51,7 @@ jobs:
       - run:
           name: TEST
           command: |
-            cd /home/magento2/installer
-            ls -al
-            cd ../scripts
-            ls -al
+            docker ps
            
       #- run:
       #    name: Install dependencies
