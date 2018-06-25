@@ -150,10 +150,9 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
      * @covers \TNW\Stripe\Gateway\Config\Config::getCountryAvailableCardTypes
      * @dataProvider getCountrySpecificCardTypeConfigDataProvider
      * @param string $encodedData
-     * @param string|array $data
      * @param array $countryData
      */
-    public function testCountryAvailableCardTypes($encodedData, $data, array $countryData)
+    public function testCountryAvailableCardTypes($encodedData, array $countryData)
     {
         $this->scopeConfigMock->expects(static::any())
             ->method('getValue')
@@ -163,10 +162,6 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         foreach ($countryData as $countryId => $types) {
             $result = $this->model->getCountryAvailableCardTypes($countryId);
             static::assertEquals($types, $result);
-        }
-
-        if (empty($countryData)) {
-            static::assertEquals($data, "");
         }
     }
 

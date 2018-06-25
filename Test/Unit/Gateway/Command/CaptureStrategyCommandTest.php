@@ -1,6 +1,7 @@
 <?php
 /**
- *
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Stripe\Test\Unit\Gateway\Command;
 
@@ -132,7 +133,7 @@ class CaptureStrategyCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->searchCriteriaBuilder = $this->getMockBuilder(SearchCriteriaBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addFilters', 'create', '__wakeup'])
+            ->setMethods(['addFilter', 'create', '__wakeup'])
             ->getMock();
     }
 
@@ -228,7 +229,7 @@ class CaptureStrategyCommandTest extends \PHPUnit\Framework\TestCase
     {
         $searchCriteria = new SearchCriteria();
         $this->searchCriteriaBuilder->expects(self::exactly(2))
-            ->method('addFilters')
+            ->method('addFilter')
             ->willReturnSelf();
         $this->searchCriteriaBuilder->method('create')
             ->willReturn($searchCriteria);

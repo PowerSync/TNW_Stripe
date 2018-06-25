@@ -1,6 +1,7 @@
 <?php
 /**
- *
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Stripe\Test\Unit\Gateway\Helper;
 
@@ -26,7 +27,7 @@ class SubjectReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \TNW\Stripe\Gateway\Helper\SubjectReader::readCustomerId
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The "customerId" field does not exists
+     * @expectedExceptionMessage The customerId field does not exist
      */
     public function testReadCustomerIdWithException()
     {

@@ -23,10 +23,11 @@ class Customer extends GeneralResponseValidator
     {
         return [
             function ($response) {
-                return [
-                    isset($response['id']),
-                    [__('Transaction has been declined')]
-                ];
+                if (!isset($response['id'])) {
+                    return [false, [__('Customer create error')]];
+                }
+
+                return [true, []];
             }
         ];
     }

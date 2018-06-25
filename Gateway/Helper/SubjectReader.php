@@ -27,7 +27,7 @@ class SubjectReader
     {
         $response = Helper\SubjectReader::readResponse($subject);
 
-        if (!isset($subject['object']) || !\is_object($response['object'])) {
+        if (!isset($response['object']) || !\is_object($response['object'])) {
             throw new \InvalidArgumentException('Response object does not exist');
         }
 
