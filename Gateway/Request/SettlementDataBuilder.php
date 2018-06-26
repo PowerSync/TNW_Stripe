@@ -15,22 +15,17 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use TNW\Stripe\Helper\Payment\Formatter;
 
 /**
  * Class SettlementDataBuilder
  */
 class SettlementDataBuilder implements BuilderInterface
 {
-    use Formatter;
-
     const CAPTURE = 'capture';
 
     /**
      * {@inheritdoc}
-     * @throws LocalizedException
      */
     public function build(array $subject)
     {

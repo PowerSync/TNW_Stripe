@@ -15,12 +15,9 @@
  */
 namespace TNW\Stripe\Gateway\Request;
 
-use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Helper\Payment\Formatter;
-use Magento\Customer\Model\Session;
-use Magento\Customer\Api\CustomerRepositoryInterface;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -31,35 +28,17 @@ class PaymentDataBuilder implements BuilderInterface
     const DESCRIPTION = 'description';
     const CAPTURE = 'capture';
 
-    /** @var Config  */
-    private $config;
-
     /** @var SubjectReader  */
     private $subjectReader;
 
-    /** @var Session  */
-    private $customerSession;
-
-    /** @var CustomerRepositoryInterface  */
-    private $customerRepository;
-
     /**
      * PaymentDataBuilder constructor.
-     * @param Config $config
      * @param SubjectReader $subjectReader
-     * @param Session $customerSession
-     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
-        Config $config,
-        SubjectReader $subjectReader,
-        Session $customerSession,
-        CustomerRepositoryInterface $customerRepository
+        SubjectReader $subjectReader
     ) {
-        $this->config = $config;
         $this->subjectReader = $subjectReader;
-        $this->customerSession = $customerSession;
-        $this->customerRepository = $customerRepository;
     }
 
     /**
