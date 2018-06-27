@@ -62,7 +62,7 @@ jobs:
             cd /var/www/html/magento2-2.2.4
             rm -rf ./generated/*
             ./bin/magento module:status
-            ./bin/magento module:enable TNW_Subscriptions
+            ./bin/magento module:enable TNW_Stripe
             ./bin/magento setup:upgrade
       - run:
           name: Compile the Code
