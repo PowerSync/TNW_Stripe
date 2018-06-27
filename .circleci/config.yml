@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: circleci/php:7.1-apache-node-browsers
-      - image: circleci/mysql:5.6
+      - image: circleci/mysql:5.7
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
@@ -41,6 +41,9 @@ jobs:
             git clone https://github.com/magento/marketplace-eqp magento-coding-standard
             cd magento-coding-standard
             composer install
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
           name: Installing Magento
           command: |
