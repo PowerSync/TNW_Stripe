@@ -55,7 +55,8 @@ jobs:
       - run:
           name: Copy the Extension Files
           command: |
-            ln -s $CIRCLE_WORKING_DIRECTORY /var/www/html/magento2-2.2.4/app/code/TNW/Stripe/
+            ln -s $CIRCLE_WORKING_DIRECTORY /var/www/html/magento2-2.2.4/app/code/TNW/Stripe
+            ls -la /var/www/html/magento2-2.2.4/app/code/TNW/Stripe
       - run:
           name: Install the Extension
           command: |
