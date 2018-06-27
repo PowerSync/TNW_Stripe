@@ -170,10 +170,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * @param null $storeId
      * @return string
      */
-    public function getSdkUrl()
+    public function getSdkUrl($storeId = null)
     {
-        return $this->getValue(self::KEY_SDK_URL);
+        return $this->getValue(self::KEY_SDK_URL, $storeId);
     }
 }
