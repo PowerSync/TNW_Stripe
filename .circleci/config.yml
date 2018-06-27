@@ -46,8 +46,8 @@ jobs:
           command: |
             cd /var/www/html/
             git clone https://github.com/magento/magento2
-            git checkout tags/2.2.4
             cd magento2
+            git checkout tags/2.2.4
             composer install --prefer-dist
             ./bin/magento setup:install --db-host=localhost --db-prefix=tnw --db-name=magento --db-user=root --backend-frontname=admin --base-url=http://magento-qa.box/ --language=en_US --timezone=America/Chicago --currency=USD --admin-lastname=Admin --admin-firstname=Admin --admin-email=admin@example.com --admin-user=admin --admin-password=admin123 --cleanup-database --use-rewrites=1
             ./bin/magento --version
