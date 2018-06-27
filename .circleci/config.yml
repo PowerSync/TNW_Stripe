@@ -45,25 +45,24 @@ jobs:
           name: Installing Magento
           command: |
             cd /var/www/html/
-            wget https://github.com/magento/magento2/archive/2.2.4.tar.gz -O - | tar -xz -C ./magento2
-            cd magento2
-            git checkout tags/2.2.4
+            wget https://github.com/magento/magento2/archive/2.2.4.tar.gz -O - | tar -xz
+            cd magento2-2.2.4
             composer install --prefer-dist
             ./bin/magento setup:install --db-host=localhost --db-prefix=tnw --db-name=magento --db-user=root --backend-frontname=admin --base-url=http://magento-qa.box/ --language=en_US --timezone=America/Chicago --currency=USD --admin-lastname=Admin --admin-firstname=Admin --admin-email=admin@example.com --admin-user=admin --admin-password=admin123 --cleanup-database --use-rewrites=1
             ./bin/magento --version
       - run:
           name: Create the Folder for the Extension
           command: |
-            cd /var/www/html/magento2/app
+            cd /var/www/html/magento2-2.2.4/app
             mkdir -p code/TNW/Stripe
       - run:
           name: Copy the Extension Files
           command: |
-            ln -s $CIRCLE_WORKING_DIRECTORY /var/www/html/magento2/app/code/TNW/Stripe/
+            ln -s $CIRCLE_WORKING_DIRECTORY /var/www/html/magento2-2.2.4/app/code/TNW/Stripe/
       - run:
           name: Install the Extension
           command: |
-            cd /var/www/html/magento2
+            cd /var/www/html/magento2-2.2.4
             rm -rf ./generated/*
             ./bin/magento module:status
             ./bin/magento module:enable TNW_Subscriptions
@@ -71,7 +70,7 @@ jobs:
       - run:
           name: Compile the Code
           command: |
-            cd /var/www/html/magento2
+            cd /var/www/html/magento2-2.2.4
             php bin/magento setup:di:compile
       - run:
           name: Run Magento Coding Standard
@@ -81,5 +80,5 @@ jobs:
       - run:
           name: Run Unit Test
           command: |
-            cd /var/www/html/magento2
+            cd /var/www/html/magento2-2.2.4
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
