@@ -45,7 +45,7 @@ jobs:
           name: Installing Magento
           command: |
             cd /var/www/html/
-            git clone https://github.com/magento/magento2
+            wget https://github.com/magento/magento2/archive/2.2.4.tar.gz -O - | tar -xz -C ./magento2
             cd magento2
             git checkout tags/2.2.4
             composer install --prefer-dist
@@ -64,6 +64,7 @@ jobs:
           name: Install the Extension
           command: |
             cd /var/www/html/magento2
+            rm -rf ./generated/*
             ./bin/magento module:status
             ./bin/magento module:enable TNW_Subscriptions
             ./bin/magento setup:upgrade
