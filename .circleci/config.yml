@@ -48,7 +48,7 @@ jobs:
             wget https://github.com/magento/magento2/archive/2.2.4.tar.gz -O - | tar -xz
             cd magento2-2.2.4
             composer install --prefer-dist
-            ./bin/magento setup:install --db-host=localhost --db-prefix=tnw --db-name=magento --db-user=root --backend-frontname=admin --base-url=http://magento-qa.box/ --language=en_US --timezone=America/Chicago --currency=USD --admin-lastname=Admin --admin-firstname=Admin --admin-email=admin@example.com --admin-user=admin --admin-password=admin123 --cleanup-database --use-rewrites=1
+            ./bin/magento setup:install --backend-frontname admin --db-host localhost --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
           name: Create the Folder for the Extension
