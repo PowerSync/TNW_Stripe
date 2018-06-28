@@ -24,6 +24,11 @@ jobs:
             sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
             sudo docker-php-ext-install -j$(nproc) intl soap xsl zip mcrypt pdo pdo_mysql gd gettext mbstring bcmath
       - run:
+          name: Configure PHP
+          command: |
+            echo "memory_limit = 512M" > /opt/circleci/php/$(phpenv global)/etc/conf.d/memory.ini
+            php -i
+      - run:
           name: Permissions
           command: |
             cd /var/www/
