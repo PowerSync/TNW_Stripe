@@ -26,6 +26,7 @@ jobs:
       - run:
           name: Configure PHP
           command: |
+            echo "memory_limit = 2G" | sudo tee --append /usr/local/etc/php/conf.d/memory.ini
             php -i
       - run:
           name: Permissions
