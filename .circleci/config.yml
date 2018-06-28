@@ -26,7 +26,7 @@ jobs:
       - run:
           name: Configure PHP
           command: |
-            echo "memory_limit = 512M" > /opt/circleci/php/$(phpenv global)/etc/conf.d/memory.ini
+            echo "memory_limit = 2G" > /opt/circleci/php/$(phpenv global)/etc/conf.d/memory.ini
             php -i
       - run:
           name: Permissions
