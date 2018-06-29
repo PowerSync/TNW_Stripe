@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  build:
+  "test-php-7.1-mage-2.2.4": &common-build
     docker:
       - image: circleci/php:7.1-apache-node-browsers
       - image: circleci/mysql:5.7
@@ -10,6 +10,8 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.4"
     working_directory: ~/tnw_extension
     steps:
       - checkout
@@ -47,25 +49,25 @@ jobs:
           name: Installing Magento
           command: |
             cd /var/www/html/
-            wget https://github.com/magento/magento2/archive/2.2.4.tar.gz -O - | tar -xz
-            cd magento2-2.2.4
+            wget https://github.com/magento/magento2/archive/$MAGENTO_VERSION.tar.gz -O - | tar -xz
+            cd magento2-$MAGENTO_VERSION
             composer install --prefer-dist
             ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
           name: Create the Folder for the Extension
           command: |
-            cd /var/www/html/magento2-2.2.4/app
+            cd /var/www/html/magento2-$MAGENTO_VERSION/app
             mkdir -p code/TNW/Stripe
       - run:
           name: Copy the Extension Files
           command: |
-            cp -R ~/tnw_extension/* /var/www/html/magento2-2.2.4/app/code/TNW/Stripe
-            ls -la /var/www/html/magento2-2.2.4/app/code/TNW/Stripe
+            cp -R ~/tnw_extension/* /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Stripe
+            ls -la /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Stripe
       - run:
           name: Install the Extension
           command: |
-            cd /var/www/html/magento2-2.2.4
+            cd /var/www/html/magento2-$MAGENTO_VERSION
             rm -rf ./generated/*
             composer require stripe/stripe-php ~5.8.0
             ./bin/magento module:status
@@ -74,7 +76,7 @@ jobs:
       - run:
           name: Compile the Code
           command: |
-            cd /var/www/html/magento2-2.2.4
+            cd /var/www/html/magento2-$MAGENTO_VERSION
             php bin/magento setup:di:compile
       - run:
           name: Run Magento Coding Standard
@@ -84,5 +86,17 @@ jobs:
       - run:
           name: Run Unit Test
           command: |
-            cd /var/www/html/magento2-2.2.4
+            cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
+  "test-php-7.0-mage-2.2.1":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.1"
