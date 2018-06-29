@@ -88,6 +88,78 @@ jobs:
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
+  "test-php-7.1-mage-2.2.3":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.3"
+  "test-php-7.1-mage-2.2.2":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.2"
+  "test-php-7.1-mage-2.2.1":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.1"
+  "test-php-7.0-mage-2.2.4":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.4"
+  "test-php-7.0-mage-2.2.3":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.3"
+  "test-php-7.0-mage-2.2.2":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.2"
   "test-php-7.0-mage-2.2.1":
     <<: *common-build
     docker:
@@ -105,4 +177,10 @@ workflows:
   build:
     jobs:
       - "test-php-7.1-mage-2.2.4"
+      - "test-php-7.1-mage-2.2.3"
+      - "test-php-7.1-mage-2.2.2"
+      - "test-php-7.1-mage-2.2.1"
+      - "test-php-7.0-mage-2.2.4"
+      - "test-php-7.0-mage-2.2.3"
+      - "test-php-7.0-mage-2.2.2"
       - "test-php-7.0-mage-2.2.1"
