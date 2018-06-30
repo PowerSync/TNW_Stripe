@@ -78,10 +78,10 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'isActive' => $this->config->isActive($storeId),
-                    'publishableKey' => $this->config->getPublishableKey(),
+                    'publishableKey' => $this->config->getPublishableKey($storeId),
                     'vaultCode' => self::CC_VAULT_CODE,
-                    'ccTypesMapper' => $this->config->getCctypesMapper(),
-                    'sdkUrl' => $this->config->getSdkUrl(),
+                    'ccTypesMapper' => $this->config->getCctypesMapper($storeId),
+                    'sdkUrl' => $this->config->getSdkUrl($storeId),
                     'returnUrl' => $this->url->getUrl('tnw_stripe/window/close'),
                     'countrySpecificCardTypes' => $this->config->getCountrySpecificCardTypeConfig($storeId),
                     'availableCardTypes' => $this->config->getAvailableCardTypes($storeId),

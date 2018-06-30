@@ -17,15 +17,12 @@ namespace TNW\Stripe\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
-use TNW\Stripe\Helper\Payment\Formatter;
 
 /**
  * Class CustomerDataBuilder
  */
 class CustomerDataBuilder implements BuilderInterface
 {
-    use Formatter;
-
     /**
      * @var SubjectReader
      */

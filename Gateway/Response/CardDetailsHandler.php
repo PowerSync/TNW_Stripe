@@ -15,7 +15,6 @@
  */
 namespace TNW\Stripe\Gateway\Response;
 
-use TNW\Stripe\Gateway\Config\Config;
 use Magento\Payment\Gateway\Helper\ContextHelper;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
@@ -26,25 +25,17 @@ class CardDetailsHandler implements HandlerInterface
     const CARD_NUMBER = 'cc_number';
 
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
      * @var SubjectReader
      */
     private $subjectReader;
 
     /**
      * Constructor.
-     * @param Config $config
      * @param SubjectReader $subjectReader
      */
     public function __construct(
-        Config $config,
         SubjectReader $subjectReader
     ) {
-        $this->config = $config;
         $this->subjectReader = $subjectReader;
     }
 
@@ -61,14 +52,19 @@ class CardDetailsHandler implements HandlerInterface
         $payment = $paymentDataObject->getPayment();
         ContextHelper::assertOrderPayment($payment);
 
-        $payment->setCcLast4($payment->getAdditionalInformation('cc_last4'));
-        $payment->setCcExpMonth($payment->getAdditionalInformation('cc_exp_month'));
-        $payment->setCcExpYear($payment->getAdditionalInformation('cc_exp_year'));
-        $payment->setCcType($payment->getAdditionalInformation('cc_type'));
+        $ccLats4 = $payment->getAdditionalInformation('cc_last4');
+        $ccExpMonth = $payment->getAdditionalInformation('cc_exp_month');
+        $ccExpYear = $payment->getAdditionalInformation('cc_exp_year');
+        $ccType = $payment->getAdditionalInformation('cc_type');
+
+        $payment->setCcLast4($ccLats4);
+        $payment->setCcExpMonth($ccExpMonth);
+        $payment->setCcExpYear($ccExpYear);
+        $payment->setCcType($ccType);
 
         // set card details to additional info
-        $payment->setAdditionalInformation(self::CARD_NUMBER, 'xxxx-' . $payment->getAdditionalInformation('cc_last4'));
-        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $payment->getAdditionalInformation('cc_type'));
+        $payment->setAdditionalInformation(self::CARD_NUMBER, "xxxx-{$ccLats4}");
+        $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $ccType);
 
         /** @var \Stripe\Source $source */
         $source = $transaction['source'];
