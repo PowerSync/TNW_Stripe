@@ -1,0 +1,186 @@
+version: 2
+
+jobs:
+  "test-php-7.1-mage-2.2.4": &common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.4"
+    working_directory: ~/tnw_extension
+    steps:
+      - checkout
+      - run:
+          name: Install System Package
+          command: |
+            sudo apt-get update
+            sudo apt install -y libicu-dev libxml2-dev libxslt1-dev zlib1g-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev
+      - run:
+          name: Install PHP extension
+          command: |
+            sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+            sudo docker-php-ext-install -j$(nproc) intl soap xsl zip mcrypt pdo pdo_mysql gd gettext mbstring bcmath
+      - run:
+          name: Configure PHP
+          command: |
+            echo "memory_limit = 2G" | sudo tee --append /usr/local/etc/php/conf.d/memory.ini
+            php -i
+      - run:
+          name: Permissions
+          command: |
+            cd /var/www/
+            sudo chown -R circleci:circleci html
+      - run:
+          name: Get Magento Code Quality Tool
+          command: |
+            cd /var/www/html/
+            git clone https://github.com/magento/marketplace-eqp magento-coding-standard
+            cd magento-coding-standard
+            composer install
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
+      - run:
+          name: Installing Magento
+          command: |
+            cd /var/www/html/
+            wget https://github.com/magento/magento2/archive/$MAGENTO_VERSION.tar.gz -O - | tar -xz
+            cd magento2-$MAGENTO_VERSION
+            composer install --prefer-dist
+            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
+            ./bin/magento --version
+      - run:
+          name: Create the Folder for the Extension
+          command: |
+            cd /var/www/html/magento2-$MAGENTO_VERSION/app
+            mkdir -p code/TNW/Stripe
+      - run:
+          name: Copy the Extension Files
+          command: |
+            cp -R ~/tnw_extension/* /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Stripe
+            ls -la /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Stripe
+      - run:
+          name: Install the Extension
+          command: |
+            cd /var/www/html/magento2-$MAGENTO_VERSION
+            rm -rf ./generated/*
+            composer require stripe/stripe-php ~5.8.0
+            ./bin/magento module:status
+            ./bin/magento module:enable TNW_Stripe
+            ./bin/magento setup:upgrade
+      - run:
+          name: Compile the Code
+          command: |
+            cd /var/www/html/magento2-$MAGENTO_VERSION
+            php bin/magento setup:di:compile
+      - run:
+          name: Run Magento Coding Standard
+          command: |
+            cd /var/www/html
+            ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
+      - run:
+          name: Run Unit Test
+          command: |
+            cd /var/www/html/magento2-$MAGENTO_VERSION
+            ./bin/magento dev:tests:run -c'--filter=TNW' unit
+  "test-php-7.1-mage-2.2.3":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.3"
+  "test-php-7.1-mage-2.2.2":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.2"
+  "test-php-7.1-mage-2.2.1":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.1-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.1"
+  "test-php-7.0-mage-2.2.4":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.4"
+  "test-php-7.0-mage-2.2.3":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.3"
+  "test-php-7.0-mage-2.2.2":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.2"
+  "test-php-7.0-mage-2.2.1":
+    <<: *common-build
+    docker:
+      - image: circleci/php:7.0-apache-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+    environment:
+      MAGENTO_VERSION: "2.2.1"
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "test-php-7.1-mage-2.2.4"
+      - "test-php-7.1-mage-2.2.3"
+      - "test-php-7.1-mage-2.2.2"
+      - "test-php-7.1-mage-2.2.1"
+      - "test-php-7.0-mage-2.2.4"
+      - "test-php-7.0-mage-2.2.3"
+      - "test-php-7.0-mage-2.2.2"
+      - "test-php-7.0-mage-2.2.1"

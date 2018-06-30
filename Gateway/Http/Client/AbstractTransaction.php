@@ -21,6 +21,7 @@ use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Model\Method\Logger;
 use Psr\Log\LoggerInterface;
+use Stripe\StripeObject;
 
 abstract class AbstractTransaction implements ClientInterface
 {
@@ -75,9 +76,9 @@ abstract class AbstractTransaction implements ClientInterface
             $this->logger->critical($message);
             throw new ClientException($message);
         } finally {
-            $log['response'] = is_object($response['object'])
+            $log['response'] = $response['object'] instanceof StripeObject
                 ? $response['object']->__toArray(true)
-                : $response['object'];
+                : [];
 
             $this->customLogger->debug($log);
         }

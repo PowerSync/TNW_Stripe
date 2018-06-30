@@ -27,10 +27,11 @@ class ResponseValidator extends GeneralResponseValidator
                         return [false, [$response['message']]];
                     }
 
-                    return [
-                        in_array($response['status'], ['succeeded', 'pending', 'failed']),
-                        [__('Wrong transaction status')]
-                    ];
+                    if (in_array($response['status'], ['succeeded', 'pending', 'failed'])) {
+                        return [false, [__('Wrong transaction status')]];
+                    }
+
+                    return [true, []];
                 }
             ]
         );

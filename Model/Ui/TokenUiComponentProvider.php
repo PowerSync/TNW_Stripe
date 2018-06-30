@@ -15,12 +15,10 @@
  */
 namespace TNW\Stripe\Model\Ui;
 
-use TNW\Stripe\Model\Ui\ConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\Ui\TokenUiComponentInterface;
 use Magento\Vault\Model\Ui\TokenUiComponentProviderInterface;
 use Magento\Vault\Model\Ui\TokenUiComponentInterfaceFactory;
-use Magento\Framework\UrlInterface;
 
 /**
  * Class TokenUiComponentProvider
@@ -33,20 +31,12 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     private $componentFactory;
 
   /**
-   * @var \Magento\Framework\UrlInterface
-   */
-    private $urlBuilder;
-
-  /**
    * @param TokenUiComponentInterfaceFactory $componentFactory
-   * @param UrlInterface $urlBuilder
    */
     public function __construct(
-        TokenUiComponentInterfaceFactory $componentFactory,
-        UrlInterface $urlBuilder
+        TokenUiComponentInterfaceFactory $componentFactory
     ) {
         $this->componentFactory = $componentFactory;
-        $this->urlBuilder = $urlBuilder;
     }
 
   /**
@@ -59,12 +49,12 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
         $jsonDetails = json_decode($paymentToken->getTokenDetails() ?: '{}', true);
         $component = $this->componentFactory->create(
             [
-            'config' => [
-            'code' => ConfigProvider::CC_VAULT_CODE,
-            TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
-            TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
-            ],
-            'name' => 'TNW_Stripe/js/view/payment/method-renderer/vault'
+                'config' => [
+                    'code' => ConfigProvider::CC_VAULT_CODE,
+                    TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
+                    TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
+                ],
+                'name' => 'TNW_Stripe/js/view/payment/method-renderer/vault'
             ]
         );
 
