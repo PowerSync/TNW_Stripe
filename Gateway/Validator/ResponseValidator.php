@@ -23,11 +23,7 @@ class ResponseValidator extends GeneralResponseValidator
             parent::getResponseValidators(),
             [
                 function ($response) {
-                    if (isset($response['error'])) {
-                        return [false, [$response['message']]];
-                    }
-
-                    if (in_array($response['status'], ['succeeded', 'pending', 'failed'])) {
+                    if (!in_array($response['status'], ['succeeded', 'pending', 'failed'])) {
                         return [false, [__('Wrong transaction status')]];
                     }
 

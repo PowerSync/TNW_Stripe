@@ -3,21 +3,21 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Stripe\Test\Unit\Gateway\Validator\ResponseValidator;
+namespace TNW\Stripe\Test\Unit\Gateway\Validator;
 
 use TNW\Stripe\Gateway\Helper\SubjectReader;
-use TNW\Stripe\Gateway\Validator\ResponseValidator\Customer;
+use TNW\Stripe\Gateway\Validator\GeneralResponseValidator;
 use Magento\Framework\Phrase;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
- * Test Customer
+ * Test GeneralResponseValidatorTest
  */
-class CustomerTest extends \PHPUnit\Framework\TestCase
+class GeneralResponseValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Customer
+     * @var GeneralResponseValidator
      */
     private $responseValidator;
 
@@ -48,7 +48,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['readResponseObject'])
             ->getMock();
 
-        $this->responseValidator = new Customer(
+        $this->responseValidator = new GeneralResponseValidator(
             $this->resultInterfaceFactory,
             $this->subjectReader
         );
@@ -87,18 +87,30 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [
-                    'id' => 'cus_D785THwOHA4xGw'
+                    'status' => 'succeeded'
                 ],
                 true,
                 []
             ],
             [
-                [],
+                [
+                    'error' => true,
+                    'message' => 'Test error message.'
+                ],
                 false,
                 [
-                    __('Customer create error'),
+                    __('Test error message.')
                 ]
             ],
+            [
+                [
+                    'status' => 'failed'
+                ],
+                'isValid' => false,
+                [
+                    __('Stripe error response.')
+                ]
+            ]
         ];
     }
 }

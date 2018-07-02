@@ -1,7 +1,7 @@
 # Magento 2 Stripe Integration
-[![CircleCI](https://circleci.com/gh/PowerSync/TNW_Stripe.svg?style=svg&circle-token=73b2820d4a6adf1d5280bb9f5b267f1fa021748b)](https://circleci.com/gh/PowerSync/TNW_Stripe)
-
 Accept credit card payments through the Stripe payment gateway.
+
+[![CircleCI](https://circleci.com/gh/PowerSync/TNW_Stripe.svg?style=svg&circle-token=73b2820d4a6adf1d5280bb9f5b267f1fa021748b)](https://circleci.com/gh/PowerSync/TNW_Stripe)
 
 * Supports Magento Instant Purchase for One Click Checkout
 * Securely accept customer payments using the Stripe.js tokenization when
