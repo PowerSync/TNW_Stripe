@@ -8,8 +8,6 @@ namespace TNW\Stripe\Test\Unit\Gateway\Validator;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use TNW\Stripe\Gateway\Validator\ResponseValidator;
 use Magento\Framework\Phrase;
-use Magento\Payment\Gateway\Validator\Result;
-use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
@@ -68,19 +66,17 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidate(array $validationSubject, $isValid, $messages)
     {
-        /** @var ResultInterface|MockObject $result */
-        $result = new Result($isValid, $messages);
-
         $this->resultInterfaceFactory->method('create')
-            ->willReturn($result);
+            ->with([
+                'isValid' => (bool)$isValid,
+                'failsDescription' => $messages
+            ]);
 
         $this->subjectReader->method('readResponseObject')
             ->with(['response' => ['object' => $validationSubject]])
             ->willReturn($validationSubject);
 
-        $actual = $this->responseValidator->validate(['response' => ['object' => $validationSubject]]);
-
-        self::assertEquals($result, $actual);
+        $this->responseValidator->validate(['response' => ['object' => $validationSubject]]);
     }
 
     /**
@@ -98,23 +94,20 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
-                    'error' => true,
-                    'message' => 'Test error message'
-                ],
-                false,
-                [
-                    __('Test error message.'),
-                    __('Wrong transaction status')
-                ]
-            ],
-            [
-                [
                     'status' => 'failed'
                 ],
                 'isValid' => false,
                 [
-                    __('Stripe error response.'),
-                    __('Wrong transaction status')
+                    __('Stripe error response.')
+                ]
+            ],
+            [
+                [
+                    'status' => 'pending'
+                ],
+                'isValid' => false,
+                [
+                    __('Stripe error response.')
                 ]
             ],
         ];

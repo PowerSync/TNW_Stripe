@@ -56,7 +56,7 @@ class GeneralResponseValidator extends AbstractValidator
         return [
             function ($response) {
                 if (isset($response['error'])) {
-                    return [false, [$response['message']]];
+                    return [false, [__($response['message'])]];
                 }
 
                 if ($response['status'] !== 'succeeded') {
