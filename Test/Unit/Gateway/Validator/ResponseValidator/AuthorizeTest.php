@@ -8,8 +8,6 @@ namespace TNW\Stripe\Test\Unit\Gateway\Validator\ResponseValidator;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use TNW\Stripe\Gateway\Validator\ResponseValidator\Authorize;
 use Magento\Framework\Phrase;
-use Magento\Payment\Gateway\Validator\Result;
-use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
@@ -68,19 +66,17 @@ class AuthorizeTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidate(array $validationSubject, $isValid, $messages)
     {
-        /** @var ResultInterface|MockObject $result */
-        $result = new Result($isValid, $messages);
-
         $this->resultInterfaceFactory->method('create')
-            ->willReturn($result);
+            ->with([
+                'isValid' => (bool)$isValid,
+                'failsDescription' => $messages
+            ]);
 
         $this->subjectReader->method('readResponseObject')
             ->with(['response' => ['object' => $validationSubject]])
             ->willReturn($validationSubject);
 
-        $actual = $this->responseValidator->validate(['response' => ['object' => $validationSubject]]);
-
-        self::assertEquals($result, $actual);
+        $this->responseValidator->validate(['response' => ['object' => $validationSubject]]);
     }
 
     /**
@@ -101,12 +97,11 @@ class AuthorizeTest extends \PHPUnit\Framework\TestCase
                 [
                     'status' => 'failed',
                     'error' => true,
-                    'message' => 'Test error message'
+                    'message' => 'Test error message.'
                 ],
                 false,
                 [
-                    __('Test error message.'),
-                    __('Wrong transaction status')
+                    __('Test error message.')
                 ]
             ],
             [
@@ -126,8 +121,7 @@ class AuthorizeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isValid' => false,
                 [
-                    __('Stripe error response.'),
-                    __('Wrong transaction status')
+                    __('Stripe error response.')
                 ]
             ],
         ];
