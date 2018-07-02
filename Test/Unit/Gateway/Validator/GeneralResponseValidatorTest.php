@@ -6,18 +6,18 @@
 namespace TNW\Stripe\Test\Unit\Gateway\Validator;
 
 use TNW\Stripe\Gateway\Helper\SubjectReader;
-use TNW\Stripe\Gateway\Validator\ResponseValidator;
+use TNW\Stripe\Gateway\Validator\GeneralResponseValidator;
 use Magento\Framework\Phrase;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
- * Test ResponseValidatorTest
+ * Test GeneralResponseValidatorTest
  */
-class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
+class GeneralResponseValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ResponseValidator
+     * @var GeneralResponseValidator
      */
     private $responseValidator;
 
@@ -48,7 +48,7 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['readResponseObject'])
             ->getMock();
 
-        $this->responseValidator = new ResponseValidator(
+        $this->responseValidator = new GeneralResponseValidator(
             $this->resultInterfaceFactory,
             $this->subjectReader
         );
@@ -94,22 +94,23 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    'error' => true,
+                    'message' => 'Test error message.'
+                ],
+                false,
+                [
+                    __('Test error message.')
+                ]
+            ],
+            [
+                [
                     'status' => 'failed'
                 ],
                 'isValid' => false,
                 [
                     __('Stripe error response.')
                 ]
-            ],
-            [
-                [
-                    'status' => 'pending'
-                ],
-                'isValid' => false,
-                [
-                    __('Stripe error response.')
-                ]
-            ],
+            ]
         ];
     }
 }
