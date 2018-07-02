@@ -69,6 +69,7 @@ jobs:
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             rm -rf ./generated/*
+            composer require stripe/stripe-php ~5.8.0
             ./bin/magento module:status
             ./bin/magento module:enable TNW_Stripe
             ./bin/magento setup:upgrade
