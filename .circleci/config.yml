@@ -139,4 +139,14 @@ workflows:
   build:
     jobs:
       - m224_php71
-      - m225_php71
+      - m225_php71:
+        filters:
+          branches:
+            ignore:
+              - /^develop/
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
