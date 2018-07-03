@@ -138,103 +138,13 @@ workflows:
 
   test-extension:
     jobs:
-      - m221_php71:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m222_php71:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m223_php71:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m225_php71:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m221_php70:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m222_php70:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m223_php70:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m224_php70:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
-      - m225_php70:
-        filters:
-          branches:
-            ignore:
-              - develop
-              - /PS-.*/
-              - /SUB-.*/
-              - /QCM-.*/
-              - /PCMI-.*/
-              - /PCMII-.*/
-              - /PSUP-.*/
+      - m221_php71
+      - m222_php71
+      - m223_php71
+      - m225_php71
+      - m221_php70
+      - m222_php70
+      - m223_php70
+      - m224_php70
+      - m225_php70
       - m224_php71
