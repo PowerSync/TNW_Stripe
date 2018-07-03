@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "test-php-7.1-mage-2.2.4": &php71-test
+  m224_php71: &php71-test
     docker:
       - image: circleci/php:7.1-apache-node-browsers
       - image: circleci/mysql:5.7
@@ -100,7 +100,7 @@ jobs:
     <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.1"
-  "test-php-7.1-mage-2.2.5":
+  m225_php71:
     <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.5"
@@ -138,11 +138,11 @@ workflows:
 
   build:
     jobs:
-      - "test-php-7.1-mage-2.2.4":
+      - m224_php71:
         filters:
           branches:
             only: /.*/
-      - "test-php-7.1-mage-2.2.5":
+      - m225_php71:
         filters:
           branches:
             ignore:
