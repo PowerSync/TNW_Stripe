@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "test-php-7.1-mage-2.2.4": &php71-build
+  "test-php-7.1-mage-2.2.4": &php71-test
     docker:
       - image: circleci/php:7.1-apache-node-browsers
       - image: circleci/mysql:5.7
@@ -89,7 +89,7 @@ jobs:
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
   "test-php-7.1-mage-2.2.3": &php71-full
-    <<: *php71-build
+    <<: *php71-test
     environment:
       MAGENTO_VERSION: "2.2.3"
     branches:
