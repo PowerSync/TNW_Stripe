@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  m224_php71: &php71-test
+  m224_php71: &php71-base
     docker:
       - image: circleci/php:7.1-apache-node-browsers
       - image: circleci/mysql:5.7
@@ -88,24 +88,24 @@ jobs:
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
-  m223_php71: &php71-full
-    <<: *php71-test
+  m223_php71:
+    <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.3"
   m222_php71:
-    <<: *php71-full
+    <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.2"
   m221_php71:
-    <<: *php71-full
+    <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.1"
   m225_php71:
-    <<: *php71-full
+    <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.5"
-  m224_php70: &php70-build
-    <<: *php71-full
+  m224_php70: &php70-base
+    <<: *php71-base
     docker:
       - image: circleci/php:7.0-apache-node-browsers
       - image: circleci/mysql:5.7
@@ -117,19 +117,19 @@ jobs:
     environment:
       MAGENTO_VERSION: "2.2.4"
   m223_php70:
-    <<: *php70-build
+    <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.3"
   m222_php70:
-    <<: *php70-build
+    <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.2"
   m221_php70:
-    <<: *php70-build
+    <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.1"
   m225_php70:
-    <<: *php70-build
+    <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.5"
 
@@ -138,7 +138,95 @@ workflows:
 
   test-extension:
     jobs:
+      - m221_php71:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m222_php71:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m223_php71:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
       - m225_php71:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m221_php70:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m222_php70:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m223_php70:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m224_php70:
+        filters:
+          branches:
+            ignore:
+              - develop
+              - /PS-.*/
+              - /SUB-.*/
+              - /QCM-.*/
+              - /PCMI-.*/
+              - /PCMII-.*/
+              - /PSUP-.*/
+      - m225_php70:
         filters:
           branches:
             ignore:
