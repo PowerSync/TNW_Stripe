@@ -88,24 +88,34 @@ jobs:
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
-  "test-php-7.1-mage-2.2.3":
+  "test-php-7.1-mage-2.2.3": &php71-full
     <<: *php71-build
     environment:
       MAGENTO_VERSION: "2.2.3"
+    filters:
+      branches:
+        ignore:
+          - develop
+          - /PS-.*/
+          - /SUB-.*/
+          - /QCM-.*/
+          - /PCMI-.*/
+          - /PCMII-.*/
+          - /PSUP-.*/
   "test-php-7.1-mage-2.2.2":
-    <<: *php71-build
+    <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.2"
   "test-php-7.1-mage-2.2.1":
-    <<: *php71-build
+    <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.1"
   "test-php-7.1-mage-2.2.5":
-    <<: *php71-build
+    <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.5"
   "test-php-7.0-mage-2.2.4": &php70-build
-    <<: *php71-build
+    <<: *php71-full
     docker:
       - image: circleci/php:7.0-apache-node-browsers
       - image: circleci/mysql:5.7
