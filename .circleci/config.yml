@@ -12,6 +12,16 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.4"
+    branches:
+      only:
+        - develop
+        - master
+        - /PS-.*/
+        - /SUB-.*/
+        - /QCM-.*/
+        - /PCMI-.*/
+        - /PCMII-.*/
+        - /PSUP-.*/
     working_directory: ~/tnw_extension
     steps:
       - checkout
