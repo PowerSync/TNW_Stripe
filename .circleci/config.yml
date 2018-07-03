@@ -138,7 +138,10 @@ workflows:
 
   build:
     jobs:
-      - "test-php-7.1-mage-2.2.5"
+      - "test-php-7.1-mage-2.2.5":
+        filters:
+          branches:
+            only: /.*/
       - "test-php-7.1-mage-2.2.4":
         filters:
           branches:
