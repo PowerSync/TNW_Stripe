@@ -88,15 +88,15 @@ jobs:
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
-  "test-php-7.1-mage-2.2.3": &php71-full
+  m223_php71: &php71-full
     <<: *php71-test
     environment:
       MAGENTO_VERSION: "2.2.3"
-  "test-php-7.1-mage-2.2.2":
+  m222_php71:
     <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.2"
-  "test-php-7.1-mage-2.2.1":
+  m221_php71:
     <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.1"
@@ -104,7 +104,7 @@ jobs:
     <<: *php71-full
     environment:
       MAGENTO_VERSION: "2.2.5"
-  "test-php-7.0-mage-2.2.4": &php70-build
+  m224_php70: &php70-build
     <<: *php71-full
     docker:
       - image: circleci/php:7.0-apache-node-browsers
@@ -116,19 +116,19 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.4"
-  "test-php-7.0-mage-2.2.3":
+  m223_php70:
     <<: *php70-build
     environment:
       MAGENTO_VERSION: "2.2.3"
-  "test-php-7.0-mage-2.2.2":
+  m222_php70:
     <<: *php70-build
     environment:
       MAGENTO_VERSION: "2.2.2"
-  "test-php-7.0-mage-2.2.1":
+  m221_php70:
     <<: *php70-build
     environment:
       MAGENTO_VERSION: "2.2.1"
-  "test-php-7.0-mage-2.2.5":
+  m225_php70:
     <<: *php70-build
     environment:
       MAGENTO_VERSION: "2.2.5"
@@ -136,17 +136,17 @@ jobs:
 workflows:
   version: 2
 
-  build:
+  test-extension:
     jobs:
-      - m224_php71
       - m225_php71:
         filters:
           branches:
             ignore:
-              - /^develop/
+              - develop
               - /PS-.*/
               - /SUB-.*/
               - /QCM-.*/
               - /PCMI-.*/
               - /PCMII-.*/
               - /PSUP-.*/
+      - m224_php71
