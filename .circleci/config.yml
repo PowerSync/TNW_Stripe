@@ -92,16 +92,15 @@ jobs:
     <<: *php71-build
     environment:
       MAGENTO_VERSION: "2.2.3"
-    filters:
-      branches:
-        ignore:
-          - develop
-          - /PS-.*/
-          - /SUB-.*/
-          - /QCM-.*/
-          - /PCMI-.*/
-          - /PCMII-.*/
-          - /PSUP-.*/
+    branches:
+      ignore:
+        - develop
+        - /PS-.*/
+        - /SUB-.*/
+        - /QCM-.*/
+        - /PCMI-.*/
+        - /PCMII-.*/
+        - /PSUP-.*/
   "test-php-7.1-mage-2.2.2":
     <<: *php71-full
     environment:
