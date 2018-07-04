@@ -150,6 +150,10 @@ workflows:
         filters:
           branches:
             only: /master/
+      - m224_php71:
+        filters:
+          branches:
+            only: /.*/
       - m225_php71:
         filters:
           branches:
@@ -171,10 +175,6 @@ workflows:
           branches:
             only: /master/
       - m225_php70:
-        filters:
-          branches:
-            only: /master/
-      - m224_php71:
         filters:
           branches:
             only: /master/
