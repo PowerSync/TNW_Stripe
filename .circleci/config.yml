@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  m224_php71: &php71-base
+  m225_php71: &php71-base
     docker:
       - image: circleci/php:7.1-apache-node-browsers
       - image: circleci/mysql:5.7
@@ -11,10 +11,8 @@ jobs:
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
     environment:
-      MAGENTO_VERSION: "2.2.4"
+      MAGENTO_VERSION: "2.2.5"
     working_directory: ~/tnw_extension
-    branches:
-      only: /.*/
     steps:
       - checkout
       - run:
@@ -94,34 +92,18 @@ jobs:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.3"
-    branches:
-      only:
-        - develop
-        - master
   m222_php71:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.2"
-    branches:
-      only:
-        - develop
-        - master
   m221_php71:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.1"
-    branches:
-      only:
-        - develop
-        - master
-  m225_php71:
+  m224_php71:
     <<: *php71-base
     environment:
-      MAGENTO_VERSION: "2.2.5"
-    branches:
-      only:
-        - develop
-        - master
+      MAGENTO_VERSION: "2.2.4"
   m224_php70: &php70-base
     <<: *php71-base
     docker:
@@ -134,46 +116,83 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.4"
-    branches:
-      only:
-        - develop
-        - master
   m223_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.3"
-    branches:
-      only:
-        - develop
-        - master
   m222_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.2"
-    branches:
-      only:
-        - develop
-        - master
   m221_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.1"
-    branches:
-      only:
-        - develop
-        - master
   m225_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.5"
-    branches:
-      only:
-        - develop
-        - master
 
 workflows:
   version: 2
 
-  build-deploy:
+  build-test:
     jobs:
-      - m224_php71
+      - m225_php71:
+          filters:
+            branches:
+              only: /.*/
+      - m224_php71:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m223_php71:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m222_php71:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m221_php71:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m225_php70:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m224_php70:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m223_php70:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m222_php70:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - m221_php70:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
