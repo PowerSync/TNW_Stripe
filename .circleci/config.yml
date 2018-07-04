@@ -13,6 +13,8 @@ jobs:
     environment:
       MAGENTO_VERSION: "2.2.4"
     working_directory: ~/tnw_extension
+    branches:
+      only: /.*/
     steps:
       - checkout
       - run:
@@ -92,18 +94,34 @@ jobs:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.3"
+    branches:
+      only:
+        - develop
+        - master
   m222_php71:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.2"
+    branches:
+      only:
+        - develop
+        - master
   m221_php71:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.1"
+    branches:
+      only:
+        - develop
+        - master
   m225_php71:
     <<: *php71-base
     environment:
       MAGENTO_VERSION: "2.2.5"
+    branches:
+      only:
+        - develop
+        - master
   m224_php70: &php70-base
     <<: *php71-base
     docker:
@@ -116,29 +134,46 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.4"
+    branches:
+      only:
+        - develop
+        - master
   m223_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.3"
+    branches:
+      only:
+        - develop
+        - master
   m222_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.2"
+    branches:
+      only:
+        - develop
+        - master
   m221_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.1"
+    branches:
+      only:
+        - develop
+        - master
   m225_php70:
     <<: *php70-base
     environment:
       MAGENTO_VERSION: "2.2.5"
+    branches:
+      only:
+        - develop
+        - master
 
 workflows:
   version: 2
 
   build-deploy:
     jobs:
-      - m224_php71:
-        filters:
-          branches:
-            ignore: /^master/
+      - m224_php71
