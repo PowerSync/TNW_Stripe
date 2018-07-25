@@ -54,6 +54,8 @@ class PaymentDetailsHandler implements HandlerInterface
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
 
+        $payment->setIsTransactionPending(strcasecmp($transaction['status'], 'pending') === 0);
+
         $payment->setCcTransId($transaction['id']);
         $payment->setLastTransId($transaction['id']);
 
