@@ -94,6 +94,13 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    'status' => 'paid'
+                ],
+                true,
+                []
+            ],
+            [
+                [
                     'status' => 'failed'
                 ],
                 'isValid' => false,

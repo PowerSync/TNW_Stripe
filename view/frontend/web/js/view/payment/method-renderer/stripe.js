@@ -347,6 +347,7 @@ define([
             if (card.three_d_secure !== 'required') {
               self.setPaymentMethodToken(response.source.id);
               self.placeOrder();
+              fullScreenLoader.stopLoader(true);
               return;
             }
 
