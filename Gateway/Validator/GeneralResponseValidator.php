@@ -59,7 +59,7 @@ class GeneralResponseValidator extends AbstractValidator
                     return [false, [__($response['message'])]];
                 }
 
-                if ($response['status'] !== 'succeeded') {
+                if (!\in_array($response['status'], ['succeeded', 'paid'])) {
                     return [false, [__('Stripe error response.')]];
                 }
 
