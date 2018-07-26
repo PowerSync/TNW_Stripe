@@ -59,8 +59,8 @@ jobs:
           name: Copy the Extension Files
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
-            mkdir -p ./app/code/TNW
-            cp -R ~/tnw_extension/* ./app/code/TNW
+            mkdir -p ./app/code/TNW/Stripe
+            cp -R ~/tnw_extension/* ./app/code/TNW/Stripe
             ls -la ./app/code/TNW
       - run:
           name: Install the Extension
@@ -93,8 +93,8 @@ jobs:
           name: Copy the Extension Files
           command: |
             cd /var/www/html/magento2-ee-$MAGENTO_VERSION
-            mkdir -p ./app/code/TNW
-            cp -R ~/tnw_extension/* ./app/code/TNW
+            mkdir -p ./app/code/TNW/Stripe
+            cp -R ~/tnw_extension/* ./app/code/TNW/Stripe
             ls -la ./app/code/TNW
       - run:
           name: Install the Extension
