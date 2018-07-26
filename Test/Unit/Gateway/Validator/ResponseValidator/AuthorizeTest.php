@@ -95,17 +95,6 @@ class AuthorizeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
-                    'status' => 'failed',
-                    'error' => true,
-                    'message' => 'Test error message.'
-                ],
-                false,
-                [
-                    __('Test error message.')
-                ]
-            ],
-            [
-                [
                     'status' => 'succeeded',
                     'outcome' => ['network_status'=>'declined_by_network']
                 ],
@@ -121,7 +110,7 @@ class AuthorizeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isValid' => false,
                 [
-                    __('Stripe error response.')
+                    __('Wrong transaction status')
                 ]
             ],
         ];

@@ -19,17 +19,14 @@ class ResponseValidator extends GeneralResponseValidator
 {
     protected function getResponseValidators()
     {
-        return array_merge(
-            parent::getResponseValidators(),
-            [
-                function ($response) {
-                    if (!\in_array($response['status'], ['succeeded', 'paid'])) {
-                        return [false, [__('Wrong transaction status')]];
-                    }
-
-                    return [true, []];
+        return [
+            function ($response) {
+                if (!\in_array($response['status'], ['succeeded', 'paid', 'pending'])) {
+                    return [false, [__('Wrong transaction status')]];
                 }
-            ]
-        );
+
+                return [true, []];
+            }
+        ];
     }
 }
