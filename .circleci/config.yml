@@ -12,6 +12,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.5"
+      COMPOSER_AUTH: '{"http-basic": {"repo.magento.com": {"username": "a32f9576628eb71f11b1a381c900516c", "password": "eee87cca8b50f63c9664ead0d0d93d4b"}}}'
     working_directory: ~/tnw_extension
     steps:
       - checkout
@@ -46,7 +47,7 @@ jobs:
           name: Wait for DB
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
-          name: Installing Magento
+          name: Installing Magento CE
           command: |
             cd /var/www/html/
             wget https://github.com/magento/magento2/archive/$MAGENTO_VERSION.tar.gz -O - | tar -xz
@@ -55,15 +56,12 @@ jobs:
             ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
-          name: Create the Folder for the Extension
-          command: |
-            cd /var/www/html/magento2-$MAGENTO_VERSION/app
-            mkdir -p code/TNW/Stripe
-      - run:
           name: Copy the Extension Files
           command: |
-            cp -R ~/tnw_extension/* /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Stripe
-            ls -la /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Stripe
+            cd /var/www/html/magento2-$MAGENTO_VERSION
+            mkdir -p ./app/code/TNW
+            cp -R ~/tnw_extension/* ./app/code/TNW
+            ls -la ./app/code/TNW
       - run:
           name: Install the Extension
           command: |
@@ -77,17 +75,51 @@ jobs:
           name: Compile the Code
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
-            php bin/magento setup:di:compile
-      - run:
-          name: Run Magento Coding Standard
-          command: |
-            cd /var/www/html
-            ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
+            ./bin/magento setup:di:compile
       - run:
           name: Run Unit Test
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento dev:tests:run -c'--filter=TNW' unit
+      - run:
+          name: Installing Magento EE
+          command: |
+            cd /var/www/html/
+            composer create-project -s RC --repository-url=https://repo.magento.com/ magento/project-enterprise-edition magento2-ee-$MAGENTO_VERSION $MAGENTO_VERSION
+            cd magento2-ee-$MAGENTO_VERSION
+            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnwee --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
+            ./bin/magento --version
+      - run:
+          name: Copy the Extension Files
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            mkdir -p ./app/code/TNW
+            cp -R ~/tnw_extension/* ./app/code/TNW
+            ls -la ./app/code/TNW
+      - run:
+          name: Install the Extension
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            rm -rf ./generated/*
+            composer require stripe/stripe-php ~5.8.0
+            ./bin/magento module:status
+            ./bin/magento module:enable TNW_Stripe
+            ./bin/magento setup:upgrade
+      - run:
+          name: Compile the Code
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            ./bin/magento setup:di:compile
+      - run:
+          name: Run Unit Test
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            ./bin/magento dev:tests:run -c'--filter=TNW' unit
+      - run:
+          name: Run Magento Coding Standard
+          command: |
+            cd /var/www/html
+            ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
   m223_php71:
     <<: *php71-base
     environment:
