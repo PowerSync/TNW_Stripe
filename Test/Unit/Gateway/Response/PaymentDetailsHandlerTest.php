@@ -44,7 +44,8 @@ class PaymentDetailsHandlerTest extends \PHPUnit\Framework\TestCase
             ->setMethods([
                 'setCcTransId',
                 'setLastTransId',
-                'setAdditionalInformation'
+                'setAdditionalInformation',
+                'setIsTransactionPending',
             ])
             ->getMock();
 
@@ -67,6 +68,7 @@ class PaymentDetailsHandlerTest extends \PHPUnit\Framework\TestCase
         $attributes = [
             'id' => 'ch_1ChBgQ2eZvKYlo2CrbAbA4ol',
             'object' => 'charge',
+            'status' => 'succeeded',
             'outcome' => [
                 'network_status' => 'approved_by_network',
                 'risk_level' => 'normal',
@@ -79,6 +81,10 @@ class PaymentDetailsHandlerTest extends \PHPUnit\Framework\TestCase
         $response = [
             'object' => Util::convertToStripeObject($attributes, [])
         ];
+
+        $this->payment->expects(static::once())
+            ->method('setIsTransactionPending')
+            ->with(false);
 
         $this->payment->expects(static::once())
             ->method('setCcTransId')

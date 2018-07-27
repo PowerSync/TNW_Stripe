@@ -105,17 +105,15 @@ class ResponseValidatorTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isValid' => false,
                 [
-                    __('Stripe error response.')
+                    __('Wrong transaction status')
                 ]
             ],
             [
                 [
                     'status' => 'pending'
                 ],
-                'isValid' => false,
-                [
-                    __('Stripe error response.')
-                ]
+                'isValid' => true,
+                []
             ],
         ];
     }

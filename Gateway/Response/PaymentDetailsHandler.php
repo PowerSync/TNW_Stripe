@@ -54,6 +54,13 @@ class PaymentDetailsHandler implements HandlerInterface
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
 
+        $payment->setIsTransactionPending(strcasecmp($transaction['status'], 'pending') === 0);
+        if (!empty($transaction['fraud_details']['stripe_report'])) {
+            $payment->setIsFraudDetected(
+                strcasecmp($transaction['fraud_details']['stripe_report'], 'fraudulent') === 0
+            );
+        }
+
         $payment->setCcTransId($transaction['id']);
         $payment->setLastTransId($transaction['id']);
 
