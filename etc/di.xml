@@ -260,7 +260,7 @@
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
       <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionSale</argument>
       <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\TransactionIdHandler</argument>
-      <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\ResponseValidator</argument>
+      <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\ResponseValidator\Authorize</argument>
     </arguments>
   </virtualType>
   <virtualType name="StripeVaultCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
