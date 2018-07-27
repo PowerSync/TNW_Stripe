@@ -12,7 +12,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.5"
-      COMPOSER_AUTH: '{"http-basic": {"repo.magento.com": {"username": "a32f9576628eb71f11b1a381c900516c", "password": "eee87cca8b50f63c9664ead0d0d93d4b"}}}'
+      #COMPOSER_AUTH: '{"http-basic": {"repo.magento.com": {"username": "a32f9576628eb71f11b1a381c900516c", "password": "eee87cca8b50f63c9664ead0d0d93d4b"}}}'
     working_directory: ~/tnw_extension
     steps:
       - checkout
@@ -85,6 +85,7 @@ jobs:
           name: Installing Magento EE
           command: |
             cd /var/www/html/
+            composer config http-basic.repo.magento.com a32f9576628eb71f11b1a381c900516c eee87cca8b50f63c9664ead0d0d93d4b
             composer create-project -s RC --repository-url=https://repo.magento.com/ magento/project-enterprise-edition magento2-ee-$MAGENTO_VERSION $MAGENTO_VERSION
             cd magento2-ee-$MAGENTO_VERSION
             ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnwee --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
