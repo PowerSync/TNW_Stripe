@@ -126,6 +126,7 @@
                         <item name="dataScope" xsi:type="string">rating</item>
                         <item name="dataType" xsi:type="string">text</item>
                         <item name="additionalClasses" xsi:type="string">quick-survey-field</item>
+                        <item name="value" xsi:type="number">5</item>
                     </item>
                 </argument>
             </field>

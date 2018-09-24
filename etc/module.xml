@@ -24,6 +24,7 @@
       <module name="Magento_Catalog"/>
       <module name="Magento_Quote"/>
       <module name="Magento_Vault"/>
+      <module name="TNW_Marketing"/>
     </sequence>
   </module>
 </config>
