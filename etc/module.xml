@@ -16,7 +16,7 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-  <module name="TNW_Stripe" setup_version="2.1.6">
+  <module name="TNW_Stripe" setup_version="2.1.8">
     <sequence>
       <module name="Magento_Customer"/>
       <module name="Magento_Payment"/>
@@ -24,6 +24,7 @@
       <module name="Magento_Catalog"/>
       <module name="Magento_Quote"/>
       <module name="Magento_Vault"/>
+      <module name="TNW_Marketing"/>
     </sequence>
   </module>
 </config>
