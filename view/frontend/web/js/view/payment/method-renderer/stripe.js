@@ -8,6 +8,7 @@ define([
     'TNW_Stripe/js/featherlight',
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/model/quote',
+    'Magento_Checkout/js/model/payment/additional-validators',
     'stripejs'
 ], function (
     $,
@@ -18,7 +19,8 @@ define([
     validator,
     featherlight,
     VaultEnabler,
-    quote
+    quote,
+    additionalValidators
 ) {
     'use strict';
 
@@ -324,7 +326,7 @@ define([
       placeOrderClick: function () {
         var self = this;
 
-        if (!this.validateCardType()) {
+        if (!this.validateCardType() || !this.validate() || !additionalValidators.validate()) {
           return;
         }
 
