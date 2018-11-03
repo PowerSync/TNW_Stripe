@@ -31,16 +31,12 @@ project via composer by running `composer require stripe/stripe-php:5.2.0`
 With the module files in place and the Stripe SDK installed,
 run `bin/magento setup:upgrade`
 
-## Magento Version Requirements
-| Release | Magento Version |
-| ------- | --------------- |
-| 1.x.x   | 2.2.x           | 
-| 1.x.x   | 2.1.x           |
-| 0.0.3   | 2.0.x           |
-
 ## Configuration
 The configuration can be found in the Magento 2 admin panel under  
 Store->Configuration->Sales->Payment Methods->Stripe
+
+## Additona Documentations
+[Integration with Stripe Gateway - Wiki](https://technweb.atlassian.net/wiki/spaces/SG/overview)
 
 ## License
 [Open Software License v. 3.0](https://opensource.org/licenses/OSL-3.0)
