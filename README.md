@@ -35,7 +35,7 @@ run `bin/magento setup:upgrade`
 The configuration can be found in the Magento 2 admin panel under  
 Store->Configuration->Sales->Payment Methods->Stripe
 
-## Additona Documentations
+## Additonal Documentation
 [Integration with Stripe Gateway - Wiki](https://technweb.atlassian.net/wiki/spaces/SG/overview)
 
 ## License
