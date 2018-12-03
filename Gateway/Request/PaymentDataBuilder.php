@@ -18,6 +18,7 @@ namespace TNW\Stripe\Gateway\Request;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Helper\Payment\Formatter;
+use TNW\Stripe\Gateway\Config\Config;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -27,18 +28,25 @@ class PaymentDataBuilder implements BuilderInterface
     const CURRENCY = 'currency';
     const DESCRIPTION = 'description';
     const CAPTURE = 'capture';
+    const RECEIPT_EMAIL = 'receipt_email';
+
 
     /** @var SubjectReader  */
     private $subjectReader;
+
+    /** @var Config  */
+    private $config;
 
     /**
      * PaymentDataBuilder constructor.
      * @param SubjectReader $subjectReader
      */
     public function __construct(
-        SubjectReader $subjectReader
+        SubjectReader $subjectReader,
+        Config $config
     ) {
         $this->subjectReader = $subjectReader;
+        $this->config = $config;
     }
 
     /**
@@ -49,12 +57,19 @@ class PaymentDataBuilder implements BuilderInterface
     {
         $paymentDO = $this->subjectReader->readPayment($subject);
         $order = $paymentDO->getOrder();
+        $payment = $paymentDO->getPayment();
 
-        return [
+        $result = [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
             self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $order->getCurrencyCode(),
             self::CAPTURE => false
         ];
+
+        if ($this->config->isReceiptEmailEnabled()) {
+            $result[self::RECEIPT_EMAIL] = $payment->getOrder()->getCustomerEmail();
+        }
+
+        return $result;
     }
 }
