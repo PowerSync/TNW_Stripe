@@ -33,6 +33,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_ALLOW_SPECIFIC = 'allowspecific';
     const KEY_SPECIFIC_COUNTRY = 'specificcountry';
     const KEY_SDK_URL = 'sdk_url';
+    const RECEIPT_EMAIL = 'receipt_email';
 
     /**
      * Return the country specific card type config
@@ -167,6 +168,15 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isTestMode($storeId = null)
     {
         return $this->getEnvironment($storeId) == Environment::ENVIRONMENT_TEST;
+    }
+
+    /**
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isReceiptEmailEnabled($storeId = null)
+    {
+        return (bool) $this->getValue(self::RECEIPT_EMAIL, $storeId);
     }
 
     /**
