@@ -10,6 +10,7 @@ use Magento\Framework\Math\Random;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Class CountryCreditCard
@@ -22,6 +23,11 @@ class CountryCreditCard extends Value
     private $mathRandom;
 
     /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    private $serializer;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -30,6 +36,7 @@ class CountryCreditCard extends Value
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
+     * @param \Magento\Framework\Serialize\Serializer\Json $serializer
      */
     public function __construct(
         Context $context,
@@ -39,10 +46,12 @@ class CountryCreditCard extends Value
         Random $mathRandom,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        Json $serializer = null
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
-
+        $this->serializer = $serializer ?: \Magento\Framework\App\ObjectManager::getInstance()
+            ->get(Json::class);
         $this->mathRandom = $mathRandom;
     }
 
@@ -54,6 +63,14 @@ class CountryCreditCard extends Value
     public function beforeSave()
     {
         $value = $this->getValue();
+        if (!is_array($value)) {
+            try {
+                $value = $this->serializer->unserialize($value);
+            } catch (\InvalidArgumentException $e) {
+                $value = [];
+            }
+        }
+
         $result = [];
         foreach ($value as $data) {
             if (empty($data['country_id']) || empty($data['cc_types'])) {
@@ -67,7 +84,7 @@ class CountryCreditCard extends Value
             }
         }
 
-        $this->setValue(serialize($result));
+        $this->setValue($this->serializer->serialize($result));
         return $this;
     }
 
@@ -79,7 +96,7 @@ class CountryCreditCard extends Value
     public function afterLoad()
     {
         if ($this->getValue()) {
-            $value = unserialize($this->getValue());
+            $value = $this->serializer->unserialize($this->getValue());
             if (is_array($value)) {
                 $this->setValue($this->encodeArrayFieldValue($value));
             }
