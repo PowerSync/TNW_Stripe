@@ -98,7 +98,7 @@
             <label>Enable Receipt Email feature</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/tnw_stripe/receipt_email</config_path>
-            <comment><![CDATA[<a href="https://stripe.com/docs/receipts" target="_blank">documentation</a>.]]></comment>
+            <comment>See the <![CDATA[<a href="https://stripe.com/docs/receipts" target="_blank">documentation</a>.]]> for more information.</comment>
 
           </field>
           <field id="stripe_vault_title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
