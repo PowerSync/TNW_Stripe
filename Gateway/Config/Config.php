@@ -16,6 +16,8 @@
 namespace TNW\Stripe\Gateway\Config;
 
 use TNW\Stripe\Model\Adminhtml\Source\Environment;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
@@ -35,6 +37,31 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_SDK_URL = 'sdk_url';
     const RECEIPT_EMAIL = 'receipt_email';
 
+
+    /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    private $serializer;
+
+    /**
+     * Braintree config constructor
+     *
+     * @param ScopeConfigInterface $scopeConfig
+     * @param null|string $methodCode
+     * @param string $pathPattern
+     * @param Json|null $serializer
+     */
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        $methodCode = null,
+        $pathPattern = self::DEFAULT_PATH_PATTERN,
+        Json $serializer = null
+    ) {
+        parent::__construct($scopeConfig, $methodCode, $pathPattern);
+        $this->serializer = $serializer ?: \Magento\Framework\App\ObjectManager::getInstance()
+            ->get(Json::class);
+    }
+
     /**
      * Return the country specific card type config
      *
@@ -43,7 +70,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getCountrySpecificCardTypeConfig($storeId = null)
     {
-        $countryCardTypes = unserialize($this->getValue(self::KEY_COUNTRY_CREDIT_CARD, $storeId));
+        $countryCardTypes = $this->getValue(self::KEY_COUNTRY_CREDIT_CARD, $storeId);
+        if (!$countryCardTypes) {
+            return [];
+        }
+        $countryCardTypes = $this->serializer->unserialize($countryCardTypes);
         return is_array($countryCardTypes) ? $countryCardTypes : [];
     }
 
