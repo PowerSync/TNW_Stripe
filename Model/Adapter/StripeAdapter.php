@@ -18,6 +18,7 @@ namespace TNW\Stripe\Model\Adapter;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
+use Stripe\PaymentIntent;
 
 class StripeAdapter
 {
@@ -45,7 +46,7 @@ class StripeAdapter
      */
     public function refund($transactionId, $amount = null)
     {
-        return Charge::retrieve($transactionId)
+        return PaymentIntent::retrieve($transactionId)
             ->refund(['amount' => $amount]);
     }
 
@@ -55,7 +56,8 @@ class StripeAdapter
      */
     public function sale(array $attributes)
     {
-        return Charge::create($attributes);
+        return PaymentIntent::create($attributes)
+            ->confirm();
     }
 
     /**
@@ -65,7 +67,7 @@ class StripeAdapter
      */
     public function capture($transactionId, $amount = null)
     {
-        return Charge::retrieve($transactionId)
+        return PaymentIntent::retrieve($transactionId)
             ->capture(['amount' => $amount]);
     }
 
@@ -75,7 +77,7 @@ class StripeAdapter
      */
     public function void($transactionId)
     {
-        return Charge::retrieve($transactionId)
+        return PaymentIntent::retrieve($transactionId)
             ->refund();
     }
 

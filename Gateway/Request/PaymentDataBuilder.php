@@ -27,7 +27,9 @@ class PaymentDataBuilder implements BuilderInterface
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const DESCRIPTION = 'description';
-    const CAPTURE = 'capture';
+    const CONFIRMATION_METHOD = 'confirmation_method';
+    const PAYMENT_METHOD = 'payment_method';
+    const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
 
 
@@ -61,13 +63,20 @@ class PaymentDataBuilder implements BuilderInterface
 
         $result = [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
-            self::DESCRIPTION => $order->getOrderIncrementId(),
+            //self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $order->getCurrencyCode(),
-            self::CAPTURE => false
+            self::PAYMENT_METHOD_TYPES => ["card"],
+            self::CONFIRMATION_METHOD => 'manual'
+
+
         ];
 
         if ($this->config->isReceiptEmailEnabled()) {
             $result[self::RECEIPT_EMAIL] = $payment->getOrder()->getCustomerEmail();
+        }
+
+        if ($token = $payment->getAdditionalInformation('cc_token')) {
+            $result[self::PAYMENT_METHOD] = $token;
         }
 
         return $result;

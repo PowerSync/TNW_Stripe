@@ -333,9 +333,9 @@ define([
         this.isPlaceOrderActionAllowed(false);
         fullScreenLoader.startLoader();
 
-        adapter.createSourceByCart({owner: self.getOwnerData()})
+        adapter.createPaymentMethodByCart({'billing_details': self.getOwnerData()})
           .done(function (response) {
-            var card = response.source.card,
+            var card = response.paymentMethod.card,
                 totalAmount = parseFloat(quote.totals()['base_grand_total']).toFixed(2).replace('.', ''),
                 currencyCode = quote.totals()['base_currency_code'];
 
@@ -346,12 +346,20 @@ define([
               cc_type: card.brand
             });
 
-            if (card.three_d_secure !== 'required') {
-              self.setPaymentMethodToken(response.source.id);
+
+            if (!card.three_d_secure_usage.supported) {
+              self.setPaymentMethodToken(response.paymentMethod.id);
               self.placeOrder();
               fullScreenLoader.stopLoader(true);
               return;
             }
+
+            adapter.createPaymentIntent (response.paymentMethod)
+                .done(function (response) {
+                  alert(response);
+                });
+
+            alert('3d stop here!!!');
 
             // Disable Payment Token
             self.vaultEnabler.isActivePaymentTokenEnabler(false);

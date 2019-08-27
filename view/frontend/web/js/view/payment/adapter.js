@@ -91,6 +91,51 @@ define([
         },
 
         /**
+         * create source by cart
+         * @return {jQuery.Deferred}
+         */
+        createPaymentMethodByCart: function (sourceData) {
+            return this.createPaymentMethod.call(this, 'card', this.stripeCardNumber, sourceData);
+        },
+
+        /**
+         * create source
+         * @return {jQuery.Deferred}
+         */
+        createPaymentMethod: function () {
+            var self = this,
+                dfd = $.Deferred();
+
+            this.getApiClient()
+                .createPaymentMethod.apply(this.getApiClient(), arguments)
+                .then(function (response) {
+                    if (response.error) {
+                        self.showError(response.error.message);
+                        dfd.reject(response);
+                    } else {
+                        dfd.resolve(response);
+                    }
+                });
+
+            return dfd;
+        },
+        createPaymentIntent: function () {
+            var self = this,
+                dfd = $.Deferred();
+            $.post(
+                "/echo/json/",
+                {json: JSON.stringify(arguments)}
+            ).then (function(response){
+                if (response.error) {
+                    self.showError(response.error.message);
+                    dfd.reject(response);
+                } else {
+                    dfd.resolve(response);
+                }
+            });
+            return dfd;
+        },
+        /**
          * @return {jQuery.Deferred}
          */
         retrieveSource: function() {
