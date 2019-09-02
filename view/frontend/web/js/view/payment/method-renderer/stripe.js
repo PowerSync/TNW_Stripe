@@ -346,7 +346,6 @@ define([
               cc_type: card.brand
             });
 
-
             if (!card.three_d_secure_usage.supported) {
               self.setPaymentMethodToken(response.paymentMethod.id);
               self.placeOrder();
@@ -354,12 +353,28 @@ define([
               return;
             }
 
-            adapter.createPaymentIntent (response.paymentMethod)
-                .done(function (response) {
-                  alert(response);
+            adapter.createPaymentIntent({
+                paymentMethod: response.paymentMethod,
+                amount: totalAmount,
+                currency: currencyCode
+            }).done(function (response) {
+                adapter.authenticateCustomer(response.pi, function (error, response) {
+                    if (error) {
+                        self.isPlaceOrderActionAllowed(true);
+                        self.messageContainer.addErrorMessage({message:"3D Secure authentication failed."});
+                    } else {
+                        self.setPaymentMethodToken(response.paymentIntent.id);
+                        self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
+                        self.placeOrder()
+                    }
                 });
+            }).fail(function() {
+                fullScreenLoader.stopLoader(true);
+                self.isPlaceOrderActionAllowed(true);
+            });
 
-            alert('3d stop here!!!');
+            alert('DONE');
+            return;
 
             // Disable Payment Token
             self.vaultEnabler.isActivePaymentTokenEnabler(false);

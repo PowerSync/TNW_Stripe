@@ -32,7 +32,6 @@ class PaymentDataBuilder implements BuilderInterface
     const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
 
-
     /** @var SubjectReader  */
     private $subjectReader;
 
@@ -41,7 +40,9 @@ class PaymentDataBuilder implements BuilderInterface
 
     /**
      * PaymentDataBuilder constructor.
+     *
      * @param SubjectReader $subjectReader
+     * @param Config $config
      */
     public function __construct(
         SubjectReader $subjectReader,
@@ -53,6 +54,7 @@ class PaymentDataBuilder implements BuilderInterface
 
     /**
      * @param array $subject
+     *
      * @return array
      */
     public function build(array $subject)
@@ -63,12 +65,9 @@ class PaymentDataBuilder implements BuilderInterface
 
         $result = [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
-            //self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $order->getCurrencyCode(),
-            self::PAYMENT_METHOD_TYPES => ["card"],
+            self::PAYMENT_METHOD_TYPES => ['card'],
             self::CONFIRMATION_METHOD => 'manual'
-
-
         ];
 
         if ($this->config->isReceiptEmailEnabled()) {

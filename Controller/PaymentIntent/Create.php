@@ -1,36 +1,73 @@
 <?php
 
-namespace TNW\Stripe\Controller\Window;
+namespace TNW\Stripe\Controller\Paymentintent;
 
 use Magento\Framework\App\Action;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\RawFactory;
+use TNW\Stripe\Helper\Payment\Formatter;
+use TNW\Stripe\Gateway\Config\Config;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
+use Magento\Framework\Controller\ResultFactory;
 
-class Close extends Action\Action
+class Create extends Action\Action
 {
+    use Formatter;
+
+    const AMOUNT = 'amount';
+    const CURRENCY = 'currency';
+    const DESCRIPTION = 'description';
+    const CONFIRMATION_METHOD = 'confirmation_method';
+    const PAYMENT_METHOD = 'payment_method';
+    const PAYMENT_METHOD_TYPES = 'payment_method_types';
+    const RECEIPT_EMAIL = 'receipt_email';
+
     /**
      * @var RawFactory
      */
     private $rawFactory;
 
+
+    /** @var Config  */
+    private $config;
+
+    /** @var StripeAdapterFactory  */
+    private $adapterFactory;
+
+
+
     public function __construct(
         Action\Context $context,
-        RawFactory $rawFactory
+        RawFactory $rawFactory,
+        Config $config,
+        StripeAdapterFactory $adapterFactory
     ) {
         parent::__construct($context);
         $this->rawFactory = $rawFactory;
+        $this->config = $config;
+        $this->adapterFactory = $adapterFactory;
     }
 
-    /**
-     * Execute action based on request and return result
-     *
-     * Note: Request will be added as operation argument in future
-     *
-     * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
-     */
     public function execute()
     {
-        return $this->rawFactory->create()
-            ->setContents('<script type="text/javascript">window.parent.require(\'TNW_Stripe/js/featherlight\').current().close()</script>');
+        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+
+        $data = json_decode($this->_request->getParam('data'));
+        $payment  = $data->paymentMethod;
+        $amount   = $data->amount;
+        $currency = $data->currency;
+        $params = [
+            self::AMOUNT => $this->formatPrice($amount),
+            self::CURRENCY => $currency,
+            self::PAYMENT_METHOD_TYPES => ['card'],
+            self::CONFIRMATION_METHOD => 'manual'
+        ];
+        if ($this->config->isReceiptEmailEnabled()) {
+            $params[self::RECEIPT_EMAIL] = 'qwerty@qwerty.com';
+        }
+        $params[self::PAYMENT_METHOD] = $payment->id;
+        $stripeAdapter = $this->adapterFactory->create();
+        $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+        $response->setData(['pi' => $paymentIntent->client_secret]);
+        return $response;
     }
 }

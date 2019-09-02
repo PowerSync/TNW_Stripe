@@ -56,8 +56,11 @@ class StripeAdapter
      */
     public function sale(array $attributes)
     {
-        return PaymentIntent::create($attributes)
-            ->confirm();
+        return PaymentIntent::retrieve($attributes['payment_method'])->confirm();
+
+
+        //return PaymentIntent::create($attributes)
+        //    ->confirm();
     }
 
     /**
@@ -88,5 +91,14 @@ class StripeAdapter
     public function customer(array $attributes)
     {
         return Customer::create($attributes);
+    }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function createPaymentIntent (array $attributes)
+    {
+        return PaymentIntent::create($attributes)->confirm();
     }
 }
