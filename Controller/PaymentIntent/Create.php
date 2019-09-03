@@ -50,7 +50,6 @@ class Create extends Action\Action
     public function execute()
     {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-
         $data = json_decode($this->_request->getParam('data'));
         $payment  = $data->paymentMethod;
         $amount   = $data->amount;
@@ -61,9 +60,6 @@ class Create extends Action\Action
             self::PAYMENT_METHOD_TYPES => ['card'],
             self::CONFIRMATION_METHOD => 'manual'
         ];
-        if ($this->config->isReceiptEmailEnabled()) {
-            $params[self::RECEIPT_EMAIL] = 'qwerty@qwerty.com';
-        }
         $params[self::PAYMENT_METHOD] = $payment->id;
         $stripeAdapter = $this->adapterFactory->create();
         $paymentIntent = $stripeAdapter->createPaymentIntent($params);

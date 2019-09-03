@@ -25,10 +25,12 @@ class Authorize extends ResponseValidator
             parent::getResponseValidators(),
             [
                 function ($response) {
+                    if (!isset($response['charges']['data'][0]['outcome'])) {
+                        return [true, []];
+                    }
                     if ($response['charges']['data'][0]['outcome']['network_status'] !== 'approved_by_network') {
                         return [false, [__('Transaction has been declined')]];
                     }
-
                     return [true, []];
                 }
             ]

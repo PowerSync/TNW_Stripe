@@ -31,6 +31,7 @@ class PaymentDataBuilder implements BuilderInterface
     const PAYMENT_METHOD = 'payment_method';
     const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
+    const PI = 'pi';
 
     /** @var SubjectReader  */
     private $subjectReader;
@@ -75,7 +76,11 @@ class PaymentDataBuilder implements BuilderInterface
         }
 
         if ($token = $payment->getAdditionalInformation('cc_token')) {
-            $result[self::PAYMENT_METHOD] = $token;
+            if (strpos($token, 'pi_') !== false) {
+                $result[self::PI] = $token;
+            } else {
+                $result[self::PAYMENT_METHOD] = $token;
+            }
         }
 
         return $result;

@@ -56,11 +56,19 @@ class StripeAdapter
      */
     public function sale(array $attributes)
     {
-        return PaymentIntent::retrieve($attributes['payment_method'])->confirm();
-
-
-        //return PaymentIntent::create($attributes)
-        //    ->confirm();
+        $needCapture = isset($attributes['capture']) ? true : false;
+        if ($needCapture) {
+            unset($attributes['capture']);
+        }
+        if (empty($attributes['pi'])) {
+            $pi = PaymentIntent::create($attributes);
+        } else {
+            $pi = PaymentIntent::retrieve($attributes['pi']);
+        }
+        if ($needCapture) {
+            return $pi->confirm();
+        }
+        return $pi;
     }
 
     /**
@@ -70,8 +78,12 @@ class StripeAdapter
      */
     public function capture($transactionId, $amount = null)
     {
-        return PaymentIntent::retrieve($transactionId)
-            ->capture(['amount' => $amount]);
+         $pi = PaymentIntent::retrieve($transactionId);
+         if ($pi->status == 'requires_capture') {
+             return $pi->capture(['amount' => $amount]);
+         } else {
+             return $pi->confirm();
+         }
     }
 
     /**

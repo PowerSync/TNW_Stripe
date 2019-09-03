@@ -186,22 +186,6 @@ define([
         getCreateUrl: function () {
             return window.checkoutConfig.payment[this.getCode()].createUrl;
         },
-        handleCardPayment: function(paymentIntentId, done)
-        {
-            try
-            {
-                this.getApiClient().handleCardPayment.apply(this.getApiClient(), [paymentIntentId]).then(function(result)
-                {
-                    if (result.error)
-                        return done(result.error.message, result);
-                    return done(false, result);
-                });
-            }
-            catch (e)
-            {
-                done(e.message);
-            }
-        },
         handleCardAction: function(paymentIntentId, done)
         {
             try
@@ -230,10 +214,7 @@ define([
                     if (result.paymentIntent.status == "requires_action"
                         || result.paymentIntent.status == "requires_source_action")
                     {
-                        if (result.paymentIntent.confirmation_method == "manual")
                             return self.handleCardAction(paymentIntentId, done);
-                        else
-                            return self.handleCardPayment(paymentIntentId, done);
                     }
                     return done(false, result);
                 });

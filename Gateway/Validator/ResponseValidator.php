@@ -21,7 +21,7 @@ class ResponseValidator extends GeneralResponseValidator
     {
         return [
             function ($response) {
-                if (!\in_array($response['status'], ['succeeded', 'paid', 'pending'])) {
+                if (!\in_array($response['status'], ['succeeded', 'paid', 'pending', 'requires_confirmation', ''])) {
                     return [false, [__('Wrong transaction status')]];
                 }
 
