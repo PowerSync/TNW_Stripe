@@ -338,26 +338,27 @@ define([
             var card = response.paymentMethod.card,
                 totalAmount = parseFloat(quote.totals()['base_grand_total']).toFixed(2).replace('.', ''),
                 currencyCode = quote.totals()['base_currency_code'];
-
             self.additionalData = _.extend(self.additionalData, {
               cc_exp_month: card.exp_month,
               cc_exp_year: card.exp_year,
               cc_last4: card.last4,
               cc_type: card.brand
             });
-
             if (!card.three_d_secure_usage.supported) {
               self.setPaymentMethodToken(response.paymentMethod.id);
               self.placeOrder();
               fullScreenLoader.stopLoader(true);
               return;
             }
-
             adapter.createPaymentIntent({
                 paymentMethod: response.paymentMethod,
                 amount: totalAmount,
                 currency: currencyCode
             }).done(function (response) {
+                if (!response.pi) {
+                    fullScreenLoader.stopLoader(true);
+                    return;
+                }
                 adapter.authenticateCustomer(response.pi, function (error, response) {
                     if (error) {
                         self.isPlaceOrderActionAllowed(true);
@@ -367,65 +368,17 @@ define([
                         self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
                         self.placeOrder()
                     }
+
                 });
             }).fail(function() {
                 fullScreenLoader.stopLoader(true);
                 self.isPlaceOrderActionAllowed(true);
             });
-
-            alert('DONE');
-            return;
-
-            // Disable Payment Token
-            self.vaultEnabler.isActivePaymentTokenEnabler(false);
-
-            adapter.createSource({
-              type: 'three_d_secure',
-              amount: totalAmount,
-              currency: currencyCode,
-              three_d_secure: {
-                card: response.source.id
-              },
-              redirect: {
-                return_url: self.getReturnUrl()
-              }
-            })
-            .done(function (response) {
-              featherlight({
-                iframe: response.source.redirect.url,
-                iframeWidth: '800',
-                iframeHeight: '600',
-                loading: '<img alt="Loading..." src="'+self.getImgLoadingUrl()+'">',
-                afterClose: function() {
-                  adapter.retrieveSource({
-                    id: response.source.id,
-                    client_secret: response.source.client_secret
-                  }).done(function(result) {
-                    if (result.source.status === 'chargeable') {
-                      self.setPaymentMethodToken(response.source.id);
-                      self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
-                      self.placeOrder()
-                    } else {
-                      self.isPlaceOrderActionAllowed(true);
-                      self.messageContainer.addErrorMessage({message:"3D Secure authentication failed."});
-                    }
-
-                    fullScreenLoader.stopLoader(true);
-                  });
-                }
-              });
-            });
           })
-          .fail(function() {
-            fullScreenLoader.stopLoader(true);
-            self.isPlaceOrderActionAllowed(true);
-          });
       },
-
       getReturnUrl: function () {
         return window.checkoutConfig.payment[this.getCode()].returnUrl;
       },
-
       getImgLoadingUrl: function () {
           return window.checkoutConfig.payment[this.getCode()].imgLoading;
       }
