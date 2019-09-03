@@ -4,6 +4,7 @@ namespace TNW\Stripe\Controller\Paymentintent;
 
 use Magento\Framework\App\Action;
 use Magento\Framework\Controller\Result\RawFactory;
+use Magento\Setup\Exception;
 use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
@@ -62,8 +63,12 @@ class Create extends Action\Action
         ];
         $params[self::PAYMENT_METHOD] = $payment->id;
         $stripeAdapter = $this->adapterFactory->create();
-        $paymentIntent = $stripeAdapter->createPaymentIntent($params);
-        $response->setData(['pi' => $paymentIntent->client_secret]);
+        try {
+            $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+            $response->setData(['pi' => $paymentIntent->client_secret]);
+        } catch (\Exception $e) {
+            $response->setData(['error' => ['message' => $e->getMessage()]]);
+        }
         return $response;
     }
 }

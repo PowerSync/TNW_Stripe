@@ -113,4 +113,13 @@ class StripeAdapter
     {
         return PaymentIntent::create($attributes)->confirm();
     }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function retrievePaymentIntent ($transactionId)
+    {
+        return PaymentIntent::retrieve($transactionId);
+    }
 }
