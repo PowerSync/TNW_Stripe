@@ -122,4 +122,14 @@ class StripeAdapter
     {
         return PaymentIntent::retrieve($transactionId);
     }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function retrieveCustomer ($customerId)
+    {
+        return Customer::retrieve($customerId);
+    }
+
 }

@@ -82,7 +82,6 @@ class PaymentDataBuilder implements BuilderInterface
                 $result[self::PAYMENT_METHOD] = $token;
             }
         }
-
         return $result;
     }
 }

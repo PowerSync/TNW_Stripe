@@ -67,7 +67,8 @@ class CustomerDataBuilder implements BuilderInterface
 
         return [
             'email' => $payment->getOrder()->getCustomerEmail(),
-            'payment_method' => $pm
+            'payment_method' => $pm,
+            'invoice_settings' => ['default_payment_method' => $pm]
         ];
     }
 }
