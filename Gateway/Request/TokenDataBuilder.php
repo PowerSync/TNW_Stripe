@@ -8,6 +8,7 @@ namespace TNW\Stripe\Gateway\Request;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 
 class TokenDataBuilder implements BuilderInterface
 {
@@ -18,16 +19,20 @@ class TokenDataBuilder implements BuilderInterface
      * @var SubjectReader
      */
     private $subjectReader;
-
+    
+    /** @var StripeAdapterFactory  */
+    private $adapterFactory;
     /**
      * Constructor
      *
      * @param SubjectReader $subjectReader
      */
     public function __construct(
-        SubjectReader $subjectReader
+        SubjectReader $subjectReader,
+        StripeAdapterFactory $adapterFactory
     ) {
         $this->subjectReader = $subjectReader;
+        $this->adapterFactory = $adapterFactory;
     }
 
     /**
@@ -49,6 +54,10 @@ class TokenDataBuilder implements BuilderInterface
 
         if ($paymentToken instanceof PaymentTokenInterface) {
             $result[self::CUSTOMER] = $paymentToken->getGatewayToken();
+            $stripeAdapter = $this->adapterFactory->create();
+            $customer = $stripeAdapter->retrieveCustomer($result[self::CUSTOMER]);
+            $pm = $customer->invoice_settings->default_payment_method;
+            $result['payment_method'] = $pm;
         }
 
         if ($token = $payment->getAdditionalInformation('cc_token')) {

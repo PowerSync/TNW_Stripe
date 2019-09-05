@@ -27,9 +27,11 @@ class PaymentDataBuilder implements BuilderInterface
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const DESCRIPTION = 'description';
-    const CAPTURE = 'capture';
+    const CONFIRMATION_METHOD = 'confirmation_method';
+    const PAYMENT_METHOD = 'payment_method';
+    const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
-
+    const PI = 'pi';
 
     /** @var SubjectReader  */
     private $subjectReader;
@@ -39,7 +41,9 @@ class PaymentDataBuilder implements BuilderInterface
 
     /**
      * PaymentDataBuilder constructor.
+     *
      * @param SubjectReader $subjectReader
+     * @param Config $config
      */
     public function __construct(
         SubjectReader $subjectReader,
@@ -51,6 +55,7 @@ class PaymentDataBuilder implements BuilderInterface
 
     /**
      * @param array $subject
+     *
      * @return array
      */
     public function build(array $subject)
@@ -61,15 +66,22 @@ class PaymentDataBuilder implements BuilderInterface
 
         $result = [
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
-            self::DESCRIPTION => $order->getOrderIncrementId(),
             self::CURRENCY => $order->getCurrencyCode(),
-            self::CAPTURE => false
+            self::PAYMENT_METHOD_TYPES => ['card'],
+            self::CONFIRMATION_METHOD => 'manual'
         ];
 
         if ($this->config->isReceiptEmailEnabled()) {
             $result[self::RECEIPT_EMAIL] = $payment->getOrder()->getCustomerEmail();
         }
 
+        if ($token = $payment->getAdditionalInformation('cc_token')) {
+            if (strpos($token, 'pi_') !== false) {
+                $result[self::PI] = $token;
+            } else {
+                $result[self::PAYMENT_METHOD] = $token;
+            }
+        }
         return $result;
     }
 }
