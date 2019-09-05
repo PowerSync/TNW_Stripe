@@ -350,6 +350,9 @@ define([
               fullScreenLoader.stopLoader(true);
               return;
             }
+              // Disable Payment Token
+              self.vaultEnabler.isActivePaymentTokenEnabler(false);
+            
             adapter.createPaymentIntent({
                 paymentMethod: response.paymentMethod,
                 amount: totalAmount,
