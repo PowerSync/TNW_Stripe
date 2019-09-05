@@ -18,6 +18,7 @@ namespace TNW\Stripe\Model\Adapter;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
+use Stripe\PaymentIntent;
 
 class StripeAdapter
 {
@@ -45,7 +46,7 @@ class StripeAdapter
      */
     public function refund($transactionId, $amount = null)
     {
-        return Charge::retrieve($transactionId)
+        return PaymentIntent::retrieve($transactionId)
             ->refund(['amount' => $amount]);
     }
 
@@ -55,7 +56,19 @@ class StripeAdapter
      */
     public function sale(array $attributes)
     {
-        return Charge::create($attributes);
+        $needCapture = isset($attributes['capture']) ? true : false;
+        if ($needCapture) {
+            unset($attributes['capture']);
+        }
+        if (empty($attributes['pi'])) {
+            $pi = PaymentIntent::create($attributes);
+        } else {
+            $pi = PaymentIntent::retrieve($attributes['pi']);
+        }
+        if ($needCapture) {
+            return $pi->confirm();
+        }
+        return $pi;
     }
 
     /**
@@ -65,8 +78,12 @@ class StripeAdapter
      */
     public function capture($transactionId, $amount = null)
     {
-        return Charge::retrieve($transactionId)
-            ->capture(['amount' => $amount]);
+         $pi = PaymentIntent::retrieve($transactionId);
+         if ($pi->status == 'requires_capture') {
+             return $pi->capture(['amount' => $amount]);
+         } else {
+             return $pi->confirm();
+         }
     }
 
     /**
@@ -75,7 +92,7 @@ class StripeAdapter
      */
     public function void($transactionId)
     {
-        return Charge::retrieve($transactionId)
+        return PaymentIntent::retrieve($transactionId)
             ->refund();
     }
 
@@ -87,4 +104,32 @@ class StripeAdapter
     {
         return Customer::create($attributes);
     }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function createPaymentIntent (array $attributes)
+    {
+        return PaymentIntent::create($attributes)->confirm();
+    }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function retrievePaymentIntent ($transactionId)
+    {
+        return PaymentIntent::retrieve($transactionId);
+    }
+
+    /**
+     * @param array $attributes
+     * @return array|\Exception|Charge|\Stripe\Error\Card
+     */
+    public function retrieveCustomer ($customerId)
+    {
+        return Customer::retrieve($customerId);
+    }
+
 }

@@ -17,6 +17,7 @@ namespace TNW\Stripe\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 
 /**
  * Class CustomerDataBuilder
@@ -28,14 +29,20 @@ class CustomerDataBuilder implements BuilderInterface
      */
     private $subjectReader;
 
+    /** @var StripeAdapterFactory  */
+    private $adapterFactory;
+
     /**
      * CaptureDataBuilder constructor.
-     * @param SubjectReader $subjectReader
+     * @param SubjectReader        $subjectReader
+     * @param StripeAdapterFactory $adapterFactory
      */
     public function __construct(
-        SubjectReader $subjectReader
+        SubjectReader $subjectReader,
+        StripeAdapterFactory $adapterFactory
     ) {
         $this->subjectReader = $subjectReader;
+        $this->adapterFactory = $adapterFactory;
     }
 
     /**
@@ -47,10 +54,21 @@ class CustomerDataBuilder implements BuilderInterface
 
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
+        $token = $payment->getAdditionalInformation('cc_token');
+        $pm = '';
+        
+        if (strpos($token, 'pm_') !== false) {
+            $pm = $token;
+        } else {
+            $stripeAdapter = $this->adapterFactory->create();
+            $paymentIntent = $stripeAdapter->retrievePaymentIntent($token);
+            $pm = $paymentIntent->payment_method;
+        }
 
         return [
             'email' => $payment->getOrder()->getCustomerEmail(),
-            'source' => $payment->getAdditionalInformation('cc_token'),
+            'payment_method' => $pm,
+            'invoice_settings' => ['default_payment_method' => $pm]
         ];
     }
 }
