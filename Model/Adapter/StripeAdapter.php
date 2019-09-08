@@ -60,6 +60,12 @@ class StripeAdapter
         if ($needCapture) {
             unset($attributes['capture']);
         }
+        // Payment with old saved customer
+        if (isset($attributes['customer']) && !isset($attributes['payment_method'])) {
+            unset($attributes['payment_method_types']);
+            unset($attributes['confirmation_method']);
+            return Charge::create($attributes);
+        }
         if (empty($attributes['pi'])) {
             $pi = PaymentIntent::create($attributes);
         } else {
