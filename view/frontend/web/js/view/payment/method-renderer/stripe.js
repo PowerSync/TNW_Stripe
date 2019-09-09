@@ -355,7 +355,7 @@ define([
             
             adapter.createPaymentIntent({
                 paymentMethod: response.paymentMethod,
-                amount: totalAmount,
+                amount: quote.totals()['base_grand_total'],
                 currency: currencyCode
             }).done(function (response) {
                 if (!response.pi) {
