@@ -65,6 +65,13 @@ class Create extends Action\Action
         $stripeAdapter = $this->adapterFactory->create();
         try {
             $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+            // 3ds could be done automaticly, need check that and skeep on frontend
+            if (is_null($paymentIntent->next_action) && !
+                ($paymentIntent->status == "requires_action" || $paymentIntent->status == "requires_source_action")) {
+                $response->setData(['skip_3ds' => true,'paymentIntent' => $paymentIntent]);
+
+                return $response;
+            }
             $response->setData(['pi' => $paymentIntent->client_secret]);
         } catch (\Exception $e) {
             $response->setData(['error' => ['message' => $e->getMessage()]]);
