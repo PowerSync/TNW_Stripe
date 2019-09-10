@@ -325,13 +325,7 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt install -y libicu-dev libxml2-dev libxslt1-dev zlib1g-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev
-            sudo apt-get install libfreetype6-dev
-            wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz \
-                && tar xfvz libsodium-1.0.18.tar.gz \
-                && cd libsodium-1.0.18 \
-                && ./configure \
-                && make && make install \
-                && pecl install -f libsodium
+            sudo apt-get install libfreetype6-dev php-libsodium
       - run:
           name: Install PHP extension
           command: |
