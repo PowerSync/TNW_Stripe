@@ -110,6 +110,13 @@ class StripeAdapter
      */
     public function customer(array $attributes)
     {
+        if (isset($attributes['id'])) {
+            $id = $attributes['id'];
+            unset($attributes['id']);
+            Customer::update($id, $attributes);
+            $cs = Customer::retrieve($id);
+            return $cs;
+        }
         return Customer::create($attributes);
     }
 

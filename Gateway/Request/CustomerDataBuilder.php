@@ -63,6 +63,14 @@ class CustomerDataBuilder implements BuilderInterface
             $stripeAdapter = $this->adapterFactory->create();
             $paymentIntent = $stripeAdapter->retrievePaymentIntent($token);
             $pm = $paymentIntent->payment_method;
+            $cs = $stripeAdapter->retrieveCustomer($paymentIntent->customer);
+            if ($cs && $cs->id) {
+                return[
+                    'email' => $payment->getOrder()->getCustomerEmail(),
+                    'invoice_settings' => ['default_payment_method' => $pm],
+                    'id' => $cs->id
+                ];
+            }
         }
 
         return [

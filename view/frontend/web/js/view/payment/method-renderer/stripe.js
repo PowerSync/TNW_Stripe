@@ -350,8 +350,6 @@ define([
               fullScreenLoader.stopLoader(true);
               return;
             }
-              // Disable Payment Token
-              self.vaultEnabler.isActivePaymentTokenEnabler(false);
 
               adapter.createPaymentIntent({
                 paymentMethod: response.paymentMethod,
@@ -365,7 +363,7 @@ define([
                     return;
                 }
                 // Disable Payment Token
-                //self.vaultEnabler.isActivePaymentTokenEnabler(false);
+                self.vaultEnabler.isActivePaymentTokenEnabler(false);
                 if (!response.pi) {
                     fullScreenLoader.stopLoader(true);
                     return;
