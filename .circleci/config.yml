@@ -475,11 +475,11 @@ workflows:
 
   test-deploy-wiki:
     jobs:
-    - m232_php72:
-        context: powersync
-        filters:
-          branches:
-            only: /.*/
+#    - m232_php72:
+#        context: powersync
+#        filters:
+#          branches:
+#            only: /.*/
     - m225_php71:
         context: powersync
         filters:
@@ -569,7 +569,7 @@ workflows:
     - deploy:
         context: powersync
         requires:
-        - m232_php72
+#        - m232_php72
         - m225_php71
 #        - m224_php71
 #        - m223_php71
