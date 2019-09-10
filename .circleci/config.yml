@@ -330,9 +330,6 @@ jobs:
           name: Install PHP extension
           command: |
             sudo pecl install mcrypt-1.0.1
-            sudo pecl install -f libsodium
-            sudo echo "extension = sodium.so" > /etc/php/7.2/mods-available/sodium.ini
-            sudo phpenmod sodium
             sudo docker-php-ext-enable mcrypt
             sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
             sudo -E docker-php-ext-install -j$(nproc) intl soap xsl zip pdo pdo_mysql gd gettext mbstring bcmath sodium
