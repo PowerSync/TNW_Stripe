@@ -350,14 +350,20 @@ define([
               fullScreenLoader.stopLoader(true);
               return;
             }
-              // Disable Payment Token
-              self.vaultEnabler.isActivePaymentTokenEnabler(false);
-            
-            adapter.createPaymentIntent({
+
+              adapter.createPaymentIntent({
                 paymentMethod: response.paymentMethod,
                 amount: quote.totals()['base_grand_total'],
                 currency: currencyCode
             }).done(function (response) {
+                if (response.skip_3ds) {
+                    fullScreenLoader.stopLoader(true);
+                    self.setPaymentMethodToken(response.paymentIntent.id);
+                    self.placeOrder();
+                    return;
+                }
+                // Disable Payment Token
+                self.vaultEnabler.isActivePaymentTokenEnabler(false);
                 if (!response.pi) {
                     fullScreenLoader.stopLoader(true);
                     return;

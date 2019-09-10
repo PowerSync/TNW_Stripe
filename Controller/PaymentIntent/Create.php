@@ -21,6 +21,7 @@ class Create extends Action\Action
     const PAYMENT_METHOD = 'payment_method';
     const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
+    const CUSTOMER = 'customer';
 
     /**
      * @var RawFactory
@@ -55,16 +56,26 @@ class Create extends Action\Action
         $payment  = $data->paymentMethod;
         $amount   = $data->amount;
         $currency = $data->currency;
+
+        $stripeAdapter = $this->adapterFactory->create();
+        $cs = $stripeAdapter->customer(['payment_method' => $payment->id]);
         $params = [
+            self::CUSTOMER => $cs->id,
             self::AMOUNT => $this->formatPrice($amount),
             self::CURRENCY => $currency,
             self::PAYMENT_METHOD_TYPES => ['card'],
             self::CONFIRMATION_METHOD => 'manual'
         ];
         $params[self::PAYMENT_METHOD] = $payment->id;
-        $stripeAdapter = $this->adapterFactory->create();
         try {
             $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+            // 3ds could be done automaticly, need check that and skeep on frontend
+            if (is_null($paymentIntent->next_action) && !
+                ($paymentIntent->status == "requires_action" || $paymentIntent->status == "requires_source_action")) {
+                $response->setData(['skip_3ds' => true,'paymentIntent' => $paymentIntent]);
+
+                return $response;
+            }
             $response->setData(['pi' => $paymentIntent->client_secret]);
         } catch (\Exception $e) {
             $response->setData(['error' => ['message' => $e->getMessage()]]);
