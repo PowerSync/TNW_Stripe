@@ -83,6 +83,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'ccTypesMapper' => $this->config->getCctypesMapper($storeId),
                     'sdkUrl' => $this->config->getSdkUrl($storeId),
                     'returnUrl' => $this->url->getUrl('tnw_stripe/window/close'),
+                    'createUrl' => $this->url->getUrl('tnw_stripe/paymentintent/create'),
                     'countrySpecificCardTypes' => $this->config->getCountrySpecificCardTypeConfig($storeId),
                     'availableCardTypes' => $this->config->getAvailableCardTypes($storeId),
                     'useCvv' => $this->config->isCvvEnabled($storeId),

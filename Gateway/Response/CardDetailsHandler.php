@@ -65,11 +65,5 @@ class CardDetailsHandler implements HandlerInterface
         // set card details to additional info
         $payment->setAdditionalInformation(self::CARD_NUMBER, "xxxx-{$ccLats4}");
         $payment->setAdditionalInformation(OrderPaymentInterface::CC_TYPE, $ccType);
-
-        /** @var \Stripe\Source $source */
-        $source = $transaction['source'];
-        if ($source->type === 'three_d_secure') {
-            $payment->setAdditionalInformation('cc_token', $source->three_d_secure->card);
-        }
     }
 }
