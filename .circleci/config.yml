@@ -187,7 +187,7 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt install -y libicu-dev libxml2-dev libxslt1-dev zlib1g-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev
-          sudo apt-get install libfreetype6-dev
+            sudo apt-get install libfreetype6-dev
       - run:
           name: Install PHP extension
           command: |
@@ -208,7 +208,7 @@ jobs:
           command: |
             cd /var/www/html/
             git clone https://github.com/magento/marketplace-eqp magento-coding-standard
-          cd magento-coding-standard && git checkout -q "2.0.1"
+            cd magento-coding-standard && git checkout -q "2.0.1"
             composer install
       - run:
           name: Wait for DB
@@ -243,7 +243,7 @@ jobs:
           command: |
             cd /var/www/html/magento2-$MAGENTO_VERSION
             ./bin/magento setup:di:compile
-          php bin/magento deploy:mode:set developer
+            php bin/magento deploy:mode:set developer
       - run:
           name: Installing Magento EE
           command: |
@@ -251,7 +251,7 @@ jobs:
             composer config -g http-basic.repo.magento.com $MAGENTO_REPO_LOGIN $MAGENTO_REPO_PASSWORD
             composer create-project -s RC --repository-url=https://repo.magento.com/ magento/project-enterprise-edition magento2-ee-$MAGENTO_VERSION $MAGENTO_VERSION
             cd magento2-ee-$MAGENTO_VERSION
-          ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1   --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
+            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1   --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
           name: Copy the Extension Files
@@ -274,7 +274,7 @@ jobs:
           command: |
             cd /var/www/html/magento2-ee-$MAGENTO_VERSION
             ./bin/magento setup:di:compile
-          php bin/magento deploy:mode:set developer
+            php bin/magento deploy:mode:set developer
       - run:
           name: Run Magento Coding Standard
           command: |
