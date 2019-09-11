@@ -375,8 +375,9 @@ define([
                     } else {
                         self.setPaymentMethodToken(response.paymentIntent.id);
                         self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
-                        self.placeOrder()
+                        self.placeOrder();
                     }
+                    fullScreenLoader.stopLoader(true);
 
                 });
             }).fail(function() {
