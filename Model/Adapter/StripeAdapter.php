@@ -15,6 +15,7 @@
  */
 namespace TNW\Stripe\Model\Adapter;
 
+use Magento\Setup\Exception;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
@@ -46,8 +47,18 @@ class StripeAdapter
      */
     public function refund($transactionId, $amount = null)
     {
-        return PaymentIntent::retrieve($transactionId)
-            ->refund(['amount' => $amount]);
+        if (strpos($transactionId, 'ch_') !== false) {
+            $chId = $transactionId;
+        } else {
+            $pi = PaymentIntent::retrieve($transactionId);
+            $chId = $pi->charges->data[0]->id;
+        }
+
+        if (!$chId) {
+            throw new Exception('Charge not found.');
+        }
+        $ch = Charge::retrieve($chId);
+        return $ch->refund(['amount' => $amount]);
     }
 
     /**
