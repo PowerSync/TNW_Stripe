@@ -84,8 +84,9 @@ class StripeAdapter
         }
         if ($needCapture) {
             if ($pi->status == 'requires_confirmation') {
-                return $pi->confirm();
+                $pi->confirm();
             }
+            $pi->capture(['amount' => $attributes['amount']]);
         }
         return $pi;
     }
@@ -97,12 +98,12 @@ class StripeAdapter
      */
     public function capture($transactionId, $amount = null)
     {
-         $pi = PaymentIntent::retrieve($transactionId);
-         if ($pi->status == 'requires_capture') {
-             return $pi->capture(['amount' => $amount]);
-         } else {
-             return $pi->confirm();
-         }
+        $pi = PaymentIntent::retrieve($transactionId);
+        if ($pi->status == 'requires_confirmation') {
+            $pi->confirm();
+        }
+        $pi->capture(['amount' => $amount]);
+        return $pi;
     }
 
     /**

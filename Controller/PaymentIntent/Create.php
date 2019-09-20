@@ -22,6 +22,7 @@ class Create extends Action\Action
     const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
     const CUSTOMER = 'customer';
+    const CAPTURE_METHOD = 'capture_method';
 
     /**
      * @var RawFactory
@@ -64,7 +65,8 @@ class Create extends Action\Action
             self::AMOUNT => $this->formatPrice($amount),
             self::CURRENCY => $currency,
             self::PAYMENT_METHOD_TYPES => ['card'],
-            self::CONFIRMATION_METHOD => 'manual'
+            self::CONFIRMATION_METHOD => 'manual',
+            self::CAPTURE_METHOD => 'manual'
         ];
         $params[self::PAYMENT_METHOD] = $payment->id;
         try {
