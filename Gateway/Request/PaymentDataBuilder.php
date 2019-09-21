@@ -32,6 +32,7 @@ class PaymentDataBuilder implements BuilderInterface
     const PAYMENT_METHOD_TYPES = 'payment_method_types';
     const RECEIPT_EMAIL = 'receipt_email';
     const PI = 'pi';
+    const CAPTURE_METHOD = 'capture_method';
 
     /** @var SubjectReader  */
     private $subjectReader;
@@ -68,7 +69,8 @@ class PaymentDataBuilder implements BuilderInterface
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($subject)),
             self::CURRENCY => $order->getCurrencyCode(),
             self::PAYMENT_METHOD_TYPES => ['card'],
-            self::CONFIRMATION_METHOD => 'manual'
+            self::CONFIRMATION_METHOD => 'manual',
+            self::CAPTURE_METHOD => 'manual'
         ];
 
         if ($this->config->isReceiptEmailEnabled()) {
