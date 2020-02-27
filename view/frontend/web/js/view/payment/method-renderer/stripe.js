@@ -380,11 +380,11 @@ define([
                     fullScreenLoader.stopLoader(true);
 
                 });
-            }).fail(function() {
-                fullScreenLoader.stopLoader(true);
-                self.isPlaceOrderActionAllowed(true);
-            });
-          })
+            })
+          }).fail(function() {
+            fullScreenLoader.stopLoader(true);
+            self.isPlaceOrderActionAllowed(true);
+        });
       },
       getReturnUrl: function () {
         return window.checkoutConfig.payment[this.getCode()].returnUrl;
