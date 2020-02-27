@@ -313,7 +313,7 @@ define([
                 invalidClass = 'stripe-hosted-fields-invalid';
 
             $selector.removeClass(invalidClass);
-            if (!$selector.hasClass('StripeElement--complete') || $selector.hasClass('is-empty')) {
+            if ($selector.hasClass("StripeElement--invalid") || $selector.hasClass("StripeElement--empty")) {
                 $(this.getSelector('expiration')).addClass(invalidClass);
                 return false;
             }
@@ -329,7 +329,7 @@ define([
                 invalidClass = 'stripe-hosted-fields-invalid';
             $selector.removeClass(invalidClass);
 
-            if (!$selector.hasClass('StripeElement--complete') || $selector.hasClass('is-empty')) {
+          if ($selector.hasClass("StripeElement--invalid") || $selector.hasClass("StripeElement--empty")) {
                 $(this.getSelector('cc_cid')).addClass(invalidClass);
                 return false;
             }
