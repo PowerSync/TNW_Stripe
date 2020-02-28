@@ -305,6 +305,38 @@ define([
       },
 
       /**
+       * Check if the expiration date field is filled
+       * @returns {Boolean}
+       */
+      validateExpirationDate: function () {
+            let $selector = $(this.getSelector('expiration')),
+                invalidClass = 'stripe-hosted-fields-invalid';
+
+            $selector.removeClass(invalidClass);
+            if ($selector.hasClass("StripeElement--invalid") || $selector.hasClass("StripeElement--empty")) {
+                $(this.getSelector('expiration')).addClass(invalidClass);
+                return false;
+            }
+            return true;
+      },
+
+      /**
+       * Check if the cvv field is filled
+       * @returns {Boolean}
+       */
+      validateCvv: function () {
+            let $selector = $(this.getSelector('cc_cid')),
+                invalidClass = 'stripe-hosted-fields-invalid';
+            $selector.removeClass(invalidClass);
+
+          if ($selector.hasClass("StripeElement--invalid") || $selector.hasClass("StripeElement--empty")) {
+                $(this.getSelector('cc_cid')).addClass(invalidClass);
+                return false;
+            }
+            return true;
+      },
+
+      /**
        * Set payment token
        * @param {String} paymentMethodToken
        */
@@ -326,7 +358,19 @@ define([
       placeOrderClick: function () {
         var self = this;
 
-        if (!this.validateCardType() || !this.validate() || !additionalValidators.validate()) {
+        let validationStatus = {
+            'cartType': this.validateCardType(),
+            'cvv': this.validateCvv(),
+            'expirationDate': this.validateExpirationDate()
+        };
+
+        if (
+            !this.validate()
+            || !additionalValidators.validate()
+            || !validationStatus.cartType
+            || !validationStatus.cvv
+            || !validationStatus.expirationDate
+        ) {
           return;
         }
 
