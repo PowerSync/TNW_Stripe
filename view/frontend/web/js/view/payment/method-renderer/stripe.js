@@ -424,7 +424,10 @@ define([
                     fullScreenLoader.stopLoader(true);
 
                 });
-            })
+            }).fail(function() {
+                  fullScreenLoader.stopLoader(true);
+                  self.isPlaceOrderActionAllowed(true);
+              });
           }).fail(function() {
             fullScreenLoader.stopLoader(true);
             self.isPlaceOrderActionAllowed(true);
