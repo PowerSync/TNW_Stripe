@@ -58,18 +58,18 @@ class Create extends Action\Action
         $amount   = $data->amount;
         $currency = $data->currency;
 
-        $stripeAdapter = $this->adapterFactory->create();
-        $cs = $stripeAdapter->customer(['payment_method' => $payment->id]);
-        $params = [
-            self::CUSTOMER => $cs->id,
-            self::AMOUNT => $this->formatPrice($amount),
-            self::CURRENCY => $currency,
-            self::PAYMENT_METHOD_TYPES => ['card'],
-            self::CONFIRMATION_METHOD => 'manual',
-            self::CAPTURE_METHOD => 'manual'
-        ];
-        $params[self::PAYMENT_METHOD] = $payment->id;
         try {
+            $stripeAdapter = $this->adapterFactory->create();
+            $cs = $stripeAdapter->customer(['payment_method' => $payment->id]);
+            $params = [
+                self::CUSTOMER => $cs->id,
+                self::AMOUNT => $this->formatPrice($amount),
+                self::CURRENCY => $currency,
+                self::PAYMENT_METHOD_TYPES => ['card'],
+                self::CONFIRMATION_METHOD => 'manual',
+                self::CAPTURE_METHOD => 'manual'
+            ];
+            $params[self::PAYMENT_METHOD] = $payment->id;
             $paymentIntent = $stripeAdapter->createPaymentIntent($params);
             // 3ds could be done automaticly, need check that and skeep on frontend
             if (is_null($paymentIntent->next_action) && !
