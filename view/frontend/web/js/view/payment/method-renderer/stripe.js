@@ -370,11 +370,11 @@ define([
             || !validationStatus.cartType
             || !validationStatus.cvv
             || !validationStatus.expirationDate
+            || (this.isPlaceOrderActionAllowed() === false)
         ) {
           return;
         }
 
-        this.isPlaceOrderActionAllowed(false);
         fullScreenLoader.startLoader();
 
         adapter.createPaymentMethodByCart({'billing_details': self.getOwnerData()})
