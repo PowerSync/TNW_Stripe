@@ -22,6 +22,7 @@ use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Model\Method\Logger;
 use Psr\Log\LoggerInterface;
 use Stripe\StripeObject;
+use Magento\Framework\App\State;
 
 abstract class AbstractTransaction implements ClientInterface
 {
@@ -39,7 +40,10 @@ abstract class AbstractTransaction implements ClientInterface
      * @var StripeAdapterFactory
      */
     protected $adapterFactory;
-
+    /**
+     * @var State
+     */
+    protected $state;
     /**
      * AbstractTransaction constructor.
      * @param LoggerInterface $logger
@@ -49,11 +53,13 @@ abstract class AbstractTransaction implements ClientInterface
     public function __construct(
         LoggerInterface $logger,
         Logger $customLogger,
-        StripeAdapterFactory $adapterFactory
+        StripeAdapterFactory $adapterFactory,
+        State $state
     ) {
         $this->logger = $logger;
         $this->customLogger = $customLogger;
         $this->adapterFactory = $adapterFactory;
+        $this->state = $state;
     }
 
     /**
