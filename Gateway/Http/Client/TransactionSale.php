@@ -28,10 +28,23 @@ class TransactionSale extends AbstractTransaction
         $storeId = $data['store_id'] ? $data['store_id'] : null;
         // sending store id and other additional keys are restricted by Stripe API
         unset($data['store_id']);
-        unset($data['payment_method']);
         unset($data['shipping']);
-
+        // only unset payment_method param in backend.
+        if ($this->getArea() === 'adminhtml') {
+            unset($data['payment_method']);
+        }
         return $this->adapterFactory->create($storeId)
             ->sale($data);
+    }
+
+    /**
+     * Get the current Area
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getArea()
+    {
+        return $this->state->getAreaCode();
     }
 }
