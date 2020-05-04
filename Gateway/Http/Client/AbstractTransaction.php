@@ -23,13 +23,14 @@ use Magento\Payment\Model\Method\Logger;
 use Psr\Log\LoggerInterface;
 use Stripe\StripeObject;
 use Magento\Framework\App\State;
+use Magento\Store\Model\StoreManagerInterface;
 
 abstract class AbstractTransaction implements ClientInterface
 {
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var Logger
@@ -45,6 +46,10 @@ abstract class AbstractTransaction implements ClientInterface
      */
     protected $state;
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+    /**
      * AbstractTransaction constructor.
      * @param LoggerInterface $logger
      * @param Logger $customLogger
@@ -54,12 +59,14 @@ abstract class AbstractTransaction implements ClientInterface
         LoggerInterface $logger,
         Logger $customLogger,
         StripeAdapterFactory $adapterFactory,
-        State $state
+        State $state,
+        StoreManagerInterface $storeManager
     ) {
         $this->logger = $logger;
         $this->customLogger = $customLogger;
         $this->adapterFactory = $adapterFactory;
         $this->state = $state;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -91,7 +98,34 @@ abstract class AbstractTransaction implements ClientInterface
 
         return $response;
     }
+    /**
+     * Get the current Area
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getArea()
+    {
+        return $this->state->getAreaCode();
+    }
 
+    /**
+     * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getCurrentUrl()
+    {
+        return $this->storeManager->getStore()->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getAdminOrdersUrl()
+    {
+        return $this->storeManager->getStore()->getUrl('sales/order_create/save');
+    }
     /**
      * Process http request
      * @param array $data

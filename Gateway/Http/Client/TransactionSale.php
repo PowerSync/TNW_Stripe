@@ -15,6 +15,8 @@
  */
 namespace TNW\Stripe\Gateway\Http\Client;
 
+use Magento\Framework\App\Area;
+
 /**
  * Transaction Sale
  */
@@ -25,26 +27,27 @@ class TransactionSale extends AbstractTransaction
      */
     protected function process(array $data)
     {
-        $storeId = $data['store_id'] ? $data['store_id'] : null;
-        // sending store id and other additional keys are restricted by Stripe API
-        unset($data['store_id']);
-        unset($data['shipping']);
-        // only unset payment_method param in backend.
-        if ($this->getArea() === 'adminhtml') {
-            unset($data['payment_method']);
+        try {
+            $storeId = $data['store_id'] ? $data['store_id'] : null;
+            // sending store id and other additional keys are restricted by Stripe API
+            unset($data['store_id']);
+            unset($data['shipping']);
+
+            if ($this->getArea() === Area::AREA_ADMINHTML) {
+                if ($this->getCurrentUrl() === $this->getAdminOrdersUrl()) {
+                    unset($data['payment_method']);
+                } else {
+                    unset($data['pi']);
+                    unset($data['source']);
+                }
+            }
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            $this->logger->debug($e->getMessage());
+        } catch (\Exception $e) {
+            $this->logger->debug($e->getMessage());
         }
+
         return $this->adapterFactory->create($storeId)
             ->sale($data);
-    }
-
-    /**
-     * Get the current Area
-     *
-     * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function getArea()
-    {
-        return $this->state->getAreaCode();
     }
 }

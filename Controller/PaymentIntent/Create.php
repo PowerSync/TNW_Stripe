@@ -23,7 +23,7 @@ class Create extends Action\Action
     const RECEIPT_EMAIL = 'receipt_email';
     const CUSTOMER = 'customer';
     const CAPTURE_METHOD = 'capture_method';
-
+    const SETUP_FUTURE_USAGE = 'setup_future_usage';
     /**
      * @var RawFactory
      */
@@ -67,7 +67,8 @@ class Create extends Action\Action
                 self::CURRENCY => $currency,
                 self::PAYMENT_METHOD_TYPES => ['card'],
                 self::CONFIRMATION_METHOD => 'manual',
-                self::CAPTURE_METHOD => 'manual'
+                self::CAPTURE_METHOD => 'manual',
+                self::SETUP_FUTURE_USAGE => 'off_session'
             ];
             $params[self::PAYMENT_METHOD] = $payment->id;
             $paymentIntent = $stripeAdapter->createPaymentIntent($params);
