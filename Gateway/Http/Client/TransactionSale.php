@@ -28,7 +28,7 @@ class TransactionSale extends AbstractTransaction
     protected function process(array $data)
     {
         try {
-            $storeId = $data['store_id'] ? $data['store_id'] : null;
+            $storeId = isset($data['store_id']) ? $data['store_id'] : null;
             // sending store id and other additional keys are restricted by Stripe API
             unset($data['store_id']);
             unset($data['shipping']);
