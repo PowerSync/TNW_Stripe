@@ -113,7 +113,7 @@ class StripeAdapter
     public function void($transactionId)
     {
         return PaymentIntent::retrieve($transactionId)
-            ->refund();
+            ->cancel();
     }
 
     /**
