@@ -22,7 +22,12 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Vault\Api\Data\PaymentTokenInterfaceFactory;
 use TNW\Stripe\Gateway\Config\Config;
+use Magento\Vault\Model\PaymentTokenManagement;
 
+/**
+ * Class VaultDetailsHandler
+ * @package TNW\Stripe\Gateway\Response
+ */
 class VaultDetailsHandler implements HandlerInterface
 {
     /**
@@ -46,19 +51,26 @@ class VaultDetailsHandler implements HandlerInterface
     private $config;
 
     /**
-     * Constructor
-     *
+     * @var PaymentTokenManagement
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * VaultDetailsHandler constructor.
      * @param PaymentTokenInterfaceFactory $paymentTokenFactory
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param SubjectReader $subjectReader
      * @param Config $config
+     * @param PaymentTokenManagement $paymentTokenManagement
      */
     public function __construct(
         PaymentTokenInterfaceFactory $paymentTokenFactory,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         SubjectReader $subjectReader,
-        Config $config
+        Config $config,
+        PaymentTokenManagement $paymentTokenManagement
     ) {
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->subjectReader = $subjectReader;
@@ -92,18 +104,35 @@ class VaultDetailsHandler implements HandlerInterface
         if (!isset($transaction['id'])) {
             return null;
         }
+        $paymentToken = null;
+        if (
+            $payment->getAdditionalInformation('public_hash')
+            && $payment->getAdditionalInformation('customer_id')
+        ) {
+            $paymentToken = $this->paymentTokenManagement->getByPublicHash(
+                $payment->getAdditionalInformation('public_hash'),
+                $payment->getAdditionalInformation('customer_id')
+            );
+        }
 
-        /** @var \Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken */
-        $paymentToken = $this->paymentTokenFactory->create();
-        $paymentToken->setGatewayToken($transaction['id']);
-        $paymentToken->setExpiresAt($this->getExpirationDate($payment));
+        if (!$paymentToken) {
+            /** @var \Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken */
+            $paymentToken = $this->paymentTokenFactory->create();
+            $paymentToken->setGatewayToken($transaction['id']);
+            $paymentToken->setExpiresAt($this->getExpirationDate($payment));
 
-        $paymentToken->setTokenDetails($this->convertDetailsToJSON([
-            'type' => $this->getCreditCardType($payment->getAdditionalInformation('cc_type')),
-            'maskedCC' => $payment->getAdditionalInformation('cc_last4'),
-            'expirationDate' => "{$payment->getAdditionalInformation('cc_exp_month')}/{$payment->getAdditionalInformation('cc_exp_year')}"
-        ]));
-
+            $paymentToken->setTokenDetails($this->convertDetailsToJSON([
+                'type' => $this->getCreditCardType($payment->getAdditionalInformation('cc_type')),
+                'maskedCC' => $payment->getAdditionalInformation('cc_last4'),
+                'expirationDate' => "{$payment->getAdditionalInformation('cc_exp_month')}/{$payment->getAdditionalInformation('cc_exp_year')}"
+            ]));
+        }
+        if ($paymentToken) {
+            $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
+            $payment->setAdditionalInformation('cc_type', $tokenDetails['type']);
+            $paymentCcNumber = $payment->getAdditionalInformation('cc_number');
+            $payment->setAdditionalInformation('cc_number', $paymentCcNumber . $tokenDetails['maskedCC']);
+        }
         return $paymentToken;
     }
 

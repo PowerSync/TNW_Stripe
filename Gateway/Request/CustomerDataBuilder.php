@@ -61,7 +61,11 @@ class CustomerDataBuilder implements BuilderInterface
             $pm = $token;
         } else {
             $stripeAdapter = $this->adapterFactory->create();
-            $paymentIntent = $stripeAdapter->retrievePaymentIntent($token);
+            if (!$token && $payment->getCcTransId()) {
+                $paymentIntent = $stripeAdapter->retrievePaymentIntent($payment->getCcTransId());
+            } else {
+                $paymentIntent = $stripeAdapter->retrievePaymentIntent($token);
+            }
             $pm = $paymentIntent->payment_method;
             $cs = $stripeAdapter->retrieveCustomer($paymentIntent->customer);
             if ($cs && $cs->id) {
