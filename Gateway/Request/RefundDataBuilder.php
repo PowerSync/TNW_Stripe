@@ -21,6 +21,10 @@ use TNW\Stripe\Helper\Payment\Formatter;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\Order\Payment;
 
+/**
+ * Class RefundDataBuilder
+ * @package TNW\Stripe\Gateway\Request
+ */
 class RefundDataBuilder implements BuilderInterface
 {
     use Formatter;

@@ -17,17 +17,35 @@ namespace TNW\Stripe\Helper;
 
 use TNW\Stripe\Model\Adminhtml\Source\Cctype as CcTypeSource;
 
+/**
+ * Class CcType
+ * @package TNW\Stripe\Helper
+ */
 class CcType
 {
+    /**
+     * @var array
+     */
     private $ccTypes = [];
+
+    /**
+     * @var CcTypeSource
+     */
     private $ccTypeSource;
 
+    /**
+     * CcType constructor.
+     * @param CcTypeSource $ccTypeSource
+     */
     public function __construct(
         CcTypeSource $ccTypeSource
     ) {
         $this->ccTypeSource = $ccTypeSource;
     }
 
+    /**
+     * @return array
+     */
     public function getCcTypes()
     {
         if (!$this->ccTypes) {

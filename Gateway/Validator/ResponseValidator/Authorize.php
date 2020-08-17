@@ -17,8 +17,15 @@ namespace TNW\Stripe\Gateway\Validator\ResponseValidator;
 
 use TNW\Stripe\Gateway\Validator\ResponseValidator;
 
+/**
+ * Class Authorize
+ * @package TNW\Stripe\Gateway\Validator\ResponseValidator
+ */
 class Authorize extends ResponseValidator
 {
+    /**
+     * @return array
+     */
     protected function getResponseValidators()
     {
         return array_merge(

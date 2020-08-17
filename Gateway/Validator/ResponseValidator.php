@@ -15,16 +15,25 @@
  */
 namespace TNW\Stripe\Gateway\Validator;
 
+/**
+ * Class ResponseValidator
+ * @package TNW\Stripe\Gateway\Validator
+ */
 class ResponseValidator extends GeneralResponseValidator
 {
+    /**
+     * @return array
+     */
     protected function getResponseValidators()
     {
         return [
             function ($response) {
-                if (!\in_array($response['status'], ['succeeded', 'paid', 'pending', 'requires_confirmation', 'requires_capture', ''])) {
+                if (!\in_array(
+                    $response['status'],
+                    ['succeeded', 'paid', 'pending', 'requires_confirmation', 'requires_capture', '']
+                )) {
                     return [false, [__('Wrong transaction status')]];
                 }
-
                 return [true, []];
             }
         ];

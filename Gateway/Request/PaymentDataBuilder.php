@@ -20,6 +20,10 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Gateway\Config\Config;
 
+/**
+ * Class PaymentDataBuilder
+ * @package TNW\Stripe\Gateway\Request
+ */
 class PaymentDataBuilder implements BuilderInterface
 {
     use Formatter;
