@@ -18,16 +18,31 @@ namespace TNW\Stripe\Gateway\Request;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
+/**
+ * Class VoidDataBuilder
+ * @package TNW\Stripe\Gateway\Request
+ */
 class VoidDataBuilder implements BuilderInterface
 {
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
 
+    /**
+     * VoidDataBuilder constructor.
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         SubjectReader $subjectReader
     ) {
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * @param array $subject
+     * @return array
+     */
     public function build(array $subject)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);

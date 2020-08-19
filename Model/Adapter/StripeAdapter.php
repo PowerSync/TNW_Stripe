@@ -15,12 +15,16 @@
  */
 namespace TNW\Stripe\Model\Adapter;
 
-use Magento\Setup\Exception;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
+use Stripe\Refund;
 
+/**
+ * Class StripeAdapter
+ * @package TNW\Stripe\Model\Adapter
+ */
 class StripeAdapter
 {
     /**
@@ -43,7 +47,8 @@ class StripeAdapter
     /**
      * @param $transactionId
      * @param null $amount
-     * @return Charge
+     * @return mixed
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function refund($transactionId, $amount = null)
     {
@@ -55,15 +60,19 @@ class StripeAdapter
         }
 
         if (!$chId) {
-            throw new Exception('Charge not found.');
+            throw new \Exception('Charge not found.');
         }
-        $ch = Charge::retrieve($chId);
-        return $ch->refund(['amount' => $amount]);
+        $refundData = ['charge' => $chId];
+        if ($amount) {
+            $refundData['amount'] = $amount;
+        }
+        return Refund::create($refundData);
     }
 
     /**
      * @param array $attributes
-     * @return array|\Exception|Charge|\Stripe\Error\Card
+     * @return Charge|PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function sale(array $attributes)
     {
@@ -82,19 +91,20 @@ class StripeAdapter
         } else {
             $pi = PaymentIntent::retrieve($attributes['pi']);
         }
+        if ($pi->status == 'requires_confirmation') {
+            $pi->confirm();
+        }
         if ($needCapture) {
-            if ($pi->status == 'requires_confirmation') {
-                $pi->confirm();
-            }
             $pi->capture(['amount' => $attributes['amount']]);
         }
         return $pi;
     }
 
     /**
-     * @param string $transactionId
+     * @param $transactionId
      * @param null $amount
-     * @return Charge
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function capture($transactionId, $amount = null)
     {
@@ -107,8 +117,9 @@ class StripeAdapter
     }
 
     /**
-     * @param string $transactionId
-     * @return Charge
+     * @param $transactionId
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function void($transactionId)
     {
@@ -119,6 +130,7 @@ class StripeAdapter
     /**
      * @param array $attributes
      * @return Customer
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function customer(array $attributes)
     {
@@ -134,7 +146,8 @@ class StripeAdapter
 
     /**
      * @param array $attributes
-     * @return array|\Exception|Charge|\Stripe\Error\Card
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function createPaymentIntent (array $attributes)
     {
@@ -142,8 +155,9 @@ class StripeAdapter
     }
 
     /**
-     * @param array $attributes
-     * @return array|\Exception|Charge|\Stripe\Error\Card
+     * @param $transactionId
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function retrievePaymentIntent ($transactionId)
     {
@@ -151,12 +165,12 @@ class StripeAdapter
     }
 
     /**
-     * @param array $attributes
-     * @return array|\Exception|Charge|\Stripe\Error\Card
+     * @param $customerId
+     * @return Customer
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function retrieveCustomer ($customerId)
     {
         return Customer::retrieve($customerId);
     }
-
 }

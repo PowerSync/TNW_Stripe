@@ -31,14 +31,14 @@ class SubjectReader
             throw new \InvalidArgumentException('Response object does not exist');
         }
 
-        if ($response['object'] instanceof \Stripe\Error\Card) {
+        if ($response['object'] instanceof \Stripe\ErrorObject) {
             return [
             'error' => true,
             'message' => __($response['object']->getMessage())
             ];
         }
 
-        return $response['object']->__toArray();
+        return $response['object']->toArray();
     }
 
     public function readPayment(array $subject)
@@ -52,7 +52,7 @@ class SubjectReader
             throw new \InvalidArgumentException('Response object does not exist');
         }
 
-        return $subject['object']->__toArray();
+        return $subject['object']->toArray();
     }
 
     public function readAmount(array $subject)

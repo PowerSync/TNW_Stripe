@@ -17,10 +17,18 @@ namespace TNW\Stripe\Gateway\Response;
 
 use Magento\Sales\Model\Order\Payment;
 
+/**
+ * Class RefundHandler
+ * @package TNW\Stripe\Gateway\Response
+ */
 class RefundHandler extends VoidHandler
 {
+    /**
+     * @param Payment $orderPayment
+     * @return bool
+     */
     protected function shouldCloseParentTransaction(Payment $orderPayment)
     {
-        return !(bool)$orderPayment->getCreditmemo()->getInvoice()->canRefund();
+        return !(bool) $orderPayment->getCreditmemo()->getInvoice()->canRefund();
     }
 }

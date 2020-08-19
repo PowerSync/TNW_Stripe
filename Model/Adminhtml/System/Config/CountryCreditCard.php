@@ -110,6 +110,7 @@ class CountryCreditCard extends Value
      *
      * @param array $value
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function encodeArrayFieldValue(array $value)
     {

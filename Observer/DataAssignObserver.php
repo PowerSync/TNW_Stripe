@@ -18,6 +18,10 @@ namespace TNW\Stripe\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Payment\Observer\AbstractDataAssignObserver;
 
+/**
+ * Class DataAssignObserver
+ * @package TNW\Stripe\Observer
+ */
 class DataAssignObserver extends AbstractDataAssignObserver
 {
     /** additional information key */

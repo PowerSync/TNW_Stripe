@@ -55,8 +55,7 @@ class CustomerDataBuilder implements BuilderInterface
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDataObject->getPayment();
         $token = $payment->getAdditionalInformation('cc_token');
-        $pm = '';
-        
+
         if (strpos($token, 'pm_') !== false) {
             $pm = $token;
         } else {

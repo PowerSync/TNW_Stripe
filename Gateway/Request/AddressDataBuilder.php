@@ -18,6 +18,10 @@ namespace TNW\Stripe\Gateway\Request;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 
+/**
+ * Class AddressDataBuilder
+ * @package TNW\Stripe\Gateway\Request
+ */
 class AddressDataBuilder implements BuilderInterface
 {
     const SHIPPING_ADDRESS = 'shipping';
@@ -32,12 +36,20 @@ class AddressDataBuilder implements BuilderInterface
 
     private $subjectReader;
 
+    /**
+     * AddressDataBuilder constructor.
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         SubjectReader $subjectReader
     ) {
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * @param array $buildSubject
+     * @return array
+     */
     public function build(array $buildSubject)
     {
         $paymentDataObject = $this->subjectReader->readPayment($buildSubject);

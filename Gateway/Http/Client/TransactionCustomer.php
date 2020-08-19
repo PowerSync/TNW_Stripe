@@ -15,9 +15,6 @@
  */
 namespace TNW\Stripe\Gateway\Http\Client;
 
-use TNW\Stripe\Gateway\Request\CaptureDataBuilder;
-use TNW\Stripe\Gateway\Request\PaymentDataBuilder;
-
 /**
  * Transaction Customer
  */

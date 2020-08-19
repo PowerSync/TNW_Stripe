@@ -17,8 +17,15 @@ namespace TNW\Stripe\Model\Adminhtml\Source;
 
 use Magento\Payment\Model\Source\Cctype as PaymentCctype;
 
+/**
+ * Class CcType
+ * @package TNW\Stripe\Model\Adminhtml\Source
+ */
 class CcType extends PaymentCctype
 {
+    /**
+     * @return array
+     */
     public function getAllowedTypes()
     {
         return ['VI', 'MC', 'AE', 'DI', 'JCB', 'DN'];

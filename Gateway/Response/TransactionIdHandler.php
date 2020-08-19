@@ -19,16 +19,31 @@ use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment;
 
+/**
+ * Class TransactionIdHandler
+ * @package TNW\Stripe\Gateway\Response
+ */
 class TransactionIdHandler implements HandlerInterface
 {
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
 
+    /**
+     * TransactionIdHandler constructor.
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         SubjectReader $subjectReader
     ) {
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * @param array $subject
+     * @param array $response
+     */
     public function handle(array $subject, array $response)
     {
         $paymentDataObject = $this->subjectReader->readPayment($subject);
@@ -48,16 +63,27 @@ class TransactionIdHandler implements HandlerInterface
         }
     }
 
+    /**
+     * @param Payment $orderPayment
+     * @param $transaction
+     */
     protected function setTransactionId(Payment $orderPayment, $transaction)
     {
         $orderPayment->setTransactionId($transaction['id']);
     }
 
+    /**
+     * @return bool
+     */
     protected function shouldCloseTransaction()
     {
         return false;
     }
 
+    /**
+     * @param Payment $orderPayment
+     * @return bool
+     */
     protected function shouldCloseParentTransaction(Payment $orderPayment)
     {
         return false;

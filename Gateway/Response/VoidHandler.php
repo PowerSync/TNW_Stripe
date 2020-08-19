@@ -16,20 +16,34 @@
 namespace TNW\Stripe\Gateway\Response;
 
 use Magento\Sales\Model\Order\Payment;
-use TNW\Stripe\Gateway\Response\TransactionIdHandler;
 
+/**
+ * Class VoidHandler
+ * @package TNW\Stripe\Gateway\Response
+ */
 class VoidHandler extends TransactionIdHandler
 {
+    /**
+     * @param Payment $orderPayment
+     * @param $transaction
+     */
     protected function setTransactionId(Payment $orderPayment, $transaction)
     {
         return;
     }
 
+    /**
+     * @return bool
+     */
     protected function shouldCloseTransaction()
     {
         return true;
     }
 
+    /**
+     * @param Payment $orderPayment
+     * @return bool
+     */
     protected function shouldCloseParentTransaction(Payment $orderPayment)
     {
         return true;

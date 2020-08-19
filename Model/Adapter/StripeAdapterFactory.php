@@ -9,7 +9,7 @@ use TNW\Stripe\Gateway\Config\Config;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * This factory is preferable to use for Braintree adapter instance creation.
+ * This factory is preferable to use for Stripe adapter instance creation.
  */
 class StripeAdapterFactory
 {
