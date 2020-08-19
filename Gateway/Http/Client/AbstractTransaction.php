@@ -41,14 +41,17 @@ abstract class AbstractTransaction implements ClientInterface
      * @var StripeAdapterFactory
      */
     protected $adapterFactory;
+
     /**
      * @var State
      */
     protected $state;
+
     /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
+
     /**
      * AbstractTransaction constructor.
      * @param LoggerInterface $logger
@@ -90,7 +93,7 @@ abstract class AbstractTransaction implements ClientInterface
             throw new ClientException($message);
         } finally {
             $log['response'] = $response['object'] instanceof StripeObject
-                ? $response['object']->__toArray(true)
+                ? $response['object']->toArray(true)
                 : [];
 
             $this->customLogger->debug($log);

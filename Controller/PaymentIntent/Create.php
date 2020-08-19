@@ -4,12 +4,15 @@ namespace TNW\Stripe\Controller\Paymentintent;
 
 use Magento\Framework\App\Action;
 use Magento\Framework\Controller\Result\RawFactory;
-use Magento\Setup\Exception;
 use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Class Create
+ * @package TNW\Stripe\Controller\Paymentintent
+ */
 class Create extends Action\Action
 {
     use Formatter;
@@ -24,11 +27,11 @@ class Create extends Action\Action
     const CUSTOMER = 'customer';
     const CAPTURE_METHOD = 'capture_method';
     const SETUP_FUTURE_USAGE = 'setup_future_usage';
+
     /**
      * @var RawFactory
      */
     private $rawFactory;
-
 
     /** @var Config  */
     private $config;
@@ -36,8 +39,13 @@ class Create extends Action\Action
     /** @var StripeAdapterFactory  */
     private $adapterFactory;
 
-
-
+    /**
+     * Create constructor.
+     * @param Action\Context $context
+     * @param RawFactory $rawFactory
+     * @param Config $config
+     * @param StripeAdapterFactory $adapterFactory
+     */
     public function __construct(
         Action\Context $context,
         RawFactory $rawFactory,
@@ -50,6 +58,9 @@ class Create extends Action\Action
         $this->adapterFactory = $adapterFactory;
     }
 
+    /**
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     */
     public function execute()
     {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);

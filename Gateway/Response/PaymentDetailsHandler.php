@@ -17,8 +17,11 @@ namespace TNW\Stripe\Gateway\Response;
 
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 
+/**
+ * Class PaymentDetailsHandler
+ * @package TNW\Stripe\Gateway\Response
+ */
 class PaymentDetailsHandler implements HandlerInterface
 {
     const RISK_LEVEL = 'risk_level';
@@ -26,6 +29,9 @@ class PaymentDetailsHandler implements HandlerInterface
     const CAPTURE = 'captured';
     const TYPE = 'type';
 
+    /**
+     * @var array
+     */
     private $additionalInformationMapping = [
         self::RISK_LEVEL,
         self::SELLER_MESSAGE,
@@ -33,8 +39,15 @@ class PaymentDetailsHandler implements HandlerInterface
         self::TYPE
     ];
 
+    /**
+     * @var SubjectReader
+     */
     private $subjectReader;
 
+    /**
+     * PaymentDetailsHandler constructor.
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         SubjectReader $subjectReader
     ) {
@@ -64,7 +77,9 @@ class PaymentDetailsHandler implements HandlerInterface
         $payment->setCcTransId($transaction['id']);
         $payment->setLastTransId($transaction['id']);
 
-        $outcome = isset($transaction['charges']['data'][0]['outcome']) ?  $transaction['charges']['data'][0]['outcome'] : [];
+        $outcome = isset($transaction['charges']['data'][0]['outcome'])
+            ? $transaction['charges']['data'][0]['outcome']
+            : [];
 
         //remove previously set payment token
         //$payment->unsAdditionalInformation('cc_token');

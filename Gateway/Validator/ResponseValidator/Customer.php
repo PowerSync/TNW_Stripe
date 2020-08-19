@@ -17,8 +17,15 @@ namespace TNW\Stripe\Gateway\Validator\ResponseValidator;
 
 use TNW\Stripe\Gateway\Validator\GeneralResponseValidator;
 
+/**
+ * Class Customer
+ * @package TNW\Stripe\Gateway\Validator\ResponseValidator
+ */
 class Customer extends GeneralResponseValidator
 {
+    /**
+     * @return array
+     */
     protected function getResponseValidators()
     {
         return [

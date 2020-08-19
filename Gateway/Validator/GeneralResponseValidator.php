@@ -19,10 +19,22 @@ use Magento\Payment\Gateway\Validator\AbstractValidator;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 
+/**
+ * Class GeneralResponseValidator
+ * @package TNW\Stripe\Gateway\Validator
+ */
 class GeneralResponseValidator extends AbstractValidator
 {
+    /**
+     * @var SubjectReader
+     */
     protected $subjectReader;
 
+    /**
+     * GeneralResponseValidator constructor.
+     * @param ResultInterfaceFactory $resultFactory
+     * @param SubjectReader $subjectReader
+     */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
         SubjectReader $subjectReader
@@ -31,6 +43,10 @@ class GeneralResponseValidator extends AbstractValidator
         $this->subjectReader = $subjectReader;
     }
 
+    /**
+     * @param array $subject
+     * @return \Magento\Payment\Gateway\Validator\ResultInterface
+     */
     public function validate(array $subject)
     {
         $response = $this->subjectReader->readResponseObject($subject);
@@ -51,6 +67,9 @@ class GeneralResponseValidator extends AbstractValidator
         return $this->createResult($isValid, $errorMessages);
     }
 
+    /**
+     * @return array
+     */
     protected function getResponseValidators()
     {
         return [

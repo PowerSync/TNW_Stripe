@@ -15,8 +15,16 @@
  */
 namespace TNW\Stripe\Helper\Payment;
 
+/**
+ * Trait Formatter
+ * @package TNW\Stripe\Helper\Payment
+ */
 trait Formatter
 {
+    /**
+     * @param $price
+     * @return mixed
+     */
     public function formatPrice($price)
     {
         $price = sprintf('%.2F', $price);

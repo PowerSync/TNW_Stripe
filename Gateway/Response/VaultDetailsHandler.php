@@ -70,6 +70,8 @@ class VaultDetailsHandler implements HandlerInterface
         Config $config,
         PaymentTokenManagement $paymentTokenManagement
     ) {
+
+        //TODO: supposed issues with unexisting OrderPaymentExtensionInterface
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
