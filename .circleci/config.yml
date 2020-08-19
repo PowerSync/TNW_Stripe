@@ -56,8 +56,7 @@ jobs:
               composer config repositories.TNW_$moduleName git git@github.com:PowerSync/TNW_$moduleName.git
 
               moduleNameLower=(`echo $moduleName| tr '[:upper:]' '[:lower:]'`)
-              if [[ $moduleNameLower=='stripe' ]]
-              then
+              if [[ $moduleNameLower == 'stripe' ]]; then
                 moduleNameLower="module-${moduleNameLower}"
               fi
               set +e
