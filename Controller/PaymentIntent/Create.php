@@ -8,6 +8,8 @@ use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Customer\Model\Session;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Class Create
@@ -39,6 +41,12 @@ class Create extends Action\Action
     /** @var StripeAdapterFactory  */
     private $adapterFactory;
 
+    /** @var Session */
+    private $session;
+
+    /** @var CheckoutSession */
+    private $checkoutSession;
+
     /**
      * Create constructor.
      * @param Action\Context $context
@@ -50,12 +58,16 @@ class Create extends Action\Action
         Action\Context $context,
         RawFactory $rawFactory,
         Config $config,
-        StripeAdapterFactory $adapterFactory
+        StripeAdapterFactory $adapterFactory,
+        Session $session,
+        CheckoutSession $checkoutSession
     ) {
         parent::__construct($context);
         $this->rawFactory = $rawFactory;
         $this->config = $config;
         $this->adapterFactory = $adapterFactory;
+        $this->session = $session;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -69,9 +81,21 @@ class Create extends Action\Action
         $amount   = $data->amount;
         $currency = $data->currency;
 
+        $attributes = ['payment_method' => $payment->id];
+
+        // for login customers while enable vault in configuration and vault not checked in frontend case
+        $email = $this->checkoutSession->getQuote()->getBillingAddress()->getEmail();
+        $isLoggedIn = $this->session->isLoggedIn();
+        if (($isLoggedIn && isset($data->vaultEnabled) && $data->vaultEnabled === false)) {
+            $attributes['email'] = $email;
+        } elseif (!$isLoggedIn) {
+            $attributes['email'] = $email;
+            $attributes['description'] = 'guest';
+        }
+
         try {
             $stripeAdapter = $this->adapterFactory->create();
-            $cs = $stripeAdapter->customer(['payment_method' => $payment->id]);
+            $cs = $stripeAdapter->customer($attributes);
             $params = [
                 self::CUSTOMER => $cs->id,
                 self::AMOUNT => $this->formatPrice($amount),

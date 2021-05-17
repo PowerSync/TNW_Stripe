@@ -90,6 +90,7 @@ class StripeAdapter
             $pi = PaymentIntent::create($attributes);
         } else {
             $pi = PaymentIntent::retrieve($attributes['pi']);
+            if (isset($attributes['description'])) $pi->update($attributes['pi'], ['description' => $attributes['description']]);
         }
         if ($pi->status == 'requires_confirmation') {
             $pi->confirm();

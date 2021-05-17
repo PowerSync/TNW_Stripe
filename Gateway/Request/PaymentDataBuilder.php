@@ -27,7 +27,7 @@ use TNW\Stripe\Gateway\Config\Config;
 class PaymentDataBuilder implements BuilderInterface
 {
     use Formatter;
-  
+
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const DESCRIPTION = 'description';
@@ -74,7 +74,8 @@ class PaymentDataBuilder implements BuilderInterface
             self::CURRENCY => $order->getCurrencyCode(),
             self::PAYMENT_METHOD_TYPES => ['card'],
             self::CONFIRMATION_METHOD => 'manual',
-            self::CAPTURE_METHOD => 'manual'
+            self::CAPTURE_METHOD => 'manual',
+            self::DESCRIPTION => $this->subjectReader->getOrderIncrementId($payment)
         ];
 
         if ($this->config->isReceiptEmailEnabled()) {
