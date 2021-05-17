@@ -19,10 +19,12 @@ use Magento\Payment\Gateway\Helper;
 
 class SubjectReader
 {
-  /**
-   * @param array $subject
-   * @return array
-   */
+    const TRANSACTION_DESCRIPTION = 'Order #';
+
+    /**
+     * @param array $subject
+     * @return array
+     */
     public function readResponseObject(array $subject)
     {
         $response = Helper\SubjectReader::readResponse($subject);
@@ -33,8 +35,8 @@ class SubjectReader
 
         if ($response['object'] instanceof \Stripe\ErrorObject) {
             return [
-            'error' => true,
-            'message' => __($response['object']->getMessage())
+                'error' => true,
+                'message' => __($response['object']->getMessage())
             ];
         }
 
@@ -67,5 +69,11 @@ class SubjectReader
         }
 
         return (int) $subject['customer_id'];
+    }
+
+    public function getOrderIncrementId(\Magento\Sales\Api\Data\OrderPaymentInterface $payment)
+    {
+        $incrementId = $payment->getOrder()->getIncrementId();
+        return SELF::TRANSACTION_DESCRIPTION . $incrementId;
     }
 }
