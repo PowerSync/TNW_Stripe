@@ -16,7 +16,12 @@
 namespace TNW\Stripe\Gateway\Helper;
 
 use Magento\Payment\Gateway\Helper;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 
+/**
+ * Class SubjectReader
+ * @package TNW\Stripe\Gateway\Helper
+ */
 class SubjectReader
 {
     const TRANSACTION_DESCRIPTION = 'Order #';
@@ -71,9 +76,8 @@ class SubjectReader
         return (int) $subject['customer_id'];
     }
 
-    public function getOrderIncrementId(\Magento\Sales\Api\Data\OrderPaymentInterface $payment)
+    public function getOrderIncrementId(OrderPaymentInterface $payment)
     {
-        $incrementId = $payment->getOrder()->getIncrementId();
-        return SELF::TRANSACTION_DESCRIPTION . $incrementId;
+        return SELF::TRANSACTION_DESCRIPTION . $payment->getOrder()->getIncrementId();
     }
 }
