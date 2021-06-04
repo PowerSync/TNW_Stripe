@@ -123,7 +123,6 @@ define([
             var self = this,
                 dfd = $.Deferred();
             if ($("#tnw_stripe_enable_vault").length) {
-                console.log(customerData);
                 arguments[0].vaultEnabled = $('#tnw_stripe_enable_vault').is(':checked');
             }
             $.post(
@@ -218,7 +217,7 @@ define([
                     if (result.paymentIntent.status == "requires_action"
                         || result.paymentIntent.status == "requires_source_action")
                     {
-                        return self.handleCardAction(paymentIntentId, done);
+                            return self.handleCardAction(paymentIntentId, done);
                     }
                     return done(false, result);
                 });

@@ -27,7 +27,7 @@ use TNW\Stripe\Gateway\Config\Config;
 class PaymentDataBuilder implements BuilderInterface
 {
     use Formatter;
-
+  
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const DESCRIPTION = 'description';
