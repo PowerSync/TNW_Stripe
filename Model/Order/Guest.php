@@ -108,7 +108,6 @@ class Guest
             ];
             $stripeAdapter->updateCustomer($cid, $arrayParams);
             $guestOrder->setGuestOrderExported(1)->save();
-
         } catch (\Exception $e) {
             $response[] = ['error' => ['message' => $e->getMessage()]];
         }

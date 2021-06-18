@@ -99,7 +99,6 @@ class Create extends Action\Action
                 'metadata' => ['site' => $this->_url->getBaseUrl()]
             ];
 
-
             // for login customers while enable vault in configuration and vault not checked in frontend case
             $email = $this->checkoutSession->getQuote()->getBillingAddress()->getEmail();
             $isLoggedIn = $this->session->isLoggedIn();
