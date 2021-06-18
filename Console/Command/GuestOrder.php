@@ -7,9 +7,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TNW\Stripe\Model\Order\Guest;
+
 /**
  * Class GuestOrder
- * @package TNW\Stripe\Console\Command
  */
 class GuestOrder extends Command
 {
@@ -46,7 +46,6 @@ class GuestOrder extends Command
     {
         $this->setName('tnw:exportguestorders');
         $this->setDescription('Export Guest Orders to Stripe');
-
         parent::configure();
     }
 
@@ -56,7 +55,6 @@ class GuestOrder extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->appState->emulateAreaCode(Area::AREA_FRONTEND, [$this, 'export'], [$input, $output]);
-
     }
 
     /**

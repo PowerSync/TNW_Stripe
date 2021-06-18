@@ -15,11 +15,10 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Eav\Api\Data\AttributeSetInterfaceFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
+use Magento\Framework\DB\Ddl\Table;
 
 /**
  * Class UpgradeData
- *
- * @package TNW\QuickbooksBasic\Setup
  */
 class UpgradeData implements UpgradeDataInterface
 {
@@ -84,12 +83,8 @@ class UpgradeData implements UpgradeDataInterface
             $this->version_2_1_7($context, $setup);
         }
 
-        if (version_compare($context->getVersion(), "2.3.2", "<=")) {
+        if (version_compare($context->getVersion(), "2.3.2", "<")) {
             $this->version_2_3_2($setup);
-        }
-
-        if (version_compare($context->getVersion(), "2.3.3", "<=")) {
-            $this->version_2_3_3($setup);
         }
         $setup->endSetup();
     }
@@ -120,7 +115,7 @@ class UpgradeData implements UpgradeDataInterface
     ) {
         $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
         $eavSetup->removeAttribute(
-            \Magento\Customer\Model\Customer::ENTITY,
+            Customer::ENTITY,
             'stripe_id'
         );
         /** @var CustomerSetup $customerSetup */
@@ -145,28 +140,21 @@ class UpgradeData implements UpgradeDataInterface
             'system' => 0,
         ]);
         //add attribute to attribute set
-        $attribute = $customerSetup->getEavConfig()->getAttribute(Customer::ENTITY, 'stripe_id')
+        $customerSetup->getEavConfig()->getAttribute(Customer::ENTITY, 'stripe_id')
             ->addData([
                 'attribute_set_id' => $attributeSetId,
                 'attribute_group_id' => $attributeGroupId,
                 'used_in_forms' => ['adminhtml_customer'],
-            ]);
+            ])
+            ->save();
 
-        $attribute->save();
-    }
-
-    /**
-     * @param $setup
-     */
-    protected function version_2_3_3($setup)
-    {
         /** @var \Magento\Sales\Setup\SalesSetup $salesInstaller */
         $salesInstaller = $this->salesSetupFactory->create(['resourceName' => 'sales_setup', 'setup' => $setup]);
         $salesInstaller->addAttribute(
             'order',
             'guest_order_exported',
             [
-                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'type' => Table::TYPE_TEXT,
                 'length'=> 255,
                 'visible' => false,
                 'nullable' => true
