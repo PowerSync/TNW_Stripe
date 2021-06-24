@@ -20,7 +20,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
  * Class SubjectReader
- * @package TNW\Stripe\Gateway\Helper
+ * Helper for reading API responses.
  */
 class SubjectReader
 {
@@ -76,6 +76,10 @@ class SubjectReader
         return (int) $subject['customer_id'];
     }
 
+    /**
+     * @param OrderPaymentInterface $payment
+     * @return string
+     */
     public function getOrderIncrementId(OrderPaymentInterface $payment)
     {
         return SELF::TRANSACTION_DESCRIPTION . $payment->getOrder()->getIncrementId();
