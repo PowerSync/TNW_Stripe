@@ -2,9 +2,10 @@
 namespace TNW\Stripe\Helper;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+
 /**
- * Class Customer
- * @package TNW\Stripe\Helper
+ * Class Customer.
+ * Updates stripe_id customer attribute.
  */
 class Customer
 {
@@ -35,7 +36,6 @@ class Customer
     {
         try {
             $customer = $this->customerRepository->get($email);
-            //$customer->setData('stripe_id', $cs);
             $customer->setCustomAttribute('stripe_id', $cs);
             $this->customerRepository->save($customer);
         } catch (\Exception $exception) {

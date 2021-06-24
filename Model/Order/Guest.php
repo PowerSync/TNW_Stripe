@@ -8,9 +8,10 @@ use Magento\Sales\Model\ResourceModel\Order\Collection;
 use TNW\Stripe\Helper\Customer as CustomerHelper;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use TNW\Stripe\Helper\Payment\Formatter;
+
 /**
  * Class Guest
- * @package TNW\Stripe\Model\Order
+ * Guest orders actializer in Stripe.
  */
 class Guest
 {
@@ -52,17 +53,11 @@ class Guest
      */
     public function getGuestOrders()
     {
-        /**
-         * @var Collection $orderCollecion
-         */
-        $orderCollecion = $this->orderCollectionFactory
+        return $this->orderCollectionFactory
             ->create()
-            ->addFieldToSelect('*');
-
-        $orderCollecion
+            ->addFieldToSelect('*')
             ->addAttributeToFilter('customer_is_guest', ['eq' => 1])
             ->addAttributeToFilter('guest_order_exported', ['null' => null]);
-        return $orderCollecion;
     }
 
     /**
@@ -73,8 +68,7 @@ class Guest
     public function exportGuestOrders()
     {
         $response = [];
-        $orderCollection = $this->getGuestOrders();
-        foreach ($orderCollection as $guestOrder) {
+        foreach ($this->getGuestOrders() as $guestOrder) {
             $response[] = $this->export($guestOrder);
         }
         return $response;

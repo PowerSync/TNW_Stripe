@@ -14,8 +14,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Class Create
- *
- * @package TNW\Stripe\Controller\Paymentintent
+ * Perform Payment and Customer Api requests to Stripe.
  */
 class Create extends Action\Action
 {
@@ -102,9 +101,9 @@ class Create extends Action\Action
             // for login customers while enable vault in configuration and vault not checked in frontend case
             $email = $this->checkoutSession->getQuote()->getBillingAddress()->getEmail();
             $isLoggedIn = $this->session->isLoggedIn();
-            if (($isLoggedIn)) {
+            if ($isLoggedIn) {
                 $attributes['email'] = $email;
-            } elseif (!$isLoggedIn) {
+            } else {
                 $attributes['email'] = $email;
                 $attributes['description'] = 'guest';
             }

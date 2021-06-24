@@ -1,4 +1,5 @@
 <?php
+
 namespace TNW\Stripe\Console\Command;
 
 use Magento\Framework\App\Area;
@@ -9,7 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TNW\Stripe\Model\Order\Guest;
 
 /**
- * Class GuestOrder
+ * Class GuestOrder.
+ * Console command responsible for actualizing guest orders in Stripe.
  */
 class GuestOrder extends Command
 {
