@@ -306,13 +306,13 @@ workflows:
               context: powersync
               filters:
                   branches:
-                      only: /.*/
+                      only: master
 
       -   m234-open_source-php72:
               context: powersync
               filters:
                   branches:
-                      only: /.*/
+                      only: master
 
       -   m235-commerce-php73:
               context: powersync
