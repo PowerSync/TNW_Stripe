@@ -122,6 +122,9 @@ define([
         createPaymentIntent: function () {
             var self = this,
                 dfd = $.Deferred();
+            if ($("#tnw_stripe_enable_vault").length) {
+                arguments[0].vaultEnabled = $('#tnw_stripe_enable_vault').is(':checked');
+            }
             $.post(
                 self.getCreateUrl(),
                 {data: JSON.stringify(arguments[0])}

@@ -90,6 +90,9 @@ class StripeAdapter
             $pi = PaymentIntent::create($attributes);
         } else {
             $pi = PaymentIntent::retrieve($attributes['pi']);
+            if (isset($attributes['description'])) {
+                $pi->update($attributes['pi'], ['description' => $attributes['description']]);
+            }
         }
         if ($pi->status == 'requires_confirmation') {
             $pi->confirm();
@@ -140,6 +143,12 @@ class StripeAdapter
             Customer::update($id, $attributes);
             $cs = Customer::retrieve($id);
             return $cs;
+        } elseif (isset($attributes['email'])) {
+            foreach (Customer::all() as $customer) {
+                if ($attributes['email'] == $customer->email && $customer->metadata->site == $attributes['metadata']['site']) {
+                    return $customer;
+                }
+            }
         }
         return Customer::create($attributes);
     }
@@ -162,6 +171,17 @@ class StripeAdapter
     public function retrievePaymentIntent ($transactionId)
     {
         return PaymentIntent::retrieve($transactionId);
+    }
+
+    /**
+     * @param $id
+     * @param $attributes
+     * @return Customer
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function updateCustomer($id, $attributes)
+    {
+        return Customer::update($id, $attributes);
     }
 
     /**
