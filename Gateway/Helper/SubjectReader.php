@@ -16,13 +16,20 @@
 namespace TNW\Stripe\Gateway\Helper;
 
 use Magento\Payment\Gateway\Helper;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 
+/**
+ * Class SubjectReader
+ * Helper for reading API responses.
+ */
 class SubjectReader
 {
-  /**
-   * @param array $subject
-   * @return array
-   */
+    const TRANSACTION_DESCRIPTION = 'Order #';
+
+    /**
+     * @param array $subject
+     * @return array
+     */
     public function readResponseObject(array $subject)
     {
         $response = Helper\SubjectReader::readResponse($subject);
@@ -33,8 +40,8 @@ class SubjectReader
 
         if ($response['object'] instanceof \Stripe\ErrorObject) {
             return [
-            'error' => true,
-            'message' => __($response['object']->getMessage())
+                'error' => true,
+                'message' => __($response['object']->getMessage())
             ];
         }
 
@@ -67,5 +74,14 @@ class SubjectReader
         }
 
         return (int) $subject['customer_id'];
+    }
+
+    /**
+     * @param OrderPaymentInterface $payment
+     * @return string
+     */
+    public function getOrderIncrementId(OrderPaymentInterface $payment)
+    {
+        return SELF::TRANSACTION_DESCRIPTION . $payment->getOrder()->getIncrementId();
     }
 }

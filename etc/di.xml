@@ -372,4 +372,12 @@
       <argument name="config" xsi:type="object">TNW\Stripe\Gateway\Config\Config</argument>
     </arguments>
   </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="stripeOrder" xsi:type="object">TNW\Stripe\Console\Command\GuestOrder</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

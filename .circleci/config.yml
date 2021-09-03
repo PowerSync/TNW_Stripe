@@ -56,7 +56,9 @@ jobs:
               composer config repositories.TNW_$moduleName git git@github.com:PowerSync/TNW_$moduleName.git
 
               moduleNameLower=(`echo $moduleName| tr '[:upper:]' '[:lower:]'`)
-
+              if [[ $moduleNameLower == 'stripe' ]]; then
+                moduleNameLower="module-${moduleNameLower}"
+              fi
               set +e
                 branchExists=(`composer info -a tnw/$moduleNameLower|grep "versions : .*dev-$CIRCLE_BRANCH[^0-9a-zA-Z-]"`)
               set -e
