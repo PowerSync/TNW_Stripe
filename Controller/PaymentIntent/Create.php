@@ -1,17 +1,21 @@
 <?php
 
-namespace TNW\Stripe\Controller\Paymentintent;
+namespace TNW\Stripe\Controller\PaymentIntent;
 
 use Magento\Framework\App\Action;
 use Magento\Framework\Controller\Result\RawFactory;
 use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
+use TNW\Stripe\Helper\Customer as CustomerHelper;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Customer\Model\Session;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Class Create
- * @package TNW\Stripe\Controller\Paymentintent
+ * @package TNW\Stripe\Controller\PaymentIntent
+ * Perform Payment and Customer Api requests to Stripe.
  */
 class Create extends Action\Action
 {
@@ -29,15 +33,26 @@ class Create extends Action\Action
     const SETUP_FUTURE_USAGE = 'setup_future_usage';
 
     /**
+     * @var CustomerHelper
+     */
+    protected $customerHelper;
+
+    /**
      * @var RawFactory
      */
     private $rawFactory;
 
-    /** @var Config  */
+    /** @var Config */
     private $config;
 
-    /** @var StripeAdapterFactory  */
+    /** @var StripeAdapterFactory */
     private $adapterFactory;
+
+    /** @var Session */
+    private $session;
+
+    /** @var CheckoutSession */
+    private $checkoutSession;
 
     /**
      * Create constructor.
@@ -45,17 +60,26 @@ class Create extends Action\Action
      * @param RawFactory $rawFactory
      * @param Config $config
      * @param StripeAdapterFactory $adapterFactory
+     * @param Session $session
+     * @param CheckoutSession $checkoutSession
+     * @param CustomerHelper $customerHelper
      */
     public function __construct(
         Action\Context $context,
         RawFactory $rawFactory,
         Config $config,
-        StripeAdapterFactory $adapterFactory
+        StripeAdapterFactory $adapterFactory,
+        Session $session,
+        CheckoutSession $checkoutSession,
+        CustomerHelper $customerHelper
     ) {
         parent::__construct($context);
         $this->rawFactory = $rawFactory;
         $this->config = $config;
         $this->adapterFactory = $adapterFactory;
+        $this->session = $session;
+        $this->checkoutSession = $checkoutSession;
+        $this->customerHelper = $customerHelper;
     }
 
     /**
@@ -65,13 +89,29 @@ class Create extends Action\Action
     {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $data = json_decode($this->_request->getParam('data'));
-        $payment  = $data->paymentMethod;
-        $amount   = $data->amount;
+        $payment = $data->paymentMethod;
+        $amount = $data->amount;
         $currency = $data->currency;
 
         try {
+            $attributes = [
+                'payment_method' => $payment->id,
+                'metadata' => ['site' => $this->_url->getBaseUrl()]
+            ];
+
+            // for login customers while enable vault in configuration and vault not checked in frontend case
+            $email = $this->checkoutSession->getQuote()->getBillingAddress()->getEmail();
+            $isLoggedIn = $this->session->isLoggedIn();
+            if ($isLoggedIn) {
+                $attributes['email'] = $email;
+            } else {
+                $attributes['email'] = $email;
+                $attributes['description'] = 'guest';
+            }
+
             $stripeAdapter = $this->adapterFactory->create();
-            $cs = $stripeAdapter->customer(['payment_method' => $payment->id]);
+            $cs = $stripeAdapter->customer($attributes);
+            $this->customerHelper->updateCustomerStripeId($attributes['email'], $cs->id);
             $params = [
                 self::CUSTOMER => $cs->id,
                 self::AMOUNT => $this->formatPrice($amount),
@@ -86,7 +126,7 @@ class Create extends Action\Action
             // 3ds could be done automaticly, need check that and skeep on frontend
             if (is_null($paymentIntent->next_action) && !
                 ($paymentIntent->status == "requires_action" || $paymentIntent->status == "requires_source_action")) {
-                $response->setData(['skip_3ds' => true,'paymentIntent' => $paymentIntent]);
+                $response->setData(['skip_3ds' => true, 'paymentIntent' => $paymentIntent]);
 
                 return $response;
             }
