@@ -1,6 +1,6 @@
 <?php
 
-namespace TNW\Stripe\Controller\Paymentintent;
+namespace TNW\Stripe\Controller\PaymentIntent;
 
 use Magento\Framework\App\Action;
 use Magento\Framework\Controller\Result\RawFactory;
