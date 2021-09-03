@@ -37,7 +37,9 @@ class TransactionSale extends AbstractTransaction
                 if ($this->getCurrentUrl() === $this->getAdminOrdersUrl() && !isset($data['customer'])) {
                     unset($data['payment_method']);
                 } else {
-                    unset($data['pi']);
+                    if (isset($data['payment_method']) && $data['payment_method']) {
+                        unset($data['pi']);
+                    }
                     unset($data['source']);
                 }
             }

@@ -1,6 +1,6 @@
 <?php
 
-namespace TNW\Stripe\Controller\Paymentintent;
+namespace TNW\Stripe\Controller\PaymentIntent;
 
 use Magento\Framework\App\Action;
 use Magento\Framework\Controller\Result\RawFactory;
@@ -14,6 +14,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Class Create
+ * @package TNW\Stripe\Controller\PaymentIntent
  * Perform Payment and Customer Api requests to Stripe.
  */
 class Create extends Action\Action
