@@ -1,6 +1,6 @@
 <?php
 
-namespace TNW\Stripe\Controller\Paymentintent;
+namespace TNW\Stripe\Controller\PaymentIntent;
 
 use Magento\Framework\App\Action;
 use Magento\Framework\Controller\Result\RawFactory;
@@ -11,7 +11,7 @@ use Magento\Framework\Controller\ResultFactory;
 
 /**
  * Class Create
- * @package TNW\Stripe\Controller\Paymentintent
+ * @package TNW\Stripe\Controller\PaymentIntent
  */
 class Create extends Action\Action
 {
