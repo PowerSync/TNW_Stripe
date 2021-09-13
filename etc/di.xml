@@ -380,4 +380,9 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Quote\Api\CartManagementInterface">
+        <plugin name="CartManagementInterfacePlugin"
+                type="TNW\Stripe\Plugin\Quote\Api\CartManagement"
+                sortOrder="1"/>
+    </type>
 </config>

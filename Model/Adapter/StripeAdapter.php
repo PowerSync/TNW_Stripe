@@ -174,6 +174,16 @@ class StripeAdapter
     }
 
     /**
+     * @param $transactionId
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function cancelPaymentIntent($transactionId)
+    {
+        return PaymentIntent::retrieve($transactionId)->cancel();
+    }
+
+    /**
      * @param $id
      * @param $attributes
      * @return Customer
