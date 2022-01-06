@@ -320,7 +320,7 @@
       <argument name="requestBuilder" xsi:type="object">StripeVoidRequest</argument>
       <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionVoid</argument>
       <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\VoidHandler</argument>
-      <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\GeneralResponseValidator</argument>
+      <argument name="validator" xsi:type="object">StripeRefundResponseValidator</argument>
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
     </arguments>
   </virtualType>
@@ -338,9 +338,16 @@
     <arguments>
       <argument name="requestBuilder" xsi:type="object">StripeRefundRequest</argument>
       <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionRefund</argument>
-      <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\GeneralResponseValidator</argument>
+      <argument name="validator" xsi:type="object">StripeRefundResponseValidator</argument>
       <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\RefundHandler</argument>
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="StripeRefundResponseValidator" type="TNW\Stripe\Gateway\Validator\GeneralResponseValidator">
+    <arguments>
+      <argument name="responseStatuses" xsi:type="array">
+        <item name="canceled" xsi:type="string">canceled</item>
+      </argument>
     </arguments>
   </virtualType>
   <virtualType name="StripeRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">

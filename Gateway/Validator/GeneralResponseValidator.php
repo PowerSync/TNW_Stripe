@@ -31,16 +31,28 @@ class GeneralResponseValidator extends AbstractValidator
     protected $subjectReader;
 
     /**
+     * @var array
+     */
+    protected $responseStatuses = ['succeeded'];
+
+    /**
      * GeneralResponseValidator constructor.
      * @param ResultInterfaceFactory $resultFactory
      * @param SubjectReader $subjectReader
+     * @param array $responseStatuses
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        SubjectReader $subjectReader
+        SubjectReader $subjectReader,
+        $responseStatuses = []
     ) {
         parent::__construct($resultFactory);
         $this->subjectReader = $subjectReader;
+        if ($responseStatuses) {
+            foreach ($responseStatuses as $status) {
+                $this->responseStatuses[] = $status;
+            }
+        }
     }
 
     /**
@@ -78,7 +90,7 @@ class GeneralResponseValidator extends AbstractValidator
                     return [false, [__($response['message'])]];
                 }
 
-                if ($response['status'] !== 'succeeded') {
+                if (!in_array($response['status'],$this->responseStatuses)) {
                     return [false, [__('Stripe error response.')]];
                 }
 
