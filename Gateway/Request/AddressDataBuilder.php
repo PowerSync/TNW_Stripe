@@ -61,8 +61,12 @@ class AddressDataBuilder implements BuilderInterface
         if ($shippingAddress) {
             $result[self::SHIPPING_ADDRESS] = [
                 'address' => [
-                    self::STREET_ADDRESS => $shippingAddress->getStreetLine(1),
-                    self::EXTENDED_ADDRESS => $shippingAddress->getStreetLine(2),
+                    self::STREET_ADDRESS => method_exists($shippingAddress, 'getStreetLine')
+                        ? $shippingAddress->getStreetLine(1)
+                        : $shippingAddress->getStreetLine1(),
+                    self::EXTENDED_ADDRESS => method_exists($shippingAddress, 'getStreetLine')
+                        ? $shippingAddress->getStreetLine(2)
+                        : $shippingAddress->getStreetLine2(),
                     self::LOCALITY => $shippingAddress->getCity(),
                     self::REGION => $shippingAddress->getRegionCode(),
                     self::POSTAL_CODE => $shippingAddress->getPostcode(),
