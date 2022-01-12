@@ -90,7 +90,7 @@ class GeneralResponseValidator extends AbstractValidator
                     return [false, [__($response['message'])]];
                 }
 
-                if (!in_array($response['status'],$this->responseStatuses)) {
+                if (!in_array($response['status'], $this->responseStatuses)) {
                     return [false, [__('Stripe error response.')]];
                 }
 

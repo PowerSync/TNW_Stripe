@@ -212,6 +212,7 @@
     <arguments>
       <argument name="builders" xsi:type="array">
         <item name="capture" xsi:type="string">TNW\Stripe\Gateway\Request\CustomerDataBuilder</item>
+        <item name="address" xsi:type="string">TNW\Stripe\Gateway\Request\AddressDataBuilder</item>
         <item name="store" xsi:type="string">TNW\Stripe\Gateway\Request\StoreDataBuilder</item>
       </argument>
     </arguments>

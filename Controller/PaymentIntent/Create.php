@@ -122,6 +122,20 @@ class Create extends Action\Action
                 self::SETUP_FUTURE_USAGE => 'off_session'
             ];
             $params[self::PAYMENT_METHOD] = $payment->id;
+            if (!$this->checkoutSession->getQuote()->isVirtual()) {
+                $shippingAddress = $this->checkoutSession->getQuote()->getShippingAddress();
+                $params['shipping'] = [
+                    'address' => [
+                        'city' => $shippingAddress->getCity(),
+                        'country' => $shippingAddress->getCountryId(),
+                        'line1' => $shippingAddress->getStreetLine(1),
+                        'line2' => $shippingAddress->getStreetLine(2),
+                        'postal_code' => $shippingAddress->getPostcode(),
+                        'state' => $shippingAddress->getRegion()
+                    ],
+                    'name' => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname()
+                ];
+            }
             $paymentIntent = $stripeAdapter->createPaymentIntent($params);
             // 3ds could be done automaticly, need check that and skeep on frontend
             if (is_null($paymentIntent->next_action) && !

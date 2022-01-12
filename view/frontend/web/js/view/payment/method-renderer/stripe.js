@@ -250,6 +250,40 @@ define([
         return stripeData;
       },
 
+        /**
+         * Address
+         * @return {{name: string, address_country: string, address_line1: *}}
+         */
+        getShippingData: function () {
+            var shippingAddress = quote.shippingAddress();
+
+            var stripeData = null;
+
+            if (shippingAddress) {
+                stripeData = {
+                    name: shippingAddress.firstname + ' ' + shippingAddress.lastname,
+                    address: {
+                        country: shippingAddress.countryId,
+                        line1: shippingAddress.street[0]
+                    }
+                };
+
+                if (shippingAddress.street.length === 2) {
+                    stripeData.address.line2 = shippingAddress.street[1];
+                }
+
+                if (shippingAddress.hasOwnProperty('postcode')) {
+                    stripeData.address.postal_code = shippingAddress.postcode;
+                }
+
+                if (shippingAddress.hasOwnProperty('regionCode')) {
+                    stripeData.address.state = shippingAddress.regionCode;
+                }
+            }
+
+            return stripeData;
+        },
+
       /**
        * Get full selector name
        *
@@ -396,9 +430,10 @@ define([
             }
 
               adapter.createPaymentIntent({
-                paymentMethod: response.paymentMethod,
-                amount: quote.totals()['base_grand_total'],
-                currency: currencyCode
+                  paymentMethod: response.paymentMethod,
+                  amount: quote.totals()['base_grand_total'],
+                  currency: currencyCode,
+                  shipping: self.getShippingData()
             }).done(function (response) {
                 if (response.skip_3ds) {
                     fullScreenLoader.stopLoader(true);

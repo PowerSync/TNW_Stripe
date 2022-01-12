@@ -31,8 +31,12 @@ class TransactionSale extends AbstractTransaction
             $storeId = isset($data['store_id']) ? $data['store_id'] : null;
             // sending store id and other additional keys are restricted by Stripe API
             unset($data['store_id']);
-            unset($data['shipping']);
-
+            if (!array_key_exists('payment_method', $data)
+                || !array_key_exists('customer', $data)
+                || (!$data['payment_method'] && !$data['customer'])
+            ) {
+                unset($data['shipping']);
+            }
             if ($this->getArea() === Area::AREA_ADMINHTML) {
                 if ($this->getCurrentUrl() === $this->getAdminOrdersUrl() && !isset($data['customer'])) {
                     unset($data['payment_method']);
