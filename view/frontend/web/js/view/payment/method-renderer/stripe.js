@@ -231,7 +231,8 @@ define([
           name: billingAddress.firstname + ' ' + billingAddress.lastname,
           address: {
               country: billingAddress.countryId,
-              line1: billingAddress.street[0]
+              line1: billingAddress.street[0],
+              city: billingAddress.city
           }
         };
 
