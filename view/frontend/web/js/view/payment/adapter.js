@@ -61,37 +61,7 @@ define([
         },
 
         /**
-         * create source by cart
-         * @return {jQuery.Deferred}
-         */
-        createSourceByCart: function (sourceData) {
-            return this.createSource.call(this, this.stripeCardNumber, sourceData);
-        },
-
-        /**
-         * create source
-         * @return {jQuery.Deferred}
-         */
-        createSource: function () {
-            var self = this,
-                dfd = $.Deferred();
-
-            this.getApiClient()
-                .createSource.apply(this.getApiClient(), arguments)
-                .then(function (response) {
-                    if (response.error) {
-                        self.showError(response.error.message);
-                        dfd.reject(response);
-                    } else {
-                        dfd.resolve(response);
-                    }
-                });
-
-            return dfd;
-        },
-
-        /**
-         * create source by cart
+         * create payment method by cart
          * @return {jQuery.Deferred}
          */
         createPaymentMethodByCart: function (sourceData) {
@@ -119,6 +89,7 @@ define([
 
             return dfd;
         },
+
         createPaymentIntent: function () {
             var self = this,
                 dfd = $.Deferred();
@@ -136,26 +107,6 @@ define([
                     dfd.resolve(response);
                 }
             });
-            return dfd;
-        },
-        /**
-         * @return {jQuery.Deferred}
-         */
-        retrieveSource: function() {
-            var self = this,
-                dfd = $.Deferred();
-
-            this.getApiClient()
-                .retrieveSource.apply(this.getApiClient(), arguments)
-                .then(function (response) {
-                    if (response.error) {
-                        self.showError(response.error.message);
-                        dfd.reject(response);
-                    } else {
-                        dfd.resolve(response);
-                    }
-                });
-
             return dfd;
         },
 
