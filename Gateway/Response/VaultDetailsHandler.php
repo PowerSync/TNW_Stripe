@@ -26,7 +26,6 @@ use Magento\Vault\Model\PaymentTokenManagement;
 
 /**
  * Class VaultDetailsHandler
- * @package TNW\Stripe\Gateway\Response
  */
 class VaultDetailsHandler implements HandlerInterface
 {
@@ -116,37 +115,64 @@ class VaultDetailsHandler implements HandlerInterface
                 $payment->getAdditionalInformation('customer_id')
             );
         }
-
+        list($expirationMonth, $expirationYear, $maskedCC) = $this->getCardInfo($payment, $transaction);
         if (!$paymentToken) {
             /** @var \Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken */
             $paymentToken = $this->paymentTokenFactory->create();
             $paymentToken->setGatewayToken($transaction['customer'] . '/' . $transaction['payment_method']);
-            $paymentToken->setExpiresAt($this->getExpirationDate($payment));
+            $paymentToken->setExpiresAt($this->getExpirationDate($expirationMonth, $expirationYear));
 
             $paymentToken->setTokenDetails($this->convertDetailsToJSON([
                 'type' => $this->getCreditCardType($payment->getAdditionalInformation('cc_type')),
-                'maskedCC' => $payment->getAdditionalInformation('cc_last4'),
-                'expirationDate' => "{$payment->getAdditionalInformation('cc_exp_month')}/{$payment->getAdditionalInformation('cc_exp_year')}"
+                'maskedCC' => $maskedCC,
+                'expirationDate' => "{$expirationMonth}/{$expirationYear}"
             ]));
         }
         if ($paymentToken) {
             $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
             $payment->setAdditionalInformation('cc_type', $tokenDetails['type']);
-            $paymentCcNumber = $payment->getAdditionalInformation('cc_number');
+            $paymentCcNumber = $payment->getAdditionalInformation('cc_number') ? : 'xxxx-';
             $payment->setAdditionalInformation('cc_number', $paymentCcNumber . $tokenDetails['maskedCC']);
         }
         return $paymentToken;
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @return string
+     * @param $payment
+     * @param $transaction
+     * @return array
      */
-    private function getExpirationDate($payment)
+    private function getCardInfo($payment, $transaction)
     {
         $year = $payment->getAdditionalInformation('cc_exp_year');
         $month = $payment->getAdditionalInformation('cc_exp_month');
+        $maskedCC = $payment->getAdditionalInformation('cc_last4');
+        if ((!$year || !$month || !$maskedCC) && array_key_exists('charges', $transaction)) {
+            if (is_array($transaction['charges'])
+                && array_key_exists('data', $transaction['charges'])
+                && is_array($transaction['charges']['data'])
+            ) {
+                foreach ($transaction['charges']['data'] as $charge) {
+                    if ($charge['payment_intent'] == $payment->getAdditionalInformation('cc_token')) {
+                        $year = $charge['payment_method_details']['card']['exp_year'];
+                        $month = $charge['payment_method_details']['card']['exp_month'];
+                        $maskedCC = $charge['payment_method_details']['card']['last4'];
+                        break;
+                    }
+                }
+            }
+        }
+        return [$month, $year, $maskedCC];
+    }
 
+
+    /**
+     * @param $month
+     * @param $year
+     * @return string
+     */
+    private function getExpirationDate($month, $year)
+    {
         return date_create("{$year}-{$month}-01 00:00:00", timezone_open('UTC'))
             ->modify('+ 1 month')
             ->format('Y-m-d 00:00:00');
