@@ -9,7 +9,11 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
+use Stripe\Collection;
 
+/**
+ * Class TokenDataBuilder
+ */
 class TokenDataBuilder implements BuilderInterface
 {
     const SOURCE = 'source';
@@ -22,10 +26,11 @@ class TokenDataBuilder implements BuilderInterface
     
     /** @var StripeAdapterFactory  */
     private $adapterFactory;
+
     /**
-     * Constructor
-     *
+     * TokenDataBuilder constructor.
      * @param SubjectReader $subjectReader
+     * @param StripeAdapterFactory $adapterFactory
      */
     public function __construct(
         SubjectReader $subjectReader,
@@ -36,10 +41,9 @@ class TokenDataBuilder implements BuilderInterface
     }
 
     /**
-     * Builds ENV request
-     *
      * @param array $buildSubject
      * @return array
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function build(array $buildSubject)
     {
@@ -53,17 +57,54 @@ class TokenDataBuilder implements BuilderInterface
         $result = [];
 
         if ($paymentToken instanceof PaymentTokenInterface) {
-            $result[self::CUSTOMER] = $paymentToken->getGatewayToken();
-            $stripeAdapter = $this->adapterFactory->create();
-            $customer = $stripeAdapter->retrieveCustomer($result[self::CUSTOMER]);
-            $pm = $customer->invoice_settings->default_payment_method;
-            $result['payment_method'] = $pm;
+            $gatewayToken = $paymentToken->getGatewayToken();
+            $compositeGatewayToken = explode('/', $gatewayToken);
+            if (count($compositeGatewayToken) > 1) {
+                $result[self::CUSTOMER] = $compositeGatewayToken[0];
+                $result['payment_method'] = $compositeGatewayToken[1];
+            } else {
+                $result[self::CUSTOMER] = $paymentToken->getGatewayToken();
+                $stripeAdapter = $this->adapterFactory->create();
+                $customerPaymentMethods = $stripeAdapter->retrieveCustomerPaymentMethods($result[self::CUSTOMER]);
+                $result['payment_method'] = $this->retrieveCurrentPaymentMethodId(
+                    $customerPaymentMethods,
+                    $paymentToken
+                );
+            }
         }
 
         if ($token = $payment->getAdditionalInformation('cc_token')) {
             $result[self::SOURCE] = $token;
         }
 
+        return $result;
+    }
+
+    /**
+     * @param $customerPaymentMethods
+     * @param $paymentToken
+     * @return string
+     */
+    private function retrieveCurrentPaymentMethodId($customerPaymentMethods, $paymentToken)
+    {
+        $result = '';
+        if ($customerPaymentMethods instanceof Collection) {
+            $customerPaymentMethods = $customerPaymentMethods->toArray();
+            if (array_key_exists('data', $customerPaymentMethods)
+                && is_array($customerPaymentMethods['data'])) {
+                $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
+                list($expirationMonth, $expirationYear) = explode('/', $tokenDetails['expirationDate']);
+                foreach ($customerPaymentMethods['data'] as $paymentMethod) {
+                    if ($paymentMethod['card']['last4'] == $tokenDetails['maskedCC']
+                        && $paymentMethod['card']['exp_month'] == $expirationMonth
+                        && $paymentMethod['card']['exp_year'] == $expirationYear
+                    ) {
+                        $result = $paymentMethod['id'];
+                        break;
+                    }
+                }
+            }
+        }
         return $result;
     }
 }

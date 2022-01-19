@@ -204,7 +204,6 @@
       <argument name="requestBuilder" xsi:type="object">StripeCustomerRequest</argument>
       <argument name="transferFactory" xsi:type="object">TNW\Stripe\Gateway\Http\TransferFactory</argument>
       <argument name="client" xsi:type="object">TNW\Stripe\Gateway\Http\Client\TransactionCustomer</argument>
-      <argument name="handler" xsi:type="object">TNW\Stripe\Gateway\Response\VaultDetailsHandler</argument>
       <argument name="validator" xsi:type="object">TNW\Stripe\Gateway\Validator\ResponseValidator\Customer</argument>
     </arguments>
   </virtualType>
@@ -301,6 +300,7 @@
       <argument name="handlers" xsi:type="array">
         <item name="payment_details" xsi:type="string">TNW\Stripe\Gateway\Response\PaymentDetailsHandler</item>
         <item name="txn_id" xsi:type="string">TNW\Stripe\Gateway\Response\TransactionIdHandler</item>
+        <item name="vault" xsi:type="string">TNW\Stripe\Gateway\Response\VaultDetailsHandler</item>
         <item name="card_details" xsi:type="string">TNW\Stripe\Gateway\Response\CardDetailsHandler</item>
       </argument>
     </arguments>

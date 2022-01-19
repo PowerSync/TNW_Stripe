@@ -20,6 +20,7 @@ use Stripe\Stripe;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
 use Stripe\Refund;
+use Stripe\StripeClient;
 
 /**
  * Class StripeAdapter
@@ -199,8 +200,22 @@ class StripeAdapter
      * @return Customer
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function retrieveCustomer ($customerId)
+    public function retrieveCustomer($customerId)
     {
         return Customer::retrieve($customerId);
+    }
+
+    /**
+     * @param $customerId
+     * @return \Stripe\Collection
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function retrieveCustomerPaymentMethods($customerId)
+    {
+        $stripeClient = new StripeClient(Stripe::getApiKey());
+        return $stripeClient->paymentMethods->all([
+            'customer' => $customerId,
+            'type' => 'card',
+        ]);
     }
 }
