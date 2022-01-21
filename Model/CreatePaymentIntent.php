@@ -84,7 +84,11 @@ class CreatePaymentIntent
     {
         $payment = $data->paymentMethod;
         $amount = $data->amount;
-        $currency = $data->currency;
+        if (property_exists($data, 'currency')) {
+            $currency = $data->currency;
+        } else {
+            $currency = $quote->getQuoteCurrencyCode();
+        }
         $attributes = [
             'payment_method' => $payment->id,
             'metadata' => ['site' => $this->url->getBaseUrl()]
