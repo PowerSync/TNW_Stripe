@@ -236,6 +236,7 @@ define([
                             self.error("3D Secure authentication failed.");
                         } else {
                             self.setPaymentMethodToken(response.paymentIntent.id);
+                            self.setPaymentMethodThreeDs(1);
                             self.placeOrder();
                         }
                         $('body').trigger('processStop');
@@ -324,6 +325,10 @@ define([
 
         setPaymentMethodToken: function (token) {
             $('#' + this.container).find('#' + this.code + '_cc_token').val(token);
+        },
+
+        setPaymentMethodThreeDs: function (threedsactive) {
+            $('#' + this.container).find('#' + this.code + '_cc_3ds').val(threedsactive);
         },
 
         handleCardAction: function (paymentIntentId, done) {
