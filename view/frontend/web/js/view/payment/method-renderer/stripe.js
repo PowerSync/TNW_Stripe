@@ -453,6 +453,7 @@ define([
                             self.isPlaceOrderActionAllowed(true);
                             self.messageContainer.addErrorMessage({message: "3D Secure authentication failed."});
                         } else {
+                            self.vaultEnabler.isActivePaymentTokenEnabler(true);
                             self.setPaymentMethodToken(response.paymentIntent.id);
                             self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
                             self.placeOrder();
