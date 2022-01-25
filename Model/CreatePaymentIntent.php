@@ -15,6 +15,7 @@
  */
 namespace TNW\Stripe\Model;
 
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use TNW\Stripe\Helper\Customer as CustomerHelper;
@@ -54,6 +55,11 @@ class CreatePaymentIntent
     private $url;
 
     /**
+     * @var PaymentTokenManagementInterface
+     */
+    private $tokenManagement;
+
+    /**
      * CreatePaymentIntent constructor.
      * @param StripeAdapterFactory $adapterFactory
      * @param CustomerHelper $customerHelper
@@ -62,16 +68,18 @@ class CreatePaymentIntent
     public function __construct(
         StripeAdapterFactory $adapterFactory,
         CustomerHelper $customerHelper,
-        UrlInterface $url
+        UrlInterface $url,
+        PaymentTokenManagementInterface $tokenManagement
     ) {
         $this->url = $url;
         $this->adapterFactory = $adapterFactory;
         $this->customerHelper = $customerHelper;
+        $this->tokenManagement = $tokenManagement;
     }
 
     /**
      * @param $data
-     * @param $quote
+     * @param \Magento\Quote\Model\Quote $quote
      * @param bool $isLoggedIn
      * @return \Stripe\PaymentIntent
      * @throws \Magento\Framework\Exception\InputException
@@ -82,7 +90,14 @@ class CreatePaymentIntent
      */
     public function getPaymentIntent($data, $quote, $isLoggedIn = false)
     {
-        $payment = $data->paymentMethod;
+        if (property_exists($data, 'public_hash')) {
+            $customerId = $quote->getCustomer()->getId();
+            $paymentToken = $this->tokenManagement->getByPublicHash($data->public_hash, $customerId);
+            $compositeGatewayToken = explode('/', $paymentToken->getGatewayToken());
+            $payment = $compositeGatewayToken[1];
+        } else {
+            $payment = $data->paymentMethod->id;
+        }
         $amount = $data->amount;
         if (property_exists($data, 'currency')) {
             $currency = $data->currency;
@@ -90,7 +105,7 @@ class CreatePaymentIntent
             $currency = $quote->getQuoteCurrencyCode();
         }
         $attributes = [
-            'payment_method' => $payment->id,
+            'payment_method' => $payment,
             'metadata' => ['site' => $this->url->getBaseUrl()]
         ];
         $email = $quote->getBillingAddress()->getEmail();
@@ -112,7 +127,7 @@ class CreatePaymentIntent
             self::CAPTURE_METHOD => 'manual',
             self::SETUP_FUTURE_USAGE => 'off_session'
         ];
-        $params[self::PAYMENT_METHOD] = $payment->id;
+        $params[self::PAYMENT_METHOD] = $payment;
         if (!$quote->isVirtual()) {
             $shippingAddress = $quote->getShippingAddress();
             $params['shipping'] = [

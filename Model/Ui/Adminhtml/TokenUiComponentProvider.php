@@ -15,6 +15,7 @@
  */
 namespace TNW\Stripe\Model\Ui\Adminhtml;
 
+use TNW\Stripe\Gateway\Config\Config;
 use TNW\Stripe\Model\Ui\ConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Framework\View\Element\Template;
@@ -33,12 +34,20 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     private $componentFactory;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param TokenUiComponentInterfaceFactory $componentFactory
+     * @param Config $config
      */
     public function __construct(
-        TokenUiComponentInterfaceFactory $componentFactory
+        TokenUiComponentInterfaceFactory $componentFactory,
+        Config $config
     ) {
         $this->componentFactory = $componentFactory;
+        $this->config = $config;
     }
 
     /**
@@ -53,6 +62,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
             [
                 'config' => [
                     'code' => ConfigProvider::CC_VAULT_CODE,
+                    'publishableKey' => $this->config->getPublishableKey(),
                     TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
                     TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash(),
                     'template' => 'TNW_Stripe::form/vault.phtml'

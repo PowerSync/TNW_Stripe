@@ -298,6 +298,10 @@ define([
             return dfd;
         },
 
+        /**
+         * Get customer billing address details
+         * @returns {{billing_details: {address: {country: string, city: string, line1: string}, name: string}}}
+         */
         getOwnerData: function () {
             var stripeData = {
                 name: $('#order-billing_address_firstname').val() + ' ' + $('#order-billing_address_lastname').val(),
@@ -323,14 +327,27 @@ define([
             return { 'billing_details': stripeData };
         },
 
+        /**
+         * Set payment method token
+         * @param token
+         */
         setPaymentMethodToken: function (token) {
             $('#' + this.container).find('#' + this.code + '_cc_token').val(token);
         },
 
+        /**
+         * Set card 3DS flag
+         * @param threedsactive
+         */
         setPaymentMethodThreeDs: function (threedsactive) {
             $('#' + this.container).find('#' + this.code + '_cc_3ds').val(threedsactive);
         },
 
+        /**
+         * Run 3DS check
+         * @param paymentIntentId
+         * @param done
+         */
         handleCardAction: function (paymentIntentId, done) {
             try {
                 this.stripe.handleCardAction.apply(this.stripe, [paymentIntentId]).then(function (result) {
@@ -344,6 +361,11 @@ define([
             }
         },
 
+        /**
+         * Authenticate customer
+         * @param paymentIntentId
+         * @param done
+         */
         authenticateCustomer: function (paymentIntentId, done) {
             var self = this
             try {
