@@ -52,7 +52,8 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
                 'config' => [
                     'code' => ConfigProvider::CC_VAULT_CODE,
                     TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
-                    TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
+                    TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash(),
+                    'template' => 'TNW_Stripe/payment/vault'
                 ],
                 'name' => 'TNW_Stripe/js/view/payment/method-renderer/vault'
             ]

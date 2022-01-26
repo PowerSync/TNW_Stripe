@@ -95,6 +95,7 @@ class CreatePaymentIntent
             $paymentToken = $this->tokenManagement->getByPublicHash($data->public_hash, $customerId);
             $compositeGatewayToken = explode('/', $paymentToken->getGatewayToken());
             $payment = $compositeGatewayToken[1];
+            $stripeCustomerId = $compositeGatewayToken[0];
         } else {
             $payment = $data->paymentMethod->id;
         }
@@ -116,10 +117,10 @@ class CreatePaymentIntent
             $attributes['description'] = 'guest';
         }
         $stripeAdapter = $this->adapterFactory->create();
-        $cs = $stripeAdapter->customer($attributes);
-        $this->customerHelper->updateCustomerStripeId($attributes['email'], $cs->id);
+        $stripeCustomerId = $stripeCustomerId ?? $stripeAdapter->customer($attributes)->id;
+        $this->customerHelper->updateCustomerStripeId($attributes['email'], $stripeCustomerId);
         $params = [
-            self::CUSTOMER => $cs->id,
+            self::CUSTOMER => $stripeCustomerId,
             self::AMOUNT => $this->formatPrice($amount),
             self::CURRENCY => $currency,
             self::PAYMENT_METHOD_TYPES => ['card'],
