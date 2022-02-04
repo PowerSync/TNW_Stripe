@@ -13,25 +13,19 @@
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
-namespace TNW\Stripe\Controller\PaymentIntent;
+namespace TNW\Stripe\Controller\Adminhtml\PaymentIntent;
 
-use Magento\Framework\App\Action;
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Customer\Model\Session;
-use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Backend\Model\Session\Quote as CheckoutSession;
 use TNW\Stripe\Model\CreatePaymentIntent;
 
 /**
  * Class Create
- * Perform Payment and Customer Api requests to Stripe.
  */
-class Create extends Action\Action
+class Create extends Action
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
     /**
      * @var CheckoutSession
      */
@@ -44,21 +38,19 @@ class Create extends Action\Action
 
     /**
      * Create constructor.
-     * @param Action\Context $context
-     * @param Session $session
+     * @param Context $context
      * @param CheckoutSession $checkoutSession
      * @param CreatePaymentIntent $createPaymentIntent
      */
     public function __construct(
-        Action\Context $context,
-        Session $session,
+        Context $context,
         CheckoutSession $checkoutSession,
         CreatePaymentIntent $createPaymentIntent
     ) {
         parent::__construct($context);
-        $this->createPaymentIntent = $createPaymentIntent;
-        $this->session = $session;
         $this->checkoutSession = $checkoutSession;
+        $this->createPaymentIntent = $createPaymentIntent;
+
     }
 
     /**
@@ -67,11 +59,12 @@ class Create extends Action\Action
     public function execute()
     {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $data = json_decode($this->_request->getParam('data'));
         try {
-            $paymentIntent = $this->createPaymentIntent
-                ->getPaymentIntent($data, $this->checkoutSession->getQuote(), $this->session->isLoggedIn());
-            // 3ds could be done automaticly, need check that and skeep on frontend
+            $paymentIntent = $this->createPaymentIntent->getPaymentIntent(
+                json_decode($this->_request->getParam('data')),
+                $this->checkoutSession->getQuote(),
+                true
+            );
             if (is_null($paymentIntent->next_action) && !
                 ($paymentIntent->status == "requires_action" || $paymentIntent->status == "requires_source_action")) {
                 $response->setData(['skip_3ds' => true, 'paymentIntent' => $paymentIntent]);
