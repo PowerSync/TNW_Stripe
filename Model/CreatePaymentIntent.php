@@ -60,17 +60,25 @@ class CreatePaymentIntent
     private $tokenManagement;
 
     /**
-     * CreatePaymentIntent constructor.
+     * @var VaultTokenProcessor
+     */
+    private $vaultTokenProcessor;
+
+    /**
      * @param StripeAdapterFactory $adapterFactory
      * @param CustomerHelper $customerHelper
      * @param UrlInterface $url
+     * @param PaymentTokenManagementInterface $tokenManagement
+     * @param VaultTokenProcessor $vaultTokenProcessor
      */
     public function __construct(
         StripeAdapterFactory $adapterFactory,
         CustomerHelper $customerHelper,
         UrlInterface $url,
-        PaymentTokenManagementInterface $tokenManagement
+        PaymentTokenManagementInterface $tokenManagement,
+        VaultTokenProcessor $vaultTokenProcessor
     ) {
+        $this->vaultTokenProcessor = $vaultTokenProcessor;
         $this->url = $url;
         $this->adapterFactory = $adapterFactory;
         $this->customerHelper = $customerHelper;
@@ -90,12 +98,11 @@ class CreatePaymentIntent
      */
     public function getPaymentIntent($data, $quote, $isLoggedIn = false)
     {
+        $stripeAdapter = $this->adapterFactory->create();
         if (property_exists($data, 'public_hash')) {
             $customerId = $quote->getCustomer()->getId();
             $paymentToken = $this->tokenManagement->getByPublicHash($data->public_hash, $customerId);
-            $compositeGatewayToken = explode('/', $paymentToken->getGatewayToken());
-            $payment = $compositeGatewayToken[1];
-            $stripeCustomerId = $compositeGatewayToken[0];
+            list($payment, $stripeCustomerId) = $this->vaultTokenProcessor->getPaymentMethodByVaultToken($paymentToken);
         } else {
             $payment = $data->paymentMethod->id;
         }
@@ -110,13 +117,10 @@ class CreatePaymentIntent
             'metadata' => ['site' => $this->url->getBaseUrl()]
         ];
         $email = $quote->getBillingAddress()->getEmail();
-        if ($isLoggedIn) {
-            $attributes['email'] = $email;
-        } else {
-            $attributes['email'] = $email;
+        if (!$isLoggedIn) {
             $attributes['description'] = 'guest';
         }
-        $stripeAdapter = $this->adapterFactory->create();
+        $attributes['email'] = $email;
         $stripeCustomerId = $stripeCustomerId ?? $stripeAdapter->customer($attributes)->id;
         $this->customerHelper->updateCustomerStripeId($attributes['email'], $stripeCustomerId);
         $params = [
