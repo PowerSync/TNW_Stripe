@@ -1,0 +1,85 @@
+{
+  "type": "extension",
+  "sku": "tnw/module-stripe",
+  "url_key": "tnw-module-stripe",
+  "platform": "M2",
+  "name": "Stripe Payment Gateway Integration",
+  "license_type": "osl",
+  "pricing_model": {
+    "pricing_type": "one-time",
+    "payment_period": 1
+  },
+  "prices": [
+    {
+      "edition": "CE",
+      "currency_code": "USD",
+      "price": 0.00
+    },
+    {
+      "edition": "EE",
+      "currency_code": "USD",
+      "price": 0.00
+    },
+    {
+      "edition": "ECE",
+      "currency_code": "USD",
+      "price": 0.00
+    }
+  ],
+  "version_compatibility": [
+    {
+      "edition": "CE",
+      "versions": [
+        "2.4"
+      ]
+    },
+    {
+      "edition": "EE",
+      "versions": [
+        "2.4"
+      ]
+    },
+    {
+      "edition": "ECE",
+      "versions": [
+        "2.4"
+      ]
+    }
+  ],
+  "documentation_artifacts": {
+    "user": {
+      "file_upload_id": "5ea0f5bfb2d134.19450710.0"
+    },
+    "installation": {
+      "file_upload_id": "5ea3e8bc2d5685.82365093.0"
+    }
+  },
+  "media_artifacts": {
+    "icon_image": {
+      "file_upload_id": "1112395"
+    },
+    "gallery_images": [
+      {
+        "file_upload_id": "1112396"
+      },
+      {
+        "file_upload_id": "1112397"
+      },
+      {
+        "file_upload_id": "1112398"
+      },
+      {
+        "file_upload_id": "1112399"
+      },
+      {
+        "file_upload_id": "1112400"
+      },
+      {
+        "file_upload_id": "1112401"
+      }
+    ]
+  },
+  "short_description": "",
+  "long_description": "<p><strong><a title=\"Stripe\" href=\"https://stripe.com/\">Stripe</a></strong> is&nbsp;first and foremost a technology company with a mission to increase the GDP of the internet.&nbsp;It offers a payment gateway, which was specifically designed to facilitate recurring billing. The&nbsp;core offering includes extra features, such as a set of open APIs and metered recurring billing to help you automate payment operations.</p>\n<p>The&nbsp;Stripe&nbsp;integration from <a title=\"PowerSync\" href=\"https://powersync.biz/\">PowerSync</a> is a fully PCI compliant solution, which allows merchants to accept payments in Magento through the use of their platform.&nbsp;Securely accept payments using the Stripe.js tokenization, credit cards are never entered or stored in Magento. The merchant is able to connect the Magento platform to a Test or Live Authorize.Net transaction gateway. When enabled and configured, your customers will be able to use all credit cards supported by the payment gateway.&nbsp;Your customers will also have an option to securely \"save\" their payment in the Authorize.Net payment gateway for faster checkout in the future. The PowerSync extension supports 3D Secure transaction validation if the customer's bank&nbsp;requires advanced level validation.</p>\n<p>&nbsp;</p>\n<h3><strong>Account &amp; Pricing</strong></h3>\n<p><strong>If you do not have <a href=\"https://dashboard.stripe.com/register\">Stripe Account</a> you will need to set one up prior to using this extension.&nbsp; Additional fees apply! The pricing associated with this service can be viewed <a href=\"https://stripe.com/us/pricing\">here</a>.</strong></p>\n<p>&nbsp;</p>\n<h3><strong>Integration Features</strong></h3>\n<ul>\n<li>Accept payments in Magento through Stripe payment gateway</li>\n<li>Allow your customers to re-use the same credit card for future orders.&nbsp;</li>\n<li>Authorize or Authorize &amp; Capture Invoice immediately, or upon shipment</li>\n<li>Ability to test the integration with Stripe Sandbox</li>\n<li>Leverage Magento Vault capability for enhanced security</li>\n<li>A flexible integration allowing you to filter out countries you wish to exclude from this integration</li>\n<li>3D secure support</li>\n<li>Native integration with&nbsp;<a title=\"mPower, the #1 Subscription Management Solution for Magento\" href=\"https://marketplace.magento.com/tnw-subscriptions.html\">mPower, the #1 Subscription Management Solution&nbsp;for Magento</a>.</li>\n</ul>\n<p>&nbsp;</p>\n<h3><strong>Technical Details &amp; Security</strong></h3>\n<ul>\n<li>No actual credit card numbers are stored in Magento</li>\n<li>A PCI compliant solution</li>\n</ul>\n<p>&nbsp;</p>\n<h3><strong>Recurring Profiles &amp; Subscription Support</strong></h3>\n<p>For recurring payments and Subscription business model support, check out <a title=\"mPower\" href=\"https://marketplace.magento.com/tnw-subscriptions.html\">mPower</a>, the most complete and flexible <a title=\"Subscription Management solution for Magento 2\" href=\"https://marketplace.magento.com/tnw-subscriptions.html\">Subscription Management solution for Magento 2.</a></p>\n<p>mPower allows you to:</p>\n<ul>\n<li>Manage all your subscription business needs in Magento &ndash; no platform hopping!</li>\n<li>Give your customers a tailored experience by providing them with flexible options and billing frequencies</li>\n<li>Designed to be customizable to fit your unique business processes</li>\n</ul>",
+  "stability": "stable"
+}
