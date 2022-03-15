@@ -6,10 +6,13 @@
 namespace TNW\Stripe\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Stripe\Gateway\Helper\SubjectReader;
-use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
+use TNW\Stripe\Model\VaultTokenProcessor;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 
+/**
+ * Class TokenDataBuilder
+ */
 class TokenDataBuilder implements BuilderInterface
 {
     const SOURCE = 'source';
@@ -19,51 +22,50 @@ class TokenDataBuilder implements BuilderInterface
      * @var SubjectReader
      */
     private $subjectReader;
-    
-    /** @var StripeAdapterFactory  */
-    private $adapterFactory;
+
     /**
-     * Constructor
-     *
+     * @var VaultTokenProcessor
+     */
+    private $vaultTokenProcessor;
+
+    /**
      * @param SubjectReader $subjectReader
+     * @param VaultTokenProcessor $vaultTokenProcessor
      */
     public function __construct(
         SubjectReader $subjectReader,
-        StripeAdapterFactory $adapterFactory
+        VaultTokenProcessor $vaultTokenProcessor
     ) {
+        $this->vaultTokenProcessor = $vaultTokenProcessor;
         $this->subjectReader = $subjectReader;
-        $this->adapterFactory = $adapterFactory;
     }
 
     /**
-     * Builds ENV request
-     *
      * @param array $buildSubject
      * @return array
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function build(array $buildSubject)
     {
         $paymentDO = $this->subjectReader->readPayment($buildSubject);
-
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentDO->getPayment();
         $extensionAttributes = $payment->getExtensionAttributes();
         $paymentToken = $extensionAttributes->getVaultPaymentToken();
-
         $result = [];
-
         if ($paymentToken instanceof PaymentTokenInterface) {
-            $result[self::CUSTOMER] = $paymentToken->getGatewayToken();
-            $stripeAdapter = $this->adapterFactory->create();
-            $customer = $stripeAdapter->retrieveCustomer($result[self::CUSTOMER]);
-            $pm = $customer->invoice_settings->default_payment_method;
-            $result['payment_method'] = $pm;
+            list($paymentMethod, $customer) = $this->vaultTokenProcessor->getPaymentMethodByVaultToken($paymentToken);
+            $result[self::CUSTOMER] = $customer;
+            $result['payment_method'] = $paymentMethod;
         }
-
+        if ($pi = $payment->getAdditionalInformation('payment_method_token')) {
+            $result['pi'] = $pi;
+            if (isset($paymentMethod)) {
+                $result[self::SOURCE] = $paymentMethod;
+            }
+        }
         if ($token = $payment->getAdditionalInformation('cc_token')) {
             $result[self::SOURCE] = $token;
         }
-
         return $result;
     }
 }
