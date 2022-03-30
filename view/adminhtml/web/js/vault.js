@@ -168,6 +168,7 @@ define([
             }).done(function (response) {
                 if (response.skip_3ds) {
                     $('body').trigger('processStop');
+                    self.setPaymentDetails(response.paymentIntent.id);
                     self.placeOrder();
                     return;
                 }
