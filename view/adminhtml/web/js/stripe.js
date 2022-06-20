@@ -176,6 +176,7 @@ define([
                 }.bind(this), 1000)
             }
             this.$selector.on('submitOrder.tnw_stripe', this.submitOrder.bind(this));
+            this.$selector.on('beforeSubmitOrder', this.beforeSubmitOrder.bind(this));
         },
 
         /**
@@ -184,12 +185,26 @@ define([
         disableEventListeners: function () {
             this.$selector.off('submitOrder');
             this.$selector.off('submit');
+            this.$selector.off('beforeSubmitOrder');
+        },
+
+        /**
+         * Event handler for 'beforeSubmitOrder' event
+         * @param event
+         */
+        beforeSubmitOrder: function (event) {
+            if (this.active() && (this.getPaymentMethodToken() || this.isCreatingPaymentIntent || this.isSubmitting)) {
+                // Cancel order submission if payment intent is already created
+                event.result = false;
+                this.$selector.trigger('processStop');
+            }
         },
 
         /**
          * Trigger order submit
          */
         submitOrder: function () {
+            this.isSubmitting = true;
             var self = this;
             this.$selector.validate().form();
             this.$selector.trigger('afterValidate.beforeSubmit');
@@ -250,6 +265,9 @@ define([
                 self.error('Something went wrong')
                 $('body').trigger('processStop');
             })
+            .always(function () {
+                self.isSubmitting = false;
+            });
         },
 
         /**
@@ -279,6 +297,7 @@ define([
          * @returns {jQuery.Deferred}
          */
         createPaymentIntent: function () {
+            this.isCreatingPaymentIntent = true;
             var self = this,
                 dfd = $.Deferred();
             if ($("#tnw_stripe_vault").length) {
@@ -294,6 +313,8 @@ define([
                 } else {
                     dfd.resolve(response);
                 }
+            }).always(function () {
+                self.isCreatingPaymentIntent = false;
             });
             return dfd;
         },
@@ -333,6 +354,14 @@ define([
          */
         setPaymentMethodToken: function (token) {
             $('#' + this.container).find('#' + this.code + '_cc_token').val(token);
+        },
+
+        /**
+         * Get payment method token
+         * @return {string}
+         */
+        getPaymentMethodToken: function () {
+            return $('#' + this.container).find('#' + this.code + '_cc_token').val();
         },
 
         /**
