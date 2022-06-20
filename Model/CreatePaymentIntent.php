@@ -15,7 +15,15 @@
  */
 namespace TNW\Stripe\Model;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\State\InputMismatchException;
+use Magento\Quote\Model\Quote;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Stripe\Exception\ApiErrorException;
+use Stripe\PaymentIntent;
 use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use TNW\Stripe\Helper\Customer as CustomerHelper;
@@ -65,39 +73,55 @@ class CreatePaymentIntent
     private $vaultTokenProcessor;
 
     /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
      * @param StripeAdapterFactory $adapterFactory
      * @param CustomerHelper $customerHelper
      * @param UrlInterface $url
      * @param PaymentTokenManagementInterface $tokenManagement
      * @param VaultTokenProcessor $vaultTokenProcessor
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         StripeAdapterFactory $adapterFactory,
         CustomerHelper $customerHelper,
         UrlInterface $url,
         PaymentTokenManagementInterface $tokenManagement,
-        VaultTokenProcessor $vaultTokenProcessor
+        VaultTokenProcessor $vaultTokenProcessor,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->vaultTokenProcessor = $vaultTokenProcessor;
         $this->url = $url;
         $this->adapterFactory = $adapterFactory;
         $this->customerHelper = $customerHelper;
         $this->tokenManagement = $tokenManagement;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
      * @param $data
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param Quote $quote
      * @param bool $isLoggedIn
-     * @return \Stripe\PaymentIntent
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\State\InputMismatchException
-     * @throws \Stripe\Exception\ApiErrorException
+     * @return PaymentIntent
+     * @throws LocalizedException
+     * @throws InputException
+     * @throws NoSuchEntityException
+     * @throws InputMismatchException
+     * @throws ApiErrorException
      */
     public function getPaymentIntent($data, $quote, $isLoggedIn = false)
     {
+        $customer = $quote->getCustomer();
+        if (!$customer->getId() && $quote->getCustomerEmail()
+            && $this->isExistingCustomerEmail($quote->getCustomerEmail(), $customer->getWebsiteId())
+        ) {
+            throw new LocalizedException(
+                __('A customer with the same email address already exists in an associated website.')
+            );
+        }
         $stripeAdapter = $this->adapterFactory->create();
         if (property_exists($data, 'public_hash')) {
             $customerId = $quote->getCustomer()->getId();
@@ -116,7 +140,7 @@ class CreatePaymentIntent
             'payment_method' => $payment,
             'metadata' => ['site' => $this->url->getBaseUrl()]
         ];
-        $email = $quote->getBillingAddress()->getEmail();
+        $email = $quote->getCustomerEmail();
         if (!$isLoggedIn) {
             $attributes['description'] = 'guest';
         }
@@ -148,5 +172,23 @@ class CreatePaymentIntent
             ];
         }
         return $stripeAdapter->createPaymentIntent($params);
+    }
+
+    /**
+     * Checks if customer with given email exists
+     *
+     * @param string $email
+     * @param int|null $websiteId
+     * @return bool
+     * @throws LocalizedException
+     */
+    public function isExistingCustomerEmail($email, $websiteId = null)
+    {
+        try {
+            $this->customerRepository->get($email, $websiteId);
+            return true;
+        } catch (NoSuchEntityException $e) {
+            return false;
+        }
     }
 }
