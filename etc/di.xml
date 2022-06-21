@@ -393,4 +393,20 @@
                 type="TNW\Stripe\Plugin\Quote\Api\CartManagement"
                 sortOrder="1"/>
     </type>
+
+    <type name="Magento\Payment\Model\Checks\SpecificationFactory">
+        <arguments>
+            <argument name="mapping" xsi:type="array">
+                <item name="has_saved_credit_cards" xsi:type="object">TNW\Stripe\Model\Checks\HasActiveSavedCreditCards</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Payment\Block\Form\Container">
+        <arguments>
+            <argument name="additionalChecks" xsi:type="array">
+                <item name="0" xsi:type="string">has_saved_credit_cards</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
