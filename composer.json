@@ -2,7 +2,7 @@
   "name": "tnw/module-stripe",
   "description": "Stripe Payments for Magento 2",
   "type": "magento2-module",
-  "version": "2.3.13",
+  "version": "2.3.13.1",
   "license": "OSL-3.0",
   "require": {
     "magento/framework": ">100",
