@@ -16,7 +16,7 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-  <module name="TNW_Stripe">
+  <module name="TNW_Stripe" setup_version="2.3.14">
     <sequence>
       <module name="Magento_Customer"/>
       <module name="Magento_Payment"/>

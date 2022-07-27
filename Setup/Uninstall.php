@@ -1,0 +1,100 @@
+<?php
+/**
+ * Copyright © 2022 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+declare(strict_types=1);
+
+namespace TNW\Stripe\Setup;
+
+use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\SchemaSetupInterface;
+use Magento\Framework\Setup\UninstallInterface;
+
+class Uninstall implements UninstallInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function uninstall(SchemaSetupInterface $setup, ModuleContextInterface $context)
+    {
+        $tablesToDrop = [];
+        $columnsToDrop = [
+            'sales_order' => [
+                'guest_order_exported',
+            ],
+        ];
+        $indexesToDrop = [];
+        $constraintsToDrop = [];
+
+        $this->dropSchema($setup, $constraintsToDrop, $indexesToDrop, $columnsToDrop, $tablesToDrop);
+    }
+
+    private function dropSchema(
+        SchemaSetupInterface $setup,
+        array                $constraintsToDrop,
+        array                $indexesToDrop,
+        array                $columnsToDrop,
+        array                $tablesToDrop
+    ): void {
+        $this->dropForeignKey($setup, $constraintsToDrop);
+        $this->dropIndexes($setup, $indexesToDrop);
+        $this->dropColumns($setup, $columnsToDrop);
+        $this->dropTables($setup, $tablesToDrop);
+    }
+
+    private function dropForeignKey(SchemaSetupInterface $setup, array $constraintsData): void
+    {
+        array_walk(
+            $constraintsData,
+            function (array $constraints, string $table) use ($setup) {
+                array_map(
+                    function (string $constraint) use ($setup, $table) {
+                        $setup->getConnection()->dropForeignKey($setup->getTable($table), $constraint);
+                    },
+                    $constraints
+                );
+            }
+        );
+    }
+
+    private function dropIndexes(SchemaSetupInterface $setup, array $indexesData): void
+    {
+        array_walk(
+            $indexesData,
+            function (array $indexes, string $table) use ($setup) {
+                array_map(
+                    function (string $index) use ($setup, $table) {
+                        $setup->getConnection()->dropIndex($setup->getTable($table), $index);
+                    },
+                    $indexes
+                );
+            }
+        );
+    }
+
+    private function dropColumns(SchemaSetupInterface $setup, array $columnsData): void
+    {
+        array_walk(
+            $columnsData,
+            function (array $columns, string $table) use ($setup) {
+                array_map(
+                    function (string $column) use ($setup, $table) {
+                        $setup->getConnection()->dropColumn($setup->getTable($table), $column);
+                    },
+                    $columns
+                );
+            }
+        );
+    }
+
+    private function dropTables(SchemaSetupInterface $setup, array $tables): void
+    {
+        array_map(
+            function (string $table) use ($setup) {
+                $setup->getConnection()->dropTable($setup->getTable($table));
+            },
+            $tables
+        );
+    }
+}
