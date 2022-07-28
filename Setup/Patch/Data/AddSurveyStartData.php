@@ -6,9 +6,8 @@ namespace TNW\Stripe\Setup\Patch\Data;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\Setup\Patch\PatchVersionInterface;
 
-class AddSurveyStartData implements DataPatchInterface, PatchVersionInterface
+class AddSurveyStartData implements DataPatchInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -24,11 +23,6 @@ class AddSurveyStartData implements DataPatchInterface, PatchVersionInterface
     public static function getDependencies()
     {
         return [];
-    }
-
-    public static function getVersion()
-    {
-        return '2.1.7';
     }
 
     public function getAliases()

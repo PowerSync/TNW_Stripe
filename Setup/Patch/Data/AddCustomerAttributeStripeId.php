@@ -11,10 +11,9 @@ use Magento\Eav\Api\Data\AttributeSetInterfaceFactory;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\Setup\Patch\PatchVersionInterface;
 use Magento\Sales\Setup\SalesSetupFactory;
 
-class AddCustomerAttributeStripeId implements DataPatchInterface, PatchVersionInterface
+class AddCustomerAttributeStripeId implements DataPatchInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -53,11 +52,6 @@ class AddCustomerAttributeStripeId implements DataPatchInterface, PatchVersionIn
     public static function getDependencies()
     {
         return [];
-    }
-
-    public static function getVersion()
-    {
-        return '2.3.2';
     }
 
     public function getAliases()
