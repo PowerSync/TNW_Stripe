@@ -11,9 +11,10 @@ use Magento\Eav\Api\Data\AttributeSetInterfaceFactory;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Sales\Setup\SalesSetupFactory;
 
-class AddCustomerAttributeStripeId implements DataPatchInterface
+class AddCustomerAttributeStripeId implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -80,5 +81,10 @@ class AddCustomerAttributeStripeId implements DataPatchInterface
         $customerSetup->getEavConfig()->getAttribute(Customer::ENTITY, 'stripe_id')->addData(['attribute_set_id' => $attributeSetId, 'attribute_group_id' => $attributeGroupId, 'used_in_forms' => ['adminhtml_customer'],])->save();
 
         $this->setup->endSetup();
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

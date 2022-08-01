@@ -6,8 +6,9 @@ namespace TNW\Stripe\Setup\Patch\Data;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 
-class AddSurveyStartData implements DataPatchInterface
+class AddSurveyStartData implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -44,5 +45,10 @@ class AddSurveyStartData implements DataPatchInterface
             ]
         );
         $this->setup->endSetup();
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }
