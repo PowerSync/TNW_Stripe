@@ -35,7 +35,7 @@ class AddSurveyStartData implements DataPatchInterface, PatchRevertableInterface
     {
         $this->setup->startSetup();
         $table = $this->setup->getTable('core_config_data');
-        $this->setup->getConnection()->insert(
+        $this->setup->getConnection()->insertOnDuplicate(
             $table,
             [
                 'scope' => 'default',
