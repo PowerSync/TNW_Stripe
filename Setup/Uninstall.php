@@ -18,6 +18,11 @@ class Uninstall implements UninstallInterface
      */
     public function uninstall(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
+        $configsToDrop = [
+            'payment/tnw_stripe/%',
+            'payment/tnw_stripe_vault/%',
+        ];
+
         $tablesToDrop = [];
         $columnsToDrop = [
             'sales_order' => [
@@ -27,7 +32,21 @@ class Uninstall implements UninstallInterface
         $indexesToDrop = [];
         $constraintsToDrop = [];
 
+        $this->dropConfigs($setup, $configsToDrop);
         $this->dropSchema($setup, $constraintsToDrop, $indexesToDrop, $columnsToDrop, $tablesToDrop);
+    }
+
+    private function dropConfigs(SchemaSetupInterface $setup, array $configs): void
+    {
+        array_map(
+            function (string $config) use ($setup) {
+                $setup->getConnection()->delete(
+                    $setup->getTable('core_config_data'),
+                    $setup->getConnection()->quoteInto('value like ?', $config)
+                );
+            },
+            $configs
+        );
     }
 
     private function dropSchema(
