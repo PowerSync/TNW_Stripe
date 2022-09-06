@@ -149,6 +149,7 @@ class StripeAdapter
                 if ($attributes['email'] == $customer->email
                     && (
                         !isset($customer->metadata->site)
+                         || !isset($attributes['metadata']['site'])
                          || $customer->metadata->site == $attributes['metadata']['site']
                     )
                 ) {
