@@ -257,10 +257,10 @@ define([
          */
         getShippingData: function () {
             var shippingAddress = quote.shippingAddress();
-
+            var virtual = quote.isVirtual();
             var stripeData = null;
 
-            if (shippingAddress) {
+            if (!virtual) {
                 stripeData = {
                     name: shippingAddress.firstname + ' ' + shippingAddress.lastname,
                     address: {
