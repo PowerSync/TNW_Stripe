@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Stripe\StripeObject;
 use Magento\Framework\App\State;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Stripe\Gateway\Config\Codes;
 
 abstract class AbstractTransaction implements ClientInterface
 {
@@ -90,7 +91,15 @@ abstract class AbstractTransaction implements ClientInterface
         } catch (\Exception $e) {
             $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
             $this->logger->critical($message);
-            throw new ClientException($message);
+            if (method_exists($e, "getDeclineCode")) {
+                throw new ClientException(
+                    $message,
+                    null,
+                    Codes::getExceptionCodeByDeclineCode($e->getDeclineCode())
+                );
+            } else {
+                throw new ClientException($message);
+            }
         } finally {
             $log['response'] = $response['object'] instanceof StripeObject
                 ? $response['object']->toArray(true)
