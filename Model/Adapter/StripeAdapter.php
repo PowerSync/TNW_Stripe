@@ -177,6 +177,17 @@ class StripeAdapter
     }
 
     /**
+     * @param $paymentIntentId
+     * @param $params
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function updatePaymentIntent($paymentIntentId, $params)
+    {
+        return PaymentIntent::update($paymentIntentId, $params);
+    }
+
+    /**
      * @param $transactionId
      * @return PaymentIntent
      * @throws \Stripe\Exception\ApiErrorException
