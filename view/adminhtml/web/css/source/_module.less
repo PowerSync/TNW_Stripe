@@ -19,12 +19,14 @@
     .shosted-control {
         height: 3.4rem;
         position: relative;
+        box-sizing: border-box;
 
         &.stripe-shosted-fields-focused {
             border-color: @stripe-focus__color;
         }
 
-        &.stripe-shosted-fields-invalid:not(.stripe-shosted-fields-focused) {
+        &.stripe-shosted-fields-invalid:not(.stripe-shosted-fields-focused),
+        &.StripeElement--invalid {
             border-color: @stripe-error__color;
 
             & ~ .shosted-error {
@@ -53,5 +55,72 @@
         color: @stripe-error__color;
         height: 0;
         opacity: 0;
+    }
+}
+#stored-cards-info {
+    > .fieldset-wrapper-title {
+        padding-bottom: 0;
+        margin-bottom: 1.5rem;
+        border: 0;
+    }
+
+    .block-title h2 {
+        margin-bottom: 1rem;
+    }
+
+    .cards-list {
+        float: left;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 360px;
+
+        .cc-image {
+            float: left;
+        }
+
+        .additional-data {
+            display: inline-block;
+            margin: 5px;
+            font-weight: bold;
+        }
+
+        .stored-cards-item-actions {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+
+        .action-delete {
+            .lib-button-reset();
+            .lib-icon-font(
+                @icon-remove,
+                @icon-font,
+                @_icon-font-size: 2.8rem,
+                @_icon-font-line-height: 2.8rem,
+                @_icon-font-text-hide: true,
+                @_icon-font-position: after,
+                @_icon-font-color: @color-black_dark,
+                @_icon-font-margin: 0 0 -7px 0
+            );
+        }
+
+        .stored-cards-item {
+            background: @color-white-fog;
+            border: 1px solid @color-gray_light;
+            cursor: pointer;
+            margin-bottom: -1px;
+            padding: 10px;
+            position: relative;
+            z-index: 1;
+        }
+    }
+    .new-cc-item-content {
+        background: @color-white;
+        border: 1px solid @color-gray_light;
+        box-shadow: 0 2px 1px 0 rgba(217, 210, 202, .5);
+        margin-left: 400px;
+        max-width: ~'calc(100% - 400px)';
+        padding: 15px 30px;
     }
 }

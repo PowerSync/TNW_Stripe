@@ -26,7 +26,8 @@
                 border-color: @stripe-focus__color;
             }
 
-            &.stripe-hosted-fields-invalid:not(.stripe-hosted-fields-focused) {
+            &.stripe-hosted-fields-invalid:not(.stripe-hosted-fields-focused),
+            &.StripeElement--invalid {
                 border-color: @stripe-error__color;
 
                 & ~ .hosted-error {
@@ -61,6 +62,73 @@
             height: 0;
             margin-top: 7px;
             opacity: 0;
+        }
+    }
+    #stored-cards-info {
+        > .fieldset-wrapper-title {
+            padding-bottom: 0;
+            margin-bottom: 1.5rem;
+            border: 0;
+        }
+
+        .block-title h2 {
+            margin-bottom: 1rem;
+        }
+
+        .cards-list {
+            float: left;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 360px;
+
+            .cc-image {
+                float: left;
+            }
+
+            .additional-data {
+                display: inline-block;
+                margin: 5px;
+                font-weight: bold;
+            }
+
+            .stored-cards-item-actions {
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+            }
+
+            .action-delete {
+                .lib-button-reset();
+                .lib-icon-font(
+                    @icon-remove,
+                    @icon-font,
+                    @_icon-font-size: 1.6rem,
+                    @_icon-font-line-height: 16px,
+                    @_icon-font-text-hide: true,
+                    @_icon-font-position: after,
+                    @_icon-font-color: @color-black_dark,
+                    @_icon-font-margin: 0 0 -5px 0
+                );
+            }
+
+            .stored-cards-item {
+                background: @color-white-fog;
+                border: 1px solid @color-gray_light;
+                cursor: pointer;
+                margin-bottom: -1px;
+                padding: 10px;
+                position: relative;
+                z-index: 1;
+            }
+        }
+        .new-cc-item-content {
+            background: @color-white;
+            border: 1px solid @color-gray_light;
+            box-shadow: 0 2px 1px 0 rgba(217, 210, 202, .5);
+            margin-left: 400px;
+            max-width: ~'calc(100% - 400px)';
+            padding: 15px 30px;
         }
     }
 }

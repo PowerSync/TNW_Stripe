@@ -409,4 +409,6 @@
             </argument>
         </arguments>
     </type>
+    <preference for="TNW\Stripe\Api\StoredCardsManagementInterface"
+                type="TNW\Stripe\Model\Customer\StoredCardsManagement"/>
 </config>

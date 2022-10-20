@@ -84,6 +84,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'sdkUrl' => $this->config->getSdkUrl($storeId),
                     'returnUrl' => $this->url->getUrl('tnw_stripe/window/close'),
                     'createUrl' => $this->url->getUrl('tnw_stripe/paymentintent/create'),
+                    'saveCustomerCardUrl' => $this->url->getUrl('customer/storedcards/save'),
                     'countrySpecificCardTypes' => $this->config->getCountrySpecificCardTypeConfig($storeId),
                     'availableCardTypes' => $this->config->getAvailableCardTypes($storeId),
                     'useCvv' => $this->config->isCvvEnabled($storeId),
