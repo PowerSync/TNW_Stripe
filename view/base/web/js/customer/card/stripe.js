@@ -15,8 +15,8 @@ define([
         apiClient: null,
         paymentToken: null,
         threeDsActive: null,
-        selectedCardType: null,
         stripeCardNumber: null,
+        additionalData: {},
 
         _create: function () {
             validator.setConfig(this.options)
@@ -37,6 +37,13 @@ define([
                 let card = response.paymentMethod.card,
                     currencyCode = self.options.currencyCode,
                     amount = 1
+
+                self.additionalData = {
+                    cc_exp_month: response.paymentMethod.card.exp_month,
+                    cc_exp_year: response.paymentMethod.card.exp_year,
+                    cc_last4: response.paymentMethod.card.last4,
+                    cc_type: response.paymentMethod.card.brand
+                }
 
                 if (!card.three_d_secure_usage.supported) {
                     self.paymentToken = response.paymentMethod.id
@@ -212,13 +219,18 @@ define([
                 this.options.saveCustomerCardUrl,
                 {
                     token: this.paymentToken,
+                    additionalData: this.additionalData,
                     threeDsActive: this.threeDsActive
                 }
             )
             .done(function (response) {
                 $('body').trigger('processStop')
-                // window.location.reload()
-            })
+                if (response.success === true) {
+                    window.location.reload()
+                } else {
+                    this.error(response.message)
+                }
+            }.bind(this))
             .fail(function () {
                 $('body').trigger('processStop')
                 this.error('Something went wrong')

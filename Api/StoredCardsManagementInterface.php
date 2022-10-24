@@ -31,13 +31,13 @@ interface StoredCardsManagementInterface
     public function getByCustomerId(int $customerId);
 
     /**
-     * @param InfoInterface $payment
+     * @param string $token
      * @param CustomerInterface $customer
      * @param array $arguments
      * @return bool
      * @throws CouldNotSaveException
      */
-    public function save(InfoInterface $payment, CustomerInterface $customer, array $arguments = []);
+    public function save(string $token, CustomerInterface $customer, array $arguments = []);
 
     /**
      * @param string $hash

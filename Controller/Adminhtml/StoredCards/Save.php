@@ -14,70 +14,65 @@
  * @license   Open Software License (OSL 3.0)
  */
 
-namespace TNW\Stripe\Controller\StoredCards;
+namespace TNW\Stripe\Controller\Adminhtml\StoredCards;
 
-use Magento\Customer\Controller\AccountInterface;
-use Magento\Customer\Model\Session;
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
 use TNW\Stripe\Api\StoredCardsManagementInterface;
 
-class Save implements AccountInterface, HttpPostActionInterface
+class Save extends Action implements HttpPostActionInterface
 {
     /**
-     * @var Session
+     * Authorization level of a basic admin session
      */
-    private $session;
-
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
+    const ADMIN_RESOURCE = 'TNW_Stripe::payment_info';
 
     /**
      * @var StoredCardsManagementInterface
      */
-    private $storedCardsManagement;
+    private $cardsManagement;
 
     /**
-     * @param Session $session
-     * @param RequestInterface $request
-     * @param ResultFactory $resultFactory
-     * @param StoredCardsManagementInterface $storedCardsManagement
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * @param Context $context
+     * @param StoredCardsManagementInterface $cardsManagement
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
-        Session $session,
-        RequestInterface $request,
-        ResultFactory $resultFactory,
-        StoredCardsManagementInterface $storedCardsManagement
+        Context $context,
+        StoredCardsManagementInterface $cardsManagement,
+        CustomerRepositoryInterface $customerRepository
     ) {
-        $this->session = $session;
-        $this->request = $request;
-        $this->resultFactory = $resultFactory;
-        $this->storedCardsManagement = $storedCardsManagement;
+        parent::__construct($context);
+        $this->cardsManagement = $cardsManagement;
+        $this->customerRepository = $customerRepository;
     }
+
     /**
      * @inheritDoc
      */
     public function execute()
     {
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $customer = $this->session->getCustomerDataObject();
-        $additionalData = $this->request->getParam('additionalData');
-        $token = $this->request->getParam('token');
-        $response = ['success' => false, 'message' => '',];
-        if (!$customer || !$token) {
-            $response['message'] = __('Invalid Request.');
-            return $result->setData($response);
-        }
+        $customerId = (int) $this->getRequest()->getParam('id');
+        $additionalData = $this->getRequest()->getParam('additionalData');
+        $token = $this->getRequest()->getParam('token');
+
         try {
-            if (!$this->storedCardsManagement->save(
+            $customer = $this->customerRepository->getById($customerId);
+            $response = ['success' => false, 'message' => '',];
+            if (!$customer || !$token) {
+                $response['message'] = __('Invalid Request.');
+                return $result->setData($response);
+            }
+            if (!$this->cardsManagement->save(
                 $token,
                 $customer,
                 [
