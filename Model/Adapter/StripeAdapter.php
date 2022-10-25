@@ -161,7 +161,7 @@ class StripeAdapter
      * @return PaymentIntent
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function createPaymentIntent (array $attributes)
+    public function createPaymentIntent(array $attributes)
     {
         return PaymentIntent::create($attributes)->confirm();
     }
@@ -171,9 +171,20 @@ class StripeAdapter
      * @return PaymentIntent
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function retrievePaymentIntent ($transactionId)
+    public function retrievePaymentIntent($transactionId)
     {
         return PaymentIntent::retrieve($transactionId);
+    }
+
+    /**
+     * @param $paymentIntentId
+     * @param $params
+     * @return PaymentIntent
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function updatePaymentIntent($paymentIntentId, $params)
+    {
+        return PaymentIntent::update($paymentIntentId, $params);
     }
 
     /**
@@ -219,5 +230,16 @@ class StripeAdapter
             'customer' => $customerId,
             'type' => 'card',
         ]);
+    }
+
+    /**
+     * @param $id
+     * @param array $customerData
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function attachPaymentMethodToCustomer($id, array $customerData)
+    {
+        $stripeClient = new StripeClient(Stripe::getApiKey());
+        $stripeClient->paymentMethods->attach($id, $customerData);
     }
 }
