@@ -47,10 +47,10 @@ class TransactionSale extends AbstractTransaction
                     ) {
                         unset($data['pi']);
                     }
-                    unset($data['set_pm']);
                     unset($data['source']);
                 }
             }
+            unset($data['set_pm']);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->logger->debug($e->getMessage());
         } catch (\Exception $e) {

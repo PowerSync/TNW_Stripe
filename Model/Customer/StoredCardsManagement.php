@@ -28,7 +28,12 @@ use TNW\Stripe\Gateway\Http\Client\TransactionSale;
 use TNW\Stripe\Gateway\Http\Client\TransactionVoid;
 use TNW\Stripe\Gateway\Validator\ResponseValidator\Authorize;
 use TNW\Stripe\Gateway\Validator\GeneralResponseValidator;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 
+/**
+ * Class StoredCardsManagement
+ * @package TNW\Stripe\Model\Customer
+ */
 class StoredCardsManagement implements StoredCardsManagementInterface
 {
     /**
@@ -41,20 +46,53 @@ class StoredCardsManagement implements StoredCardsManagementInterface
      */
     private $paymentTokenRepository;
 
+    /**
+     * @var TransferFactory
+     */
     private $transferFactory;
 
+    /**
+     * @var StoredCardDataBuilder
+     */
     private $dataBuilder;
 
+    /**
+     * @var TransactionSale
+     */
     private $client;
 
+    /**
+     * @var TransactionVoid
+     */
     private $cancelClient;
 
+    /**
+     * @var Authorize
+     */
     private $validator;
 
+    /**
+     * @var TokenExtractor
+     */
     private $tokenExtractor;
 
+    /**
+     * @var GeneralResponseValidator
+     */
     private $voidValidator;
 
+    /**
+     * StoredCardsManagement constructor.
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param TransferFactory $transferFactory
+     * @param StoredCardDataBuilder $dataBuilder
+     * @param TransactionSale $client
+     * @param TransactionVoid $cancelClient
+     * @param Authorize $validator
+     * @param TokenExtractor $tokenExtractor
+     * @param GeneralResponseValidator $voidValidator
+     */
     public function __construct(
         PaymentTokenManagementInterface $paymentTokenManagement,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
@@ -77,6 +115,10 @@ class StoredCardsManagement implements StoredCardsManagementInterface
         $this->voidValidator = $voidValidator;
     }
 
+    /**
+     * @param int $customerId
+     * @return array|PaymentTokenInterface[]
+     */
     public function getByCustomerId(int $customerId)
     {
         $storedCards = [];

@@ -22,6 +22,9 @@ use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use TNW\Stripe\Gateway\Http\Client\TransactionCustomer;
 use TNW\Stripe\Gateway\Http\TransferFactory;
 
+/**
+ * Class StoredCardDataBuilder
+ */
 class StoredCardDataBuilder implements BuilderInterface
 {
     const AMOUNT = 'amount';
@@ -67,6 +70,14 @@ class StoredCardDataBuilder implements BuilderInterface
      */
     private $transferFactory;
 
+    /**
+     * StoredCardDataBuilder constructor.
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param Config $config
+     * @param StripeAdapterFactory $adapterFactory
+     * @param TransactionCustomer $customerClient
+     * @param TransferFactory $transferFactory
+     */
     public function __construct(
         PaymentTokenManagementInterface $paymentTokenManagement,
         Config $config,
@@ -81,6 +92,12 @@ class StoredCardDataBuilder implements BuilderInterface
         $this->paymentTokenManagement = $paymentTokenManagement;
     }
 
+    /**
+     * @param array $data
+     * @return array
+     * @throws \Magento\Payment\Gateway\Http\ConverterException
+     * @throws \Stripe\Exception\ApiErrorException
+     */
     public function build(array $data)
     {
         /** @var \Magento\Customer\Model\Data\Customer $customer */
@@ -137,6 +154,7 @@ class StoredCardDataBuilder implements BuilderInterface
             $result[self::CUSTOMER] = $customerRequestData['id'];
             $result[self::PAYMENT_METHOD] = $pm;
         }
+        $result['set_pm'] = true;
         return $result;
     }
 
