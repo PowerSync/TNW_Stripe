@@ -19,7 +19,6 @@ namespace TNW\Stripe\Api;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Payment\Model\InfoInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
 interface StoredCardsManagementInterface

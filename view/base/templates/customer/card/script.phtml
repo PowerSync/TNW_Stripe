@@ -21,12 +21,14 @@
  */
 
 $viewModel = $block->getViewModel();
+$email = $viewModel ? $viewModel->getCustomer()->getEmail() : null;
+
 ?>
 <script type="text/x-magento-init">
 {
     "#stored-cards-info": {
         "TNW_Stripe/js/customer/card/stripe": {
-            "customerEmail" : "<?= $escaper->escapeHtml($viewModel->getCustomer()->getEmail()) ?>",
+            "customerEmail" : "<?= $escaper->escapeHtml($email) ?>",
             "clientConfig" : <?= /* @noEscape */ $block->getPaymentConfig(); ?>
         }
     }
