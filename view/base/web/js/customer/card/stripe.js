@@ -10,7 +10,8 @@ define([
 
     $.widget('tnw.stripeStoredCards', {
         options: {
-
+            clientConfig: {},
+            customerEmail: null
         },
         apiClient: null,
         paymentToken: null,
@@ -34,9 +35,7 @@ define([
             $('body').trigger('processStart');
 
             this.createPaymentMethod('card', this.stripeCardNumber).done(function (response) {
-                let card = response.paymentMethod.card,
-                    currencyCode = self.options.currencyCode,
-                    amount = 1
+                let card = response.paymentMethod.card
 
                 self.additionalData = {
                     cc_exp_month: response.paymentMethod.card.exp_month,
@@ -54,8 +53,9 @@ define([
 
                 self.createPaymentIntent({
                     paymentMethod: response.paymentMethod,
-                    amount: amount,
-                    currency: currencyCode
+                    amount: 1,
+                    customerEmail: self.options.customerEmail,
+                    currency: self.options.clientConfig.currencyCode
                 }).done(function (response) {
                     if (response.skip_3ds) {
                         $('body').trigger('processStop');
@@ -91,7 +91,7 @@ define([
 
         getApiClient: function () {
             if (!this.apiClient) {
-                this.apiClient = Stripe(this.options.publishableKey);
+                this.apiClient = Stripe(this.options.clientConfig.publishableKey);
             }
 
             return this.apiClient;
@@ -120,7 +120,7 @@ define([
         onFieldEvent: function (event) {
             // self.isValidCardNumber = event.complete;
             $('#tnw_stripe_cc_type').val(
-                validator.getMageCardType(event.brand, this.options.availableCardTypes)
+                validator.getMageCardType(event.brand, this.options.clientConfig.availableCardTypes)
             );
         },
 
@@ -155,7 +155,7 @@ define([
                 dfd = $.Deferred();
             arguments[0].vaultEnabled = true;
             $.post(
-                self.options.createUrl,
+                self.options.clientConfig.createUrl,
                 {data: JSON.stringify(arguments[0])}
             ).then(function (response) {
                 if (response.error) {
@@ -216,7 +216,7 @@ define([
          */
         saveToken: function () {
             $.post(
-                this.options.saveCustomerCardUrl,
+                this.options.clientConfig.saveCustomerCardUrl,
                 {
                     token: this.paymentToken,
                     additionalData: this.additionalData,

@@ -14,13 +14,21 @@
  * @license   Open Software License (OSL 3.0)
  */
 
-/** @var TNW\Stripe\Block\Payment $block */
+/**
+ * @var TNW\Stripe\Block\Payment $block
+ * @var Magento\Framework\Escaper $escaper
+ * @var \TNW\Stripe\ViewModel\StoredCards $viewModel
+ */
 
+$viewModel = $block->getViewModel();
 ?>
 <script type="text/x-magento-init">
 {
     "#stored-cards-info": {
-        "TNW_Stripe/js/customer/card/stripe": <?= /* @noEscape */ $block->getPaymentConfig(); ?>
+        "TNW_Stripe/js/customer/card/stripe": {
+            "customerEmail" : "<?= $escaper->escapeHtml($viewModel->getCustomer()->getEmail()) ?>",
+            "clientConfig" : <?= /* @noEscape */ $block->getPaymentConfig(); ?>
+        }
     }
 }
 </script>

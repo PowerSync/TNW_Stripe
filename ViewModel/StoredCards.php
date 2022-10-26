@@ -184,16 +184,18 @@ class StoredCards implements ArgumentInterface
 
     /**
      * @return CustomerInterface|null
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function getCustomer()
     {
-        if ($this->customerSession->getCustomerId()) {
-            return $this->customerSession->getCustomerData();
-        }
-        if ($customerId = $this->request->getParam('id')) {
-            return $this->customerRepository->getById($customerId);
+        try {
+            if ($this->customerSession->getCustomerId()) {
+                return $this->customerSession->getCustomerData();
+            }
+            if ($customerId = $this->request->getParam('id')) {
+                return $this->customerRepository->getById($customerId);
+            }
+        } catch (NoSuchEntityException|LocalizedException $e) {
+            return null;
         }
         return null;
     }

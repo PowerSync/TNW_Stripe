@@ -37,7 +37,11 @@
             <block name="tnw_stripe_payment_script"
                    as="tnw_stripe_payment_script"
                    template="TNW_Stripe::customer/card/script.phtml"
-                   class="TNW\Stripe\Block\Payment"/>
+                   class="TNW\Stripe\Block\Payment">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">TNW\Stripe\ViewModel\StoredCards</argument>
+                </arguments>
+            </block>
         </block>
     </container>
 </layout>
