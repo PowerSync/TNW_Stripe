@@ -202,7 +202,7 @@ class TokenExtractor
     {
         $hashKey = $paymentToken->getGatewayToken();
         if ($paymentToken->getCustomerId()) {
-            $hashKey = $paymentToken->getCustomerId();
+            $hashKey .= $paymentToken->getCustomerId();
         }
 
         $hashKey .= $paymentToken->getPaymentMethodCode()
