@@ -44,13 +44,6 @@ define([
                     cc_type: response.paymentMethod.card.brand
                 }
 
-                if (!card.three_d_secure_usage.supported) {
-                    self.paymentToken = response.paymentMethod.id
-                    self.saveToken()
-                    $('body').trigger('processStop')
-                    return
-                }
-
                 self.createPaymentIntent({
                     paymentMethod: response.paymentMethod,
                     amount: 1,
