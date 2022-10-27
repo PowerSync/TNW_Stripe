@@ -153,9 +153,15 @@ class CreatePaymentIntent
         if (!$email && property_exists($data, 'customerEmail')) {
             $email = $data->customerEmail;
             if ($email) {
-                try {
-                    $customer = $this->customerRepository->get($email);
-                } catch (\Exception $e) {
+                $websites = $this->storeManager->getWebsites();
+                foreach ($websites as $website) {
+                    try {
+                        $customer = $this->customerRepository->get($email, $website->getId());
+                    } catch (\Exception $e) {
+                        $exception = $e;
+                    }
+                }
+                if (!$customer->getId() && isset($exception))  {
                     throw new LocalizedException(
                         __('Customer with provided email does not exists.')
                     );
