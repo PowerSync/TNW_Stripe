@@ -20,7 +20,7 @@ define([
         additionalData: {},
 
         _create: function () {
-            validator.setConfig(this.options)
+            validator.setConfig(this.options.clientConfig)
             this.initHostedFields()
             this.bind()
         },
