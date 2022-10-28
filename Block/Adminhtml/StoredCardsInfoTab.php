@@ -16,7 +16,9 @@
 
 namespace TNW\Stripe\Block\Adminhtml;
 
+use Magento\Customer\Controller\RegistryConstants;
 use Magento\Framework\Phrase;
+use Magento\Framework\Registry;
 use Magento\Ui\Component\Layout\Tabs\TabWrapper;
 use TNW\Stripe\Gateway\Config\Config;
 use Magento\Framework\View\Element\Context;
@@ -34,17 +36,25 @@ class StoredCardsInfoTab extends TabWrapper
     private $config;
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+    /**
      * @param Context $context
      * @param Config $config
+     * @param Registry $registry
      * @param array $data
      */
     public function __construct(
         Context $context,
         Config $config,
+        Registry $registry,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->config = $config;
+        $this->registry = $registry;
     }
 
     /**
@@ -68,6 +78,6 @@ class StoredCardsInfoTab extends TabWrapper
      */
     public function canShowTab()
     {
-        return $this->config->isActive();
+        return $this->registry->registry(RegistryConstants::CURRENT_CUSTOMER_ID) && $this->config->isActive();
     }
 }
