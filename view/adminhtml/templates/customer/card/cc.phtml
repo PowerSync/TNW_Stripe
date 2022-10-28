@@ -1,0 +1,96 @@
+<?php
+/**
+ * TNW_Stripe extension
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the OSL 3.0 License
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  TNW
+ * @package   TNW_Stripe
+ * @copyright Copyright (c) 2017-2018
+ * @license   Open Software License (OSL 3.0)
+ */
+
+/**
+ * @var TNW\Stripe\Block\Form $block
+ * @var Magento\Framework\Escaper $escaper
+ */
+
+$code = $block->escapeHtml($block->getMethodCode());
+$ccType = $block->getInfoData('cc_type');
+?>
+<admin__fieldset class="admin__fieldset payment-method payment-method-tnw_stripe"
+          id="payment_form_<?php /* @noEscape */ echo $code; ?>">
+    <div class="admin__field _required">
+        <label class="label admin__field-label" for="<?php echo /* @noEscape */ $code ?>_cc_type" >
+            <span><?php echo $block->escapeHtml(__('Credit Card Type')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <select id="<?php echo /* @noEscape */ $code ?>_cc_type" name="payment[cc_type]"
+                    class="required-entry select control-select validate-cc-type-select">
+                <?php foreach ($block->getCcAvailableTypes() as $typeCode => $typeName) :?>
+                    <option value="<?php echo $block->escapeHtml($typeCode) ?>"
+                        <?php if ($typeCode == $ccType) :?> selected="selected"<?php endif; ?>>
+                        <?php echo $block->escapeHtml($typeName) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Credit Card Number')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <div id="<?php echo /* @noEscape */ $code ?>_cc_number"
+                 class="admin__control-text shosted-control"></div>
+            <div class="shosted-error">
+                <?php echo $block->escapeHtml(__('Please, enter valid Credit Card Number')) ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Expiration Date')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <div class="shosted-date-wrap">
+                <div id="<?php echo /* @noEscape */ $code ?>_cc_exp"
+                     class="admin__control-text shosted-control shosted-date"></div>
+
+                <div class="shosted-error">
+                    <?php echo $block->escapeHtml(__('Please, enter valid Expiration Date')) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php if ($block->hasVerification()) :?>
+        <div class="admin__field _required">
+            <label class="label admin__field-label">
+                <span><?php echo $block->escapeHtml(__('Card Verification Number')) ?></span>
+            </label>
+            <div class="admin__field-control control">
+                <div id="<?php echo /* @noEscape */ $code ?>_cc_cid"
+                     class="admin__control-text shosted-control shosted-cid"></div>
+
+                <div class="shosted-error">
+                    <?php echo $block->escapeHtml(__('Please, enter valid Card Verification Number')) ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="button"
+                    class="action action-save primary"
+                    data-action="save-cc"
+                    title="<?= $escaper->escapeHtmlAttr(__('Add')) ?>">
+                <span><?= $escaper->escapeHtml(__('Add')) ?></span>
+            </button>
+        </div>
+    </div>
+</admin__fieldset>

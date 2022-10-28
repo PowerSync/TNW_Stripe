@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="TNW_Stripe::menu" title="TNW Stripe">
+                    <resource id="TNW_Stripe::payment_info" title="View Payment Info"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

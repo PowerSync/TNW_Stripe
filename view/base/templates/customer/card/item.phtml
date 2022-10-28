@@ -1,0 +1,58 @@
+<?php
+/**
+ * TNW_Stripe extension
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the OSL 3.0 License
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  TNW
+ * @package   TNW_Stripe
+ * @copyright Copyright (c) 2017-2022
+ * @license   Open Software License (OSL 3.0)
+ */
+
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+
+/** @var \TNW\Stripe\Block\Customer\CardRenderer $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+<li class="stored-cards-item<?php if ($block->getToken()->getExpiresAt() != '' && strtotime($block->getToken()->getExpiresAt()) < time()): ?> expired<?php endif; ?>">
+    <div class="stored-cards-item-actions">
+        <form class="form"
+              action="<?= $escaper->escapeUrl($block->getUrl('customer/storedcards/delete', ['_current' => true])) ?>"
+              method="post"
+              enctype="multipart/form-data"
+        >
+            <?= $block->getBlockHtml('formkey') ?>
+            <input
+                name="<?= /* @noEscape */ PaymentTokenInterface::PUBLIC_HASH ?>"
+                value="<?= /* @noEscape */ $block->getToken()->getPublicHash() ?>"
+                type="hidden"/>
+            <button class="action-delete danger-zone" type="submit">
+                <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
+            </button>
+        </form>
+    </div>
+    <div>
+        <div class="cc-image">
+            <?php if (!empty($block->getToken()->getType())): ?>
+                <img src="<?= /* @noEscape */ $block->getIconUrl() ?>"
+                     width="<?= /* @noEscape */ $block->getIconWidth() ?>"
+                     height="<?= /* @noEscape */ $block->getIconHeight() ?>"
+                >
+            <?php endif; ?>
+        </div>
+        <div class="additional-data">
+            <span>
+                <?= $escaper->escapeHtml(__('ending %1', $block->getNumberLast4Digits())) ?>
+            </span>
+            <?php if ($block->getExpDate() != ''): ?>
+                <small><?= $escaper->escapeHtml(__('(Expires %1)', $block->getExpDate())); ?></small>
+            <?php endif; ?>
+        </div>
+    </div>
+</li>

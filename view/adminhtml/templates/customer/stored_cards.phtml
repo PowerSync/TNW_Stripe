@@ -1,0 +1,75 @@
+<?php
+/**
+ * TNW_Stripe extension
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the OSL 3.0 License
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  TNW
+ * @package   TNW_Stripe
+ * @copyright Copyright (c) 2017-2022
+ * @license   Open Software License (OSL 3.0)
+ */
+
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \TNW\Stripe\ViewModel\StoredCards $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+
+use Magento\Vault\Block\TokenRendererInterface;
+
+$viewModel = $block->getViewModel();
+?>
+<div class="fieldset-wrapper" id="stored-cards-info">
+    <div class="fieldset-wrapper-content">
+        <div class="manage-stored-card">
+            <div class="ui-tabs">
+                <?php if ($viewModel->isStoredCardsExist()): ?>
+                    <ul class="cards-list ui-tabs-nav">
+                        <?php foreach ($viewModel->getCustomerTokens() as $token): ?>
+                            <?php $cardRenderer = $block->getChildBlock('storedcard.item'); ?>
+                            <?php if ($cardRenderer instanceof TokenRendererInterface && $cardRenderer->canRender($token)): ?>
+                                <?= $cardRenderer->render($token); ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="message info empty">
+                                    <span>
+                                        <?= $escaper->escapeHtml(__('There are currently no active stored cards.')); ?>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                <?php endif; ?>
+                <div class="new-cc-item-content">
+                    <div class="block-title">
+                        <h2><?= $escaper->escapeHtml(__('Add A Credit Card')); ?></h2>
+                    </div>
+                    <?php $ccFormBlock = $block->getChildBlock('storedcard.form')->setMethod($viewModel->getPaymentMethodInstance()) ?>
+                    <?= $ccFormBlock->toHtml(); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?= $block->getChildHtml('tnw_stripe_payment_script') ?>
+    <?php
+    $scriptString = <<<script
+require([
+    'jquery'
+], function ($) {
+    $('body').trigger('contentUpdated');
+});
+script;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+</div>
