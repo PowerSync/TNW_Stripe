@@ -5,5 +5,8 @@
         <route id="tnw_stripe" frontName="tnw_stripe">
             <module before="Magento_Backend" name="TNW_Stripe"/>
         </route>
+        <route id="customer" frontName="customer">
+            <module name="TNW_Stripe" after="Magento_Customer" />
+        </route>
     </router>
 </config>

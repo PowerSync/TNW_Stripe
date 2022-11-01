@@ -15,6 +15,8 @@
  */
 namespace TNW\Stripe\Block;
 
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
 use TNW\Stripe\Model\Ui\ConfigProvider;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
@@ -30,30 +32,42 @@ class Payment extends Template
     private $config;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * Constructor
      *
      * @param Context $context
      * @param ConfigProvider $config
+     * @param SerializerInterface $serializer
      * @param array $data
      */
     public function __construct(
         Context $context,
         ConfigProvider $config,
+        SerializerInterface $serializer,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->config = $config;
+        $this->serializer = $serializer;
     }
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getPaymentConfig()
     {
         $payment = $this->config->getConfig()['payment'];
         $config = $payment[$this->getCode()];
         $config['code'] = $this->getCode();
-        return json_encode($config, JSON_UNESCAPED_SLASHES);
+        if ($store = $this->_storeManager->getStore()) {
+            $config['currencyCode'] = $store->getCurrentCurrencyCode();
+        }
+        return $this->serializer->serialize($config);
     }
 
     /**

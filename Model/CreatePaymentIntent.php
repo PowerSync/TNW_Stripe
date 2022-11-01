@@ -28,7 +28,7 @@ use TNW\Stripe\Helper\Payment\Formatter;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use TNW\Stripe\Helper\Customer as CustomerHelper;
 use Magento\Framework\UrlInterface;
-
+use Magento\Store\Model\StoreManagerInterface;
 /**
  * Class CreatePaymentIntent - model used to create payment intent from quote
  */
@@ -78,12 +78,19 @@ class CreatePaymentIntent
     private $customerRepository;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * CreatePaymentIntent constructor.
      * @param StripeAdapterFactory $adapterFactory
      * @param CustomerHelper $customerHelper
      * @param UrlInterface $url
      * @param PaymentTokenManagementInterface $tokenManagement
      * @param VaultTokenProcessor $vaultTokenProcessor
      * @param CustomerRepositoryInterface $customerRepository
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         StripeAdapterFactory $adapterFactory,
@@ -91,8 +98,10 @@ class CreatePaymentIntent
         UrlInterface $url,
         PaymentTokenManagementInterface $tokenManagement,
         VaultTokenProcessor $vaultTokenProcessor,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        StoreManagerInterface $storeManager
     ) {
+        $this->storeManager = $storeManager;
         $this->vaultTokenProcessor = $vaultTokenProcessor;
         $this->url = $url;
         $this->adapterFactory = $adapterFactory;
@@ -141,6 +150,26 @@ class CreatePaymentIntent
             'metadata' => ['site' => $this->url->getBaseUrl()]
         ];
         $email = $quote->getCustomerEmail();
+        if (!$email && property_exists($data, 'customerEmail')) {
+            $email = $data->customerEmail;
+            if ($email) {
+                $websites = $this->storeManager->getWebsites();
+                foreach ($websites as $website) {
+                    try {
+                        $customer = $this->customerRepository->get($email, $website->getId());
+                    } catch (\Exception $e) {
+                        $exception = $e;
+                    }
+                }
+                if (!$customer->getId() && isset($exception))  {
+                    throw new LocalizedException(
+                        __('Customer with provided email does not exists.')
+                    );
+                }
+                $store = $this->storeManager->getStore($customer->getStoreId());
+                $attributes['metadata']['site'] =  $store->getBaseUrl();
+            }
+        }
         if (!$isLoggedIn) {
             $attributes['description'] = 'guest';
         }

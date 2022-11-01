@@ -41,12 +41,16 @@ class TransactionSale extends AbstractTransaction
                 if ($this->getCurrentUrl() === $this->getAdminOrdersUrl() && !isset($data['customer'])) {
                     unset($data['payment_method']);
                 } else {
-                    if (isset($data['payment_method']) && $data['payment_method']) {
+                    if (isset($data['payment_method'])
+                        && $data['payment_method']
+                        && !isset($data['set_pm'])
+                    ) {
                         unset($data['pi']);
                     }
                     unset($data['source']);
                 }
             }
+            unset($data['set_pm']);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->logger->debug($e->getMessage());
         } catch (\Exception $e) {

@@ -37,7 +37,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_SDK_URL = 'sdk_url';
     const RECEIPT_EMAIL = 'receipt_email';
 
-
     /**
      * @var \Magento\Framework\Serialize\Serializer\Json
      */
