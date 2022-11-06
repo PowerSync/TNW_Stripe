@@ -22,13 +22,14 @@
 
 $viewModel = $block->getViewModel();
 $email = $viewModel ? $viewModel->getCustomer()->getEmail() : null;
-
+$customerDefaultBillingAddress = $viewModel ? $viewModel->getCustomerDefaultBillingAddressData() : null;
 ?>
 <script type="text/x-magento-init">
 {
     "#stored-cards-info": {
         "TNW_Stripe/js/customer/card/stripe": {
             "customerEmail" : "<?= $escaper->escapeHtml($email) ?>",
+            "customerDefaultBillingAddress" : <?= /* @noEscape */ json_encode($customerDefaultBillingAddress) ?>,
             "clientConfig" : <?= /* @noEscape */ $block->getPaymentConfig(); ?>
         }
     }
