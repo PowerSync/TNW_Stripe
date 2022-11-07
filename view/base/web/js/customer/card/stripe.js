@@ -11,7 +11,8 @@ define([
     $.widget('tnw.stripeStoredCards', {
         options: {
             clientConfig: {},
-            customerEmail: null
+            customerEmail: null,
+            customerDefaultBillingAddress: null
         },
         apiClient: null,
         paymentToken: null,
@@ -34,7 +35,11 @@ define([
             var self = this
             $('body').trigger('processStart');
 
-            this.createPaymentMethod('card', this.stripeCardNumber).done(function (response) {
+            this.createPaymentMethod(
+                'card',
+                this.stripeCardNumber,
+                {'billing_details': self.getOwnerData()}
+            ).done(function (response) {
                 let card = response.paymentMethod.card
 
                 self.additionalData = {
@@ -268,6 +273,40 @@ define([
                 }
             })
         },
+
+        /**
+         * Address
+         * @return {{}|{name: string, address_country: string, address_line1: *}}
+         */
+        getOwnerData: function () {
+            var billingAddress = this.options.customerDefaultBillingAddress;
+            if (!billingAddress) {
+                return {};
+            }
+
+            var stripeData = {
+                name: billingAddress.firstname + ' ' + billingAddress.lastname,
+                address: {
+                    country: billingAddress.countryId,
+                    line1: billingAddress.street[0],
+                    city: billingAddress.city
+                }
+            };
+
+            if (billingAddress.street.length === 2) {
+                stripeData.address.line2 = billingAddress.street[1];
+            }
+
+            if (billingAddress.hasOwnProperty('postcode')) {
+                stripeData.address.postal_code = billingAddress.postcode;
+            }
+
+            if (billingAddress.hasOwnProperty('regionCode')) {
+                stripeData.address.state = billingAddress.regionCode;
+            }
+
+            return stripeData;
+        }
     })
 
     return $.tnw.stripeStoredCards;
