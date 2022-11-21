@@ -59,6 +59,7 @@ class TokenDataBuilder implements BuilderInterface
         }
         if ($pi = $payment->getAdditionalInformation('payment_method_token')) {
             $result['pi'] = $pi;
+            $result['set_pm'] = true;
             if (isset($paymentMethod)) {
                 $result[self::SOURCE] = $paymentMethod;
             }
