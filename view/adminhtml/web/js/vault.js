@@ -98,13 +98,13 @@ define([
 
         /**
          * Store payment details
-         * @param {String} nonce
+         * @param {String} token
          */
-        setPaymentDetails: function (nonce) {
+        setPaymentDetails: function (token) {
             this.createPublicHashSelector();
 
             this.$selector.find('[name="payment[public_hash]"]').val(this.publicHash);
-            this.$selector.find('[name="payment[payment_method_nonce]"]').val(nonce).prop('disabled', false);
+                this.$selector.find('[name="payment[payment_method_token]"]').val(token).prop('disabled', false);
         },
 
         /**
@@ -113,12 +113,12 @@ define([
         createPublicHashSelector: function () {
             var $input;
 
-            if (this.$selector.find('[name="payment[payment_method_nonce]"]').size() === 0) {
+            if (this.$selector.find('[name="payment[payment_method_token]"]').size() === 0) {
                 $input = $('<input>').attr(
                     {
                         type: 'hidden',
-                        id: 'nonce_' + this.getCode(),
-                        name: 'payment[payment_method_nonce]'
+                        id: 'token_' + this.getCode(),
+                        name: 'payment[payment_method_token]'
                     }
                 );
 
