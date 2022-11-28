@@ -17,6 +17,7 @@
 namespace TNW\Stripe\ViewModel;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\RequestInterface;
@@ -198,5 +199,43 @@ class StoredCards implements ArgumentInterface
             return null;
         }
         return null;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getCustomerDefaultBillingAddressData()
+    {
+        $customer = $this->getCustomer();
+        if (!$customer) {
+            return null;
+        }
+
+        $defaultBillingAddress = null;
+        foreach ($customer->getAddresses() as $address) {
+            if ($address->isDefaultBilling()) {
+                $defaultBillingAddress = $address;
+                break;
+            }
+        }
+
+        return $defaultBillingAddress ? $this->formatBillingAddress($defaultBillingAddress) : null;
+    }
+
+    /**
+     * @param AddressInterface $address
+     * @return array
+     */
+    private function formatBillingAddress(AddressInterface $address)
+    {
+        return [
+            'firstname' => $address->getFirstname(),
+            'lastname' => $address->getLastname(),
+            'countryId' => $address->getCountryId(),
+            'street' => $address->getStreet(),
+            'city' => $address->getCity(),
+            'postcode' => $address->getPostcode(),
+            'regionCode' => $address->getRegion()->getRegionCode(),
+        ];
     }
 }
