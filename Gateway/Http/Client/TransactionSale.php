@@ -51,6 +51,12 @@ class TransactionSale extends AbstractTransaction
                 }
             }
             unset($data['set_pm']);
+            if (isset($data['payment_method'])
+                && isset($data['source'])
+                && $data['source'] == $data['payment_method']
+            ) {
+                unset($data['source']);
+            }
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->logger->debug($e->getMessage());
         } catch (\Exception $e) {

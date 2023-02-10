@@ -147,6 +147,10 @@ class StripeAdapter
         } elseif (isset($attributes['email'])) {
             foreach (Customer::all() as $customer) {
                 if ($attributes['email'] == $customer->email
+                    && isset($customer->metadata)
+                    && isset($customer->metadata->site)
+                    && isset($attributes['metadata'])
+                    && isset( $attributes['metadata']['site'])
                     && $customer->metadata->site == $attributes['metadata']['site']
                 ) {
                     return $customer;
