@@ -219,17 +219,8 @@ define([
 
             this.createPaymentMethod('card', this.stripeCardNumber, this.getOwnerData())
             .done(function (response) {
-                let card = response.paymentMethod.card,
-                    currencyCode = $('#currency_switcher').val(),
+                let currencyCode = $('#currency_switcher').val(),
                     amount = $('#grand-total .price').text().replace(/([^0-9.])/g, '')
-
-                if (!card.three_d_secure_usage.supported) {
-                    self.setPaymentMethodToken(response.paymentMethod.id);
-                    self.placeOrder();
-                    $('body').trigger('processStop');
-                    return;
-                }
-
                 self.createPaymentIntent({
                     paymentMethod: response.paymentMethod,
                     amount: amount,
