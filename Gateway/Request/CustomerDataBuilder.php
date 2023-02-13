@@ -56,7 +56,7 @@ class CustomerDataBuilder implements BuilderInterface
         $payment = $paymentDataObject->getPayment();
         $token = $payment->getAdditionalInformation('cc_token');
 
-        if (strpos($token, 'pm_') !== false) {
+        if ($token && strpos($token, 'pm_') !== false) {
             $pm = $token;
         } else {
             $stripeAdapter = $this->adapterFactory->create();
