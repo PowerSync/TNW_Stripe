@@ -16,6 +16,8 @@
 namespace TNW\Stripe\Model\Adapter;
 
 use Stripe\Customer;
+use Stripe\Exception\ApiErrorException;
+use Stripe\PaymentMethod;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
@@ -49,7 +51,7 @@ class StripeAdapter
      * @param $transactionId
      * @param null $amount
      * @return mixed
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function refund($transactionId, $amount = null)
     {
@@ -73,7 +75,7 @@ class StripeAdapter
     /**
      * @param array $attributes
      * @return Charge|PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function sale(array $attributes)
     {
@@ -108,7 +110,7 @@ class StripeAdapter
      * @param $transactionId
      * @param null $amount
      * @return PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function capture($transactionId, $amount = null)
     {
@@ -123,7 +125,7 @@ class StripeAdapter
     /**
      * @param $transactionId
      * @return PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function void($transactionId)
     {
@@ -134,7 +136,7 @@ class StripeAdapter
     /**
      * @param array $attributes
      * @return Customer
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function customer(array $attributes)
     {
@@ -150,7 +152,7 @@ class StripeAdapter
                     && isset($customer->metadata)
                     && isset($customer->metadata->site)
                     && isset($attributes['metadata'])
-                    && isset( $attributes['metadata']['site'])
+                    && isset($attributes['metadata']['site'])
                     && $customer->metadata->site == $attributes['metadata']['site']
                 ) {
                     return $customer;
@@ -163,7 +165,7 @@ class StripeAdapter
     /**
      * @param array $attributes
      * @return PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function createPaymentIntent(array $attributes)
     {
@@ -173,7 +175,7 @@ class StripeAdapter
     /**
      * @param $transactionId
      * @return PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function retrievePaymentIntent($transactionId)
     {
@@ -184,7 +186,7 @@ class StripeAdapter
      * @param $paymentIntentId
      * @param $params
      * @return PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function updatePaymentIntent($paymentIntentId, $params)
     {
@@ -194,7 +196,7 @@ class StripeAdapter
     /**
      * @param $transactionId
      * @return PaymentIntent
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function cancelPaymentIntent($transactionId)
     {
@@ -205,7 +207,7 @@ class StripeAdapter
      * @param $id
      * @param $attributes
      * @return Customer
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function updateCustomer($id, $attributes)
     {
@@ -215,7 +217,7 @@ class StripeAdapter
     /**
      * @param $customerId
      * @return Customer
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function retrieveCustomer($customerId)
     {
@@ -225,7 +227,7 @@ class StripeAdapter
     /**
      * @param $customerId
      * @return \Stripe\Collection
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function retrieveCustomerPaymentMethods($customerId)
     {
@@ -239,11 +241,23 @@ class StripeAdapter
     /**
      * @param $id
      * @param array $customerData
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function attachPaymentMethodToCustomer($id, array $customerData)
     {
         $stripeClient = new StripeClient(Stripe::getApiKey());
         $stripeClient->paymentMethods->attach($id, $customerData);
+    }
+
+    /**
+     * @param string $id
+     * @param array $data
+     * @return PaymentMethod
+     * @throws ApiErrorException
+     */
+    public function updatePaymentMethod(string $id, array $data)
+    {
+        $stripeClient = new StripeClient(Stripe::getApiKey());
+        return $stripeClient->paymentMethods->update($id, $data);
     }
 }

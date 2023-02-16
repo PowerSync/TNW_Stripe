@@ -411,4 +411,9 @@
     </type>
     <preference for="TNW\Stripe\Api\StoredCardsManagementInterface"
                 type="TNW\Stripe\Model\Customer\StoredCardsManagement"/>
+
+    <type name="Magento\Vault\Model\Method\Vault">
+        <plugin name="stripe_vault_payment_method_plugin"
+                type="TNW\Stripe\Plugin\Vault\Model\Method\Vault"/>
+    </type>
 </config>
