@@ -226,9 +226,11 @@ define([
          */
         getOwnerData: function () {
             var billingAddress = quote.billingAddress();
+            var email = quote.guestEmail;
 
             var stripeData = {
                 name: billingAddress.firstname + ' ' + billingAddress.lastname,
+                email: email,
                 address: {
                     country: billingAddress.countryId,
                     line1: billingAddress.street[0],
