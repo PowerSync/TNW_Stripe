@@ -254,7 +254,7 @@ class StripeAdapter
      * @return PaymentMethod
      * @throws ApiErrorException
      */
-    public function retrievePaymentMethod(string $id): PaymentMethod
+    public function retrievePaymentMethod(string $id)
     {
         $stripeClient = new StripeClient(Stripe::getApiKey());
         return $stripeClient->paymentMethods->retrieve($id);
@@ -266,7 +266,7 @@ class StripeAdapter
      * @return PaymentMethod
      * @throws ApiErrorException
      */
-    public function updatePaymentMethod(string $id, array $data): PaymentMethod
+    public function updatePaymentMethod(string $id, array $data)
     {
         $stripeClient = new StripeClient(Stripe::getApiKey());
         return $stripeClient->paymentMethods->update($id, $data);
