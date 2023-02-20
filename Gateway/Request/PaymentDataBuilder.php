@@ -84,7 +84,16 @@ class PaymentDataBuilder implements BuilderInterface
 
         if ($token = $payment->getAdditionalInformation('cc_token')) {
             if (strpos($token, 'pi_') !== false) {
-                $result[self::PI] = $token;
+                $order = $payment->getOrder();
+                if ($order
+                    && method_exists($order,'getBaseTotalInvoiced')
+                    && $order->getBaseTotalInvoiced()
+                    && $order->getTotalDue()
+                ) {
+                    unset($result[self::PI]);
+                } else {
+                    $result[self::PI] = $token;
+                }
             } else {
                 $result[self::PAYMENT_METHOD] = $token;
             }
