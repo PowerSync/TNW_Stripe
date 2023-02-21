@@ -89,6 +89,7 @@ class PaymentDataBuilder implements BuilderInterface
                     && method_exists($order,'getBaseTotalInvoiced')
                     && $order->getBaseTotalInvoiced()
                     && $order->getTotalDue()
+                    && $order->getBaseGrandTotal() > $order->getBaseTotalInvoiced()
                 ) {
                     unset($result[self::PI]);
                 } else {
