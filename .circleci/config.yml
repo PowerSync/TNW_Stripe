@@ -356,6 +356,7 @@ jobs:
   check-composer-installation:
     <<: *base-image243
     steps:
+      - checkout
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
@@ -372,13 +373,23 @@ jobs:
             cd /var/www/html/magento/
             composer config -g http-basic.dist.powersync.biz $TECHWEB_REPO_LOGIN $TECHNWEB_REPO_PASSWORD
             composer config --global repositories.powersync composer https://dist.powersync.biz
+            composer config repositories.powersync '{"type": "composer", "url": "https://dist.powersync.biz", "canonical": false}'
+            composer config repositories.0 '{"type": "composer", "url": "https://repo.magento.com/", "canonical": false}'
 
       - run:
           name: Checkout related modules
           command: |
+            set -x
             cd /var/www/html/magento/
+            MODULE_NAME=$(grep -o '^ *"name": *"[a-zA-Z\/]*"' ~/tnw_extension/composer.json |  awk '{print $2}' | sed -e 's/"\(.*\)"/\1/g')
             for package in $PACKAGES_NAME; do
-              NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
+              if [[ "$package" == "$MODULE_NAME" ]];
+              then
+                NEW_MODULE_VERSION=$(grep -o '^ *"version": *"[0-9\.]*"' ~/tnw_extension/composer.json | awk '{print $2}' | sed -e 's/"\(.*\)"/\1/g')
+              else
+                NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
+              fi
+              echo $NEW_MODULE_VERSION
               composer require $package=$NEW_MODULE_VERSION
             done
 
