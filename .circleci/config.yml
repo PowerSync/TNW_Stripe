@@ -50,6 +50,7 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+    resource_class: large
     working_directory: ~/tnw_extension
     steps:
       - checkout
@@ -137,6 +138,8 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+    resource_class: large
+    working_directory: ~/tnw_extension
     steps:
       - checkout
       - run:
