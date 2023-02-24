@@ -91,7 +91,7 @@ abstract class AbstractTransaction implements ClientInterface
         } catch (\Exception $e) {
             $message = __($e->getMessage() ?: 'Sorry, but something went wrong.');
             $this->logger->critical($message);
-            if (method_exists($e, "getHttpBody")) {
+            if (method_exists($e, "getHttpBody") && $e->getHttpBody() !== null) {
                 $httpBody = json_decode($e->getHttpBody(), true);
                 if (isset($httpBody['error']['payment_intent']['charges']['data'][0]['outcome']['type'])
                     && $httpBody['error']['payment_intent']['charges']['data'][0]['outcome']['type']

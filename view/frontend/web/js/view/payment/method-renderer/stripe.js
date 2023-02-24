@@ -226,9 +226,11 @@ define([
          */
         getOwnerData: function () {
             var billingAddress = quote.billingAddress();
+            var email = quote.guestEmail;
 
             var stripeData = {
                 name: billingAddress.firstname + ' ' + billingAddress.lastname,
+                email: email,
                 address: {
                     country: billingAddress.countryId,
                     line1: billingAddress.street[0],
@@ -415,7 +417,6 @@ define([
             adapter.createPaymentMethodByCart({'billing_details': self.getOwnerData()})
             .done(function (response) {
                 var card = response.paymentMethod.card,
-                    totalAmount = parseFloat(quote.totals()['base_grand_total']).toFixed(2).replace('.', ''),
                     currencyCode = quote.totals()['base_currency_code'];
                 self.additionalData = _.extend(self.additionalData, {
                     cc_exp_month: card.exp_month,
@@ -423,12 +424,6 @@ define([
                     cc_last4: card.last4,
                     cc_type: card.brand
                 });
-                if (!card.three_d_secure_usage.supported) {
-                    self.setPaymentMethodToken(response.paymentMethod.id);
-                    self.placeOrder();
-                    fullScreenLoader.stopLoader(true);
-                    return;
-                }
 
                 adapter.createPaymentIntent({
                     paymentMethod: response.paymentMethod,

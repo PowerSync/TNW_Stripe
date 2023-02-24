@@ -58,7 +58,17 @@ class TokenDataBuilder implements BuilderInterface
             $result['payment_method'] = $paymentMethod;
         }
         if ($pi = $payment->getAdditionalInformation('payment_method_token')) {
-            $result['pi'] = $pi;
+            $order = $payment->getOrder();
+            if ($order
+                && method_exists($order,'getBaseTotalInvoiced')
+                && $order->getBaseTotalInvoiced()
+                && $order->getTotalDue()
+                && $order->getBaseGrandTotal() > $order->getBaseTotalInvoiced()
+            ) {
+                unset($result['pi']);
+            } else {
+                $result['pi'] = $pi;
+            }
             $result['set_pm'] = true;
             if (isset($paymentMethod)) {
                 $result[self::SOURCE] = $paymentMethod;
