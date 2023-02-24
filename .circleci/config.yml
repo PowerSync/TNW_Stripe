@@ -460,14 +460,14 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - /.*/
 
       - m243-open_source-php74:
           context: powersync
           filters:
             branches:
               only:
-                - master
+                - /.*/
 
       - m244-commerce-php81:
           context: powersync
