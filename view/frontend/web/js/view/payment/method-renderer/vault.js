@@ -1,15 +1,22 @@
 define([
-    'Magento_Vault/js/view/payment/method-renderer/vault',
-    'TNW_Stripe/js/view/payment/adapter',
-    'Magento_Checkout/js/model/quote',
-    'Magento_Checkout/js/model/full-screen-loader'
-], function (VaultComponent, adapter, quote, fullScreenLoader) {
-    'use strict';
+    "Magento_Vault/js/view/payment/method-renderer/vault",
+    "TNW_Stripe/js/view/payment/adapter",
+    "Magento_Checkout/js/model/quote",
+    "Magento_Checkout/js/model/full-screen-loader",
+    "Magento_Checkout/js/action/redirect-on-success",
+], function (
+    VaultComponent,
+    adapter,
+    quote,
+    fullScreenLoader,
+    redirectOnSuccessAction
+) {
+    "use strict";
 
     return VaultComponent.extend({
         defaults: {
-            template: 'Magento_Vault/payment/form',
-            paymentMethodToken: false
+            template: "Magento_Vault/payment/form",
+            paymentMethodToken: false,
         },
 
         /**
@@ -26,13 +33,16 @@ define([
             var self = this;
 
             fullScreenLoader.startLoader();
-            adapter.createPaymentIntent({
+            this.isPlaceOrderActionAllowed(false);
+
+            adapter
+            .createPaymentIntent({
                 public_hash: this.publicHash,
-                amount: quote.totals()['base_grand_total'],
-                currency: quote.totals()['base_currency_code']
-            }).done(function (response) {
+                amount: quote.totals()["base_grand_total"],
+                currency: quote.totals()["base_currency_code"],
+            })
+            .done(function (response) {
                 if (response.skip_3ds) {
-                    fullScreenLoader.stopLoader(true);
                     self.setPaymentMethodToken(response.paymentIntent.id);
                     self.placeOrder();
                     return;
@@ -47,18 +57,44 @@ define([
                     if (error) {
                         self.isPlaceOrderActionAllowed(true);
                         self.setPaymentMethodToken(false);
-                        self.messageContainer.addErrorMessage({message: "3D Secure authentication failed."});
+                        self.messageContainer.addErrorMessage({
+                            message: "3D Secure authentication failed.",
+                        });
                     } else {
                         self.setPaymentMethodToken(response.paymentIntent.id);
                         self.placeOrder();
                     }
-                    fullScreenLoader.stopLoader(true);
-
                 });
-            }).fail(function () {
+            })
+            .fail(function () {
                 fullScreenLoader.stopLoader(true);
                 self.isPlaceOrderActionAllowed(true);
                 self.setPaymentMethodToken(false);
+            });
+        },
+
+        /**
+         * Place order.
+         */
+        placeOrder: function (data, event) {
+            var self = this;
+
+            if (event) {
+                event.preventDefault();
+            }
+            this.getPlaceOrderDeferredObject()
+            .done(function () {
+                self.afterPlaceOrder();
+
+                if (self.redirectAfterPlaceOrder) {
+                    redirectOnSuccessAction.execute();
+                }
+            })
+            .fail(function () {
+                self.isPlaceOrderActionAllowed(true);
+            })
+            .always(function () {
+                fullScreenLoader.stopLoader(true);
             });
         },
 
@@ -83,12 +119,12 @@ define([
          */
         getData: function () {
             var data = {
-                method: this.getCode()
+                method: this.getCode(),
             };
 
-            data['additional_data'] = {};
-            data['additional_data']['public_hash'] = this.getToken();
-            data['additional_data']['payment_method_token'] = this.paymentMethodToken;
+            data["additional_data"] = {};
+            data["additional_data"]["public_hash"] = this.getToken();
+            data["additional_data"]["payment_method_token"] = this.paymentMethodToken;
 
             return data;
         },
@@ -98,7 +134,7 @@ define([
          * @param token
          */
         setPaymentMethodToken: function (token) {
-            this.paymentMethodToken = token
-        }
+            this.paymentMethodToken = token;
+        },
     });
 });
