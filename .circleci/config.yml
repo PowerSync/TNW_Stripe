@@ -389,7 +389,7 @@ jobs:
               else
                 NEW_MODULE_VERSION=(`composer show -al $package -f json|jq -r '.versions'|grep 2.3.\[0-9\]\*|head -n1`);
               fi
-              composer require $package=$NEW_MODULE_VERSION
+              composer require $package=$NEW_MODULE_VERSION --no-plugins
             done
 
       - run:
