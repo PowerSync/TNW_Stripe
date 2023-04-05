@@ -9,6 +9,7 @@ define([
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/payment/additional-validators',
+    'Magento_Checkout/js/action/redirect-on-success',
     'stripejs'
 ], function (
     $,
@@ -20,7 +21,8 @@ define([
     featherlight,
     VaultEnabler,
     quote,
-    additionalValidators
+    additionalValidators,
+    redirectOnSuccessAction
 ) {
     'use strict';
 
@@ -413,6 +415,7 @@ define([
             }
 
             fullScreenLoader.startLoader();
+            this.isPlaceOrderActionAllowed(false);
 
             adapter.createPaymentMethodByCart({'billing_details': self.getOwnerData()})
             .done(function (response) {
@@ -432,7 +435,6 @@ define([
                     shipping: self.getShippingData()
                 }).done(function (response) {
                     if (response.skip_3ds) {
-                        fullScreenLoader.stopLoader(true);
                         self.setPaymentMethodToken(response.paymentIntent.id);
                         self.placeOrder();
                         return;
@@ -453,8 +455,6 @@ define([
                             self.additionalData = _.extend(self.additionalData, {'cc_3ds': true});
                             self.placeOrder();
                         }
-                        fullScreenLoader.stopLoader(true);
-
                     });
                 }).fail(function () {
                     fullScreenLoader.stopLoader(true);
@@ -465,9 +465,40 @@ define([
                 self.isPlaceOrderActionAllowed(true);
             });
         },
+
+        /**
+         * Place order.
+         */
+        placeOrder: function (data, event) {
+            var self = this;
+
+            if (event) {
+                event.preventDefault();
+            }
+            this.getPlaceOrderDeferredObject()
+            .done(
+                function () {
+                    self.afterPlaceOrder();
+
+                    if (self.redirectAfterPlaceOrder) {
+                        redirectOnSuccessAction.execute();
+                    }
+                }
+            ).fail(
+                function () {
+                    self.isPlaceOrderActionAllowed(true);
+                }
+            ).always(
+                function () {
+                    fullScreenLoader.stopLoader(true);
+                }
+            );
+        },
+
         getReturnUrl: function () {
             return window.checkoutConfig.payment[this.getCode()].returnUrl;
         },
+
         getImgLoadingUrl: function () {
             return window.checkoutConfig.payment[this.getCode()].imgLoading;
         }
