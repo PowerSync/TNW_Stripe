@@ -119,7 +119,14 @@ class VaultDetailsHandler implements HandlerInterface
         if (!$paymentToken) {
             /** @var \Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken */
             $paymentToken = $this->paymentTokenFactory->create();
-            $paymentToken->setGatewayToken($transaction['customer'] . '/' . $transaction['payment_method']);
+            if (!isset($transaction['customer']) && isset($transaction['object']) && $transaction['object'] == 'customer') {
+                $customer = $transaction['id'];
+                $paymentMethod = $transaction['invoice_settings']['default_payment_method'];
+            } else {
+                $customer = $transaction['customer'];
+                $paymentMethod = $transaction['payment_method'];
+            }
+            $paymentToken->setGatewayToken($customer . '/' . $paymentMethod);
             $paymentToken->setExpiresAt($this->getExpirationDate($expirationMonth, $expirationYear));
 
             $paymentToken->setTokenDetails($this->convertDetailsToJSON([
