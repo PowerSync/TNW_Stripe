@@ -144,6 +144,9 @@ class CreatePaymentIntent
             $currency = $data->currency;
         } else {
             $currency = $quote->getQuoteCurrencyCode();
+            if (!$currency && $quote->getStoreId()) {
+                $currency = $this->storeManager->getStore($quote->getStoreId())->getCurrentCurrencyCode();
+            }
         }
         $attributes = [
             'payment_method' => $payment,
