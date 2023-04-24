@@ -20,13 +20,6 @@ define([
         },
 
         /**
-         * @returns {exports}
-         */
-        initObservable: function () {
-            return this;
-        },
-
-        /**
          * Place order
          */
         placeOrderClick: function () {
@@ -66,7 +59,11 @@ define([
                     }
                 });
             })
-            .fail(function () {
+            .fail(function (e) {
+                self.messageContainer.addErrorMessage({
+                    message: e.responseJSON.message
+                        || $t('An error occurred on the server.')
+                })
                 fullScreenLoader.stopLoader(true);
                 self.isPlaceOrderActionAllowed(true);
                 self.setPaymentMethodToken(false);
@@ -90,7 +87,11 @@ define([
                     redirectOnSuccessAction.execute();
                 }
             })
-            .fail(function () {
+            .fail(function (e) {
+                self.messageContainer.addErrorMessage({
+                    message: e.responseJSON.message
+                        || $t('An error occurred on the server.')
+                })
                 self.isPlaceOrderActionAllowed(true);
             })
             .always(function () {

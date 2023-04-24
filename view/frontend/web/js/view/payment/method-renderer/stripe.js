@@ -30,8 +30,6 @@ define([
         defaults: {
             active: false,
             template: 'TNW_Stripe/payment/form',
-            ccCode: null,
-            ccMessageContainer: null,
             paymentMethodToken: null,
             isValidCardNumber: false,
 
@@ -159,36 +157,7 @@ define([
             if (!isActive) {
                 return;
             }
-
-            this.restoreMessageContainer();
-            this.restoreCode();
-
             this.initStripe();
-        },
-
-        /**
-         * Restore original message container for cc-form component
-         */
-        restoreMessageContainer: function () {
-            this.messageContainer = this.ccMessageContainer;
-        },
-
-        /**
-         * Restore original code for cc-form component
-         */
-        restoreCode: function () {
-            this.code = this.ccCode;
-        },
-
-        /**
-         * @inheritdoc
-         */
-        initChildren: function () {
-            this._super();
-            this.ccMessageContainer = this.messageContainer;
-            this.ccCode = this.code;
-
-            return this;
         },
 
         getData: function () {
@@ -456,11 +425,19 @@ define([
                             self.placeOrder();
                         }
                     });
-                }).fail(function () {
+                }).fail(function (e) {
+                    self.messageContainer.addErrorMessage({
+                        message: e.responseJSON.message
+                            || $t('An error occurred on the server.')
+                    })
                     fullScreenLoader.stopLoader(true);
                     self.isPlaceOrderActionAllowed(true);
                 });
-            }).fail(function () {
+            }).fail(function (e) {
+                self.messageContainer.addErrorMessage({
+                    message: e.responseJSON.message
+                        || $t('An error occurred on the server.')
+                })
                 fullScreenLoader.stopLoader(true);
                 self.isPlaceOrderActionAllowed(true);
             });
@@ -485,7 +462,11 @@ define([
                     }
                 }
             ).fail(
-                function () {
+                function (e) {
+                    self.messageContainer.addErrorMessage({
+                        message: e.responseJSON.message
+                            || $t('An error occurred on the server.')
+                    })
                     self.isPlaceOrderActionAllowed(true);
                 }
             ).always(
