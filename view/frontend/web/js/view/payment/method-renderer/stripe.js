@@ -193,18 +193,17 @@ define([
          * @return {{name: string, address_country: string, address_line1: *}}
          */
         getOwnerData: function () {
-            var billingAddress = quote.billingAddress()
-            var email = quote.guestEmail
-
-            var stripeData = {
-                name: billingAddress.firstname + " " + billingAddress.lastname,
-                email: email,
-                address: {
-                    country: billingAddress.countryId,
-                    line1: billingAddress.street[0],
-                    city: billingAddress.city,
-                },
-            }
+            var billingAddress = quote.billingAddress(),
+                email = quote.guestEmail,
+                stripeData = {
+                    name: billingAddress.firstname + " " + billingAddress.lastname,
+                    email: email,
+                    address: {
+                        country: billingAddress.countryId,
+                        line1: billingAddress.street[0],
+                        city: billingAddress.city,
+                    },
+                }
 
             if (billingAddress.street.length === 2) {
                 stripeData.address.line2 = billingAddress.street[1]
@@ -226,9 +225,9 @@ define([
          * @return {{name: string, address_country: string, address_line1: *}}
          */
         getShippingData: function () {
-            var shippingAddress = quote.shippingAddress()
-            var virtual = quote.isVirtual()
-            var stripeData = null
+            var shippingAddress = quote.shippingAddress(),
+                virtual = quote.isVirtual(),
+                stripeData = null
 
             if (!virtual) {
                 stripeData = {
@@ -330,6 +329,7 @@ define([
         validateCvv: function () {
             let $selector = $(this.getSelector("cc_cid")),
                 invalidClass = "stripe-hosted-fields-invalid"
+
             $selector.removeClass(invalidClass)
 
             if ($selector.hasClass("StripeElement--invalid") || $selector.hasClass("StripeElement--empty")) {
@@ -359,13 +359,12 @@ define([
          * Triggers order placing
          */
         placeOrderClick: function () {
-            var self = this
-
-            let validationStatus = {
-                cartType: this.validateCardType(),
-                cvv: this.validateCvv(),
-                expirationDate: this.validateExpirationDate(),
-            }
+            var self = this,
+                validationStatus = {
+                    cartType: this.validateCardType(),
+                    cvv: this.validateCvv(),
+                    expirationDate: this.validateExpirationDate(),
+                }
 
             if (
                 !this.validate() ||
@@ -381,6 +380,11 @@ define([
             fullScreenLoader.startLoader()
             this.isPlaceOrderActionAllowed(false)
 
+            if (this.paymentMethodToken) {
+                self.placeOrder()
+                return
+            }
+
             adapter
                 .createPaymentMethodByCart({
                     billing_details: self.getOwnerData(),
@@ -390,7 +394,6 @@ define([
                         currencyCode = quote.totals()["base_currency_code"]
                     self.additionalData = _.extend(self.additionalData, {
                         cc_exp_month: card.exp_month,
-
                         cc_exp_year: card.exp_year,
                         cc_last4: card.last4,
                         cc_type: card.brand,

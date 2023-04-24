@@ -22,6 +22,11 @@ define([
             fullScreenLoader.startLoader()
             this.isPlaceOrderActionAllowed(false)
 
+            if (this.paymentMethodToken) {
+                self.placeOrder()
+                return
+            }
+
             adapter
                 .createPaymentIntent({
                     public_hash: this.publicHash,
