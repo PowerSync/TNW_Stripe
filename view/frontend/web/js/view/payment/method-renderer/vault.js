@@ -4,7 +4,8 @@ define([
     "Magento_Checkout/js/model/quote",
     "Magento_Checkout/js/model/full-screen-loader",
     "Magento_Checkout/js/action/redirect-on-success",
-], function (VaultComponent, adapter, quote, fullScreenLoader, redirectOnSuccessAction) {
+    "mage/translate",
+], function (VaultComponent, adapter, quote, fullScreenLoader, redirectOnSuccessAction, $t) {
     "use strict"
 
     return VaultComponent.extend({
@@ -50,7 +51,7 @@ define([
                             self.isPlaceOrderActionAllowed(true)
                             self.setPaymentMethodToken(false)
                             self.messageContainer.addErrorMessage({
-                                message: "3D Secure authentication failed.",
+                                message: $t("3D Secure authentication failed."),
                             })
                         } else {
                             self.setPaymentMethodToken(response.paymentIntent.id)
@@ -58,9 +59,9 @@ define([
                         }
                     })
                 })
-                .fail(function (e) {
+                .fail(function (res) {
                     self.messageContainer.addErrorMessage({
-                        message: e.responseJSON.message || $t("An error occurred on the server."),
+                        message: self.resolveErrorText(res),
                     })
                     fullScreenLoader.stopLoader(true)
                     self.isPlaceOrderActionAllowed(true)
@@ -85,9 +86,9 @@ define([
                         redirectOnSuccessAction.execute()
                     }
                 })
-                .fail(function (e) {
+                .fail(function (res) {
                     self.messageContainer.addErrorMessage({
-                        message: e.responseJSON.message || $t("An error occurred on the server."),
+                        message: self.resolveErrorText(res),
                     })
                     self.isPlaceOrderActionAllowed(true)
                 })
@@ -133,6 +134,21 @@ define([
          */
         setPaymentMethodToken: function (token) {
             this.paymentMethodToken = token
+        },
+
+        /**
+         * Resolve error text from various types of responses
+         * @param res
+         * @return {*}
+         */
+        resolveErrorText: function (res) {
+            if (res.error && res.error.message) {
+                return res.error.message
+            }
+            if (res.responseJSON && res.responseJSON.message) {
+                return res.responseJSON.message
+            }
+            return $t("An error occurred on the server.")
         },
     })
 })

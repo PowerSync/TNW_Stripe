@@ -1,5 +1,6 @@
 define([
     "jquery",
+    "mage/translate",
     "Magento_Payment/js/view/payment/cc-form",
     "Magento_Checkout/js/model/full-screen-loader",
     "Magento_Checkout/js/action/set-payment-information",
@@ -13,6 +14,7 @@ define([
     "stripejs",
 ], function (
     $,
+    $t,
     Component,
     fullScreenLoader,
     setPaymentInformationAction,
@@ -122,8 +124,15 @@ define([
              * @param {Object} event
              */
             fields.onFieldEvent = function (event) {
+                self.paymentMethodToken = null
                 self.isValidCardNumber = event.complete
                 self.selectedCardType(validator.getMageCardType(event.brand, self.getCcAvailableTypes()))
+            }
+            fields.onExpiryEvent = function () {
+                self.paymentMethodToken = null
+            }
+            fields.onCVCEvent = function () {
+                self.paymentMethodToken = null
             }
 
             return fields
@@ -422,7 +431,7 @@ define([
                                 if (error) {
                                     self.isPlaceOrderActionAllowed(true)
                                     self.messageContainer.addErrorMessage({
-                                        message: "3D Secure authentication failed.",
+                                        message: $t("3D Secure authentication failed."),
                                     })
                                 } else {
                                     self.vaultEnabler.isActivePaymentTokenEnabler(true)
@@ -434,17 +443,17 @@ define([
                                 }
                             })
                         })
-                        .fail(function (e) {
+                        .fail(function (res) {
                             self.messageContainer.addErrorMessage({
-                                message: e.responseJSON.message || $t("An error occurred on the server."),
+                                message: self.resolveErrorText(res),
                             })
                             fullScreenLoader.stopLoader(true)
                             self.isPlaceOrderActionAllowed(true)
                         })
                 })
-                .fail(function (e) {
+                .fail(function (res) {
                     self.messageContainer.addErrorMessage({
-                        message: e.responseJSON.message || $t("An error occurred on the server."),
+                        message: self.resolveErrorText(res),
                     })
                     fullScreenLoader.stopLoader(true)
                     self.isPlaceOrderActionAllowed(true)
@@ -468,15 +477,30 @@ define([
                         redirectOnSuccessAction.execute()
                     }
                 })
-                .fail(function (e) {
+                .fail(function (res) {
                     self.messageContainer.addErrorMessage({
-                        message: e.responseJSON.message || $t("An error occurred on the server."),
+                        message: self.resolveErrorText(res),
                     })
                     self.isPlaceOrderActionAllowed(true)
                 })
                 .always(function () {
                     fullScreenLoader.stopLoader(true)
                 })
+        },
+
+        /**
+         * Resolve error text from various types of responses
+         * @param res
+         * @return {*}
+         */
+        resolveErrorText: function (res) {
+            if (res.error && res.error.message) {
+                return res.error.message
+            }
+            if (res.responseJSON && res.responseJSON.message) {
+                return res.responseJSON.message
+            }
+            return $t("An error occurred on the server.")
         },
 
         getReturnUrl: function () {
