@@ -4,8 +4,9 @@ define([
     "Magento_Checkout/js/model/quote",
     "Magento_Checkout/js/model/full-screen-loader",
     "Magento_Checkout/js/action/redirect-on-success",
+    "Magento_Checkout/js/model/payment/additional-validators",
     "mage/translate",
-], function (VaultComponent, adapter, quote, fullScreenLoader, redirectOnSuccessAction, $t) {
+], function (VaultComponent, adapter, quote, fullScreenLoader, redirectOnSuccessAction, additionalValidators, $t) {
     "use strict"
 
     return VaultComponent.extend({
@@ -19,6 +20,14 @@ define([
          */
         placeOrderClick: function () {
             var self = this
+
+            if (
+                !additionalValidators.validate() ||
+                this.isPlaceOrderActionAllowed() === false ||
+                window.isGettingPi
+            ) {
+                return
+            }
 
             fullScreenLoader.startLoader()
             this.isPlaceOrderActionAllowed(false)
