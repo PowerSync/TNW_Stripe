@@ -98,16 +98,25 @@ define(["jquery", "stripejs", "Magento_Ui/js/model/messageList", "mage/translate
         createPaymentIntent: function () {
             var self = this,
                 dfd = $.Deferred()
+
+            window.isGettingPi = true
             if ($("#tnw_stripe_enable_vault").length) {
                 arguments[0].vaultEnabled = $("#tnw_stripe_enable_vault").is(":checked")
             }
-            $.post(self.getCreateUrl(), { data: JSON.stringify(arguments[0]) }).then(function (response) {
-                if (response.error) {
+            $.post(self.getCreateUrl(), { data: JSON.stringify(arguments[0]) })
+                .done(function (response) {
+                    if (response.error) {
+                        dfd.reject(response)
+                    } else {
+                        dfd.resolve(response)
+                    }
+                })
+                .fail(function (response) {
                     dfd.reject(response)
-                } else {
-                    dfd.resolve(response)
-                }
-            })
+                })
+                .always(function () {
+                    window.isGettingPi = false
+                })
             return dfd
         },
 

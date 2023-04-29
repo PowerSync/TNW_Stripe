@@ -381,7 +381,8 @@ define([
                 !validationStatus.cartType ||
                 !validationStatus.cvv ||
                 !validationStatus.expirationDate ||
-                this.isPlaceOrderActionAllowed() === false
+                this.isPlaceOrderActionAllowed() === false ||
+                window.isGettingPi
             ) {
                 return
             }
