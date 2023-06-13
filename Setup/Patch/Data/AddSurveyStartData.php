@@ -6,9 +6,9 @@ namespace TNW\Stripe\Setup\Patch\Data;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\Setup\Patch\PatchVersionInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 
-class AddSurveyStartData implements DataPatchInterface, PatchVersionInterface
+class AddSurveyStartData implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -26,11 +26,6 @@ class AddSurveyStartData implements DataPatchInterface, PatchVersionInterface
         return [];
     }
 
-    public static function getVersion()
-    {
-        return '2.1.7';
-    }
-
     public function getAliases()
     {
         return [];
@@ -40,7 +35,7 @@ class AddSurveyStartData implements DataPatchInterface, PatchVersionInterface
     {
         $this->setup->startSetup();
         $table = $this->setup->getTable('core_config_data');
-        $this->setup->getConnection()->insert(
+        $this->setup->getConnection()->insertOnDuplicate(
             $table,
             [
                 'scope' => 'default',
@@ -50,5 +45,10 @@ class AddSurveyStartData implements DataPatchInterface, PatchVersionInterface
             ]
         );
         $this->setup->endSetup();
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }
